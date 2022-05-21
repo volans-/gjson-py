@@ -16,7 +16,7 @@ __pycache__/
 /.pytest_cache/
 
 # Sphinx documentation
-/doc/_build/
+/doc/build/
 
 # pyenv
 /.python-version
