@@ -132,7 +132,7 @@ This is the list of GJSON modifiers and how they are supported by gjson-py:
 +----------------+-----------------------+-----------------------------------------+
 
 .. _`GJSON`: https://github.com/tidwall/gjson
-.. _`Python Package Index`: https://pypi.org/project/wikimedia-spicerack/
+.. _`Python Package Index`: https://pypi.org/project/gjson/
 .. _`GJSON Path Syntax`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md
 .. _`gjson-py documentation`: https://volans-.github.io/gjson-py/index.html
 
