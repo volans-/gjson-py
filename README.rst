@@ -13,19 +13,19 @@ or any Python object that is JSON-serializable.
 A detailed list of the GJSON features supported by gjson-py is provided below.
 
 Installation
-============
+------------
 
 gjson-py is available on the `Python Package Index`_ (PyPI) and can be easily installed with::
 
     pip install gjson
 
 How to use the library
-======================
+----------------------
 
 gjson-py provides different ways to perform queries on JSON-like objects.
 
 ``gjson.get()``
----------------
+^^^^^^^^^^^^^^^
 
 A quick accessor to GJSON functionalities exposed for simplicity of use. Particularly useful to perform a single
 query on a given object::
@@ -39,7 +39,7 @@ It's also possible to make it return a JSON-encoded string and decide on failure
 or return `None`. See the full API documentation for more details.
 
 ``GJSON`` class
----------------
+^^^^^^^^^^^^^^^
 
 The ``GJSON`` class provides full access to the gjson-py API allowing to perform multiple queries on the same object::
 
@@ -61,12 +61,12 @@ The ``GJSON`` class provides full access to the gjson-py API allowing to perform
 See the full API documentation for more details.
 
 Query syntax
-============
+------------
 
 For the generic query syntax refer to the original `GJSON Path Syntax`_ documentation.
 
 Supported GJSON features
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 This is the list of GJSON features and how they are supported by gjson-py:
 
