@@ -1,3 +1,7 @@
+.. image:: https://github.com/volans-/gjson-py/actions/workflows/run-tox.yaml/badge.svg
+   :alt: CI results
+   :target: https://github.com/volans-/gjson-py/actions/workflows/run-tox.yaml
+
 Introduction
 ============
 
