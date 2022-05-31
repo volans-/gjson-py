@@ -13,7 +13,12 @@ Bug fixes
 Miscellanea
 """""""""""
 
+* GitHub actions: add workflow to run tox.
+* GitHub actions: fix branch name for pushes
 * documentation: include also the ``@sort`` modifier that is not present in the GJSON project.
+* documentation: fix link to PyPI package.
+* documentation: add link to the generated docs.
+* documentation: fix section hierarchy and build.
 
 `v0.0.1`_ (2022-05-22)
 ^^^^^^^^^^^^^^^^^^^^^^
