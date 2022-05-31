@@ -105,7 +105,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 | `Literals`_            | NO                     |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
 
-This is the list of GJSON modifiers and how they are supported by gjson-py:
+This is the list of modifiers and how they are supported by gjson-py:
 
 +----------------+-----------------------+-----------------------------------------+
 | GJSON Modifier | Supported by gjson-py | Notes                                   |
@@ -133,6 +133,8 @@ This is the list of GJSON modifiers and how they are supported by gjson-py:
 | ``@fromstr``   | NO                    |                                         |
 +----------------+-----------------------+-----------------------------------------+
 | ``@group``     | NO                    |                                         |
++----------------+-----------------------+-----------------------------------------+
+| ``@sort``      | YES                   | Not present in GJSON                    |
 +----------------+-----------------------+-----------------------------------------+
 
 .. _`GJSON`: https://github.com/tidwall/gjson

@@ -4,6 +4,8 @@ import io
 import json
 import re
 
+from typing import Mapping
+
 import pytest
 
 import gjson
@@ -85,6 +87,13 @@ INPUT_BASIC = json.loads("""
 """)
 
 
+def compare_values(result, expected):
+    """Compare results with the expected values ensuring same-order of keys for dictionaries."""
+    assert result == expected
+    if isinstance(expected, Mapping):
+        assert list(result.keys()) == list(expected.keys())
+
+
 class TestObject:
     """Testing gjson with a basic input object."""
 
@@ -154,7 +163,7 @@ class TestObject:
     ))
     def test_get_ok(self, query, expected):
         """It should query the JSON object and return the expected result."""
-        assert self.object.get(query) == expected
+        compare_values(self.object.get(query), expected)
 
     @pytest.mark.parametrize('query, error', (
         # Basic
@@ -312,7 +321,7 @@ def test_get_modifier_valid_raise():
 def test_get_modifier_sort(data, expected):
     """It should return the object sorted."""
     obj = gjson.GJSON(json.loads(data))
-    assert obj.get('@sort', quiet=True) == expected
+    compare_values(obj.get('@sort', quiet=True), expected)
 
 
 def test_get_integer_index_on_mapping():

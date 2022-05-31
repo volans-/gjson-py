@@ -604,7 +604,7 @@ class GJSONObj:
         """
         del last  # for pylint, unused argument
         if isinstance(obj, Mapping):
-            return {k: obj[k] for k in reversed(obj.keys())}
+            return {k: obj[k] for k in sorted(obj.keys())}
         if isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
             return sorted(obj)
 
