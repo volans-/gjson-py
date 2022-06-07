@@ -104,6 +104,15 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Literals`_            | NO                     |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
+| `JSON Lines`_          | YES                    | CLI support [#]_ [#]_                               |
++------------------------+------------------------+-----------------------------------------------------+
+
+.. [#] Both for applying the same query to each line using the ``-l/--lines`` argument and to automatically encapsulate
+   the input lines in a list and apply the query to the list using the ``..`` special query prefix described in
+   `JSON Lines`_.
+.. [#] Library support is not currently present because gjson-py accepts only Python objects, making it impossible to
+   pass JSON Lines directly. The client is free to choose if calling gjson-py for each line or to encapsulate them in
+   a list before calling gjson-py.
 
 This is the list of modifiers and how they are supported by gjson-py:
 
@@ -154,3 +163,4 @@ This is the list of modifiers and how they are supported by gjson-py:
 .. _`Custom modifier`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers
 .. _`Multipaths`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipaths
 .. _`Literals`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#literals
+.. _`JSON Lines`: https://github.com/tidwall/gjson#json-lines

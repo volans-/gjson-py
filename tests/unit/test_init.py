@@ -506,3 +506,47 @@ def test_cli_lines_failed_linesi_verbosity_2(monkeypatch):
     with pytest.raises(
             json.decoder.JSONDecodeError, match='Expecting property name enclosed in double quotes'):
         gjson.cli(['-vv', '--lines', '-', 'name'])
+
+
+def test_cli_lines_double_dot_query(monkeypatch):
+    """It should fail the argument parsing and exit."""
+    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
+    with pytest.raises(SystemExit, match='2'):
+        gjson.cli(['--lines', '-', '..name'])
+
+
+def test_cli_double_dot_query_ok(monkeypatch, capsys):
+    """It should encapsulate the input in an array and apply the query to the array."""
+    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
+    ret = gjson.cli(['-', '..#.name'])
+    assert ret == 0
+    captured = capsys.readouterr()
+    assert captured.out == '["Gilbert", "Alexa", "May", "Deloise"]\n'
+    assert not captured.err
+
+
+def test_cli_double_dot_query_failed_lines_verbosity_0(monkeypatch, capsys):
+    """It should encapsulate the input in an array skipping failing lines."""
+    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
+    ret = gjson.cli(['-', '..#.name'])
+    assert ret == 1
+    captured = capsys.readouterr()
+    assert not captured.out
+    assert not captured.err
+
+
+def test_cli_double_dot_query_failed_lines_verbosity_1(monkeypatch, capsys):
+    """It should encapsulate the input in an array skipping failing lines and printing an error for each failure."""
+    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
+    ret = gjson.cli(['-v', '-', '..#.name'])
+    assert ret == 1
+    captured = capsys.readouterr()
+    assert not captured.out
+    assert captured.err.startswith('JSONDecodeError: Expecting property name enclosed in double quotes')
+
+
+def test_cli_double_dot_query_failed_lines_verbosity_2(monkeypatch):
+    """It should interrupt the execution at the first invalid line and exit printing the traceback."""
+    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
+    with pytest.raises(json.decoder.JSONDecodeError, match='Expecting property name enclosed in double quotes'):
+        gjson.cli(['-vv', '-', '..#.name'])

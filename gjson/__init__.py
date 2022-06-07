@@ -686,6 +686,14 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     """
     parser = get_parser()
     args = parser.parse_args(argv)
+    if args.lines and args.query.startswith('..'):
+        parser.error('Argument --lines and query starting with ".." (JSON Lines) are mutually exclusive.')
+
+    encapsulate = False
+    if args.query.startswith('..'):
+        args.query = args.query[2:]
+        encapsulate = True
+
     # Use argparse.FileType here instead of putting it as type in the --file argument parsing, to allow to handle the
     # verbosity in case of error and make sure the file is always closed in case other arguments fail the validation.
     try:
@@ -700,7 +708,15 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
 
     def _execute(source: Union[str, IO[Any]], load_json: Callable[..., Any]) -> int:
         try:
-            result = get(load_json(source), args.query, as_str=True)
+            if encapsulate:
+                input_data = []
+                for line in source:
+                    if line.strip():
+                        input_data.append(json.loads(line))
+            else:
+                input_data = load_json(source)
+
+            result = get(input_data, args.query, as_str=True)
             exit_code = 0
         except (json.JSONDecodeError, GJSONError) as ex:
             result = ''
