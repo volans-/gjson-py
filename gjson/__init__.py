@@ -5,8 +5,7 @@ import operator
 import re
 import sys
 from collections.abc import Mapping, Sequence
-from pathlib import Path
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, IO, Optional, Union
 
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -670,7 +669,7 @@ class GJSONObj:
                 yield elem
 
 
-def cli(argv: Optional[Sequence[str]] = None) -> int:
+def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     """Command line entry point to run gjson as a CLI tool.
 
     Arguments:
@@ -687,26 +686,46 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:
     """
     parser = get_parser()
     args = parser.parse_args(argv)
-
+    # Use argparse.FileType here instead of putting it as type in the --file argument parsing, to allow to handle the
+    # verbosity in case of error and make sure the file is always closed in case other arguments fail the validation.
     try:
-        if str(args.file) == '-':
-            data = json.load(sys.stdin)
-        else:
-            with open(args.file, 'r', encoding='utf-8') as input_file:
-                data = json.load(input_file)
-
-        result = get(data, args.query, as_str=True)
-        exit_code = 0
-    except (json.JSONDecodeError, OSError, GJSONError) as ex:
-        result = ''
-        exit_code = 1
+        args.file = argparse.FileType(encoding='utf-8')(args.file)
+    except (OSError, argparse.ArgumentTypeError) as ex:
         if args.verbose == 1:
             print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
         elif args.verbose >= 2:
             raise
 
-    if result:
-        print(result)
+        return 1
+
+    def _execute(source: Union[str, IO[Any]], load_json: Callable[..., Any]) -> int:
+        try:
+            result = get(load_json(source), args.query, as_str=True)
+            exit_code = 0
+        except (json.JSONDecodeError, GJSONError) as ex:
+            result = ''
+            exit_code = 1
+            if args.verbose == 1:
+                print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
+            elif args.verbose >= 2:
+                raise
+
+        if result:
+            print(result)
+
+        return exit_code
+
+    if args.lines:
+        exit_code = 0
+        for line in args.file:
+            line = line.strip()
+            if not line:
+                continue
+            ret = _execute(line, load_json=json.loads)
+            if ret > exit_code:
+                exit_code = ret
+    else:
+        exit_code = _execute(args.file, load_json=json.load)
 
     return exit_code
 
@@ -726,7 +745,10 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('-v', '--verbose', action='count', default=0,
                         help=('Verbosity level. By default on error no output will be printed. Use -v to get the '
                               'error message to stderr and -vv to get the full traceback.'))
-    parser.add_argument('file', type=Path, help='Input JSON file to query/filter. Use "-" to read from stdin.')
+    parser.add_argument('-l', '--lines', action='store_true',
+                        help='Treat the input as JSON Lines, parse each line and apply the query to each line.')
+    # argparse.FileType is used later to parse this argument.
+    parser.add_argument('file', help='Input JSON file to query/filter. Use "-" to read from stdin.')
     parser.add_argument('query', help='A GJSON query to apply to the input data.')
 
     return parser
