@@ -382,7 +382,7 @@ class TestJSONOutput:
         """It should prettyfy the JSON string based on the parameters."""
         assert self.gjson.getj(query) == expected
 
-    def test_modifier_pretty_sort_keys_prefix(self):  # pylint: disable=no-self-use
+    def test_modifier_pretty_sort_keys_prefix(self):
         """It should prettyfy the JSON string and sort the keys."""
         output = gjson.GJSON({'key2': 'value2', 'key1': 'value1'}).getj('@pretty:{"sortKeys": true, "prefix": "## "}')
         assert output == '## {\n##   "key1": "value1",\n##   "key2": "value2"\n## }'

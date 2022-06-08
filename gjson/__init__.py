@@ -373,7 +373,7 @@ class GJSONObj:
 
         return ret
 
-    def _parse_query(self, query: str, obj: Any, all_items: bool) -> Any:  # pylint: disable=no-self-use # noqa: MC0001
+    def _parse_query(self, query: str, obj: Any, all_items: bool) -> Any:  # noqa: MC0001
         """Parse an inline query #(...) / #(...)#.
 
         Arguments:
@@ -482,8 +482,7 @@ class GJSONObj:
 
         return modifier_func(options, obj, last=last)
 
-    def _parse_modifier_reverse(  # pylint: disable=no-self-use
-            self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_reverse(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @reverse modifier.
 
         Arguments:
@@ -503,8 +502,7 @@ class GJSONObj:
 
         return obj
 
-    def _parse_modifier_keys(  # pylint: disable=no-self-use
-            self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_keys(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @keys modifier.
 
         Arguments:
@@ -525,8 +523,7 @@ class GJSONObj:
         except AttributeError as ex:
             raise GJSONError('The current object does not have a keys() method.') from ex
 
-    def _parse_modifier_values(  # pylint: disable=no-self-use
-            self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_values(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @values modifier.
 
         Arguments:
@@ -586,8 +583,7 @@ class GJSONObj:
         }
         return obj
 
-    def _parse_modifier_sort(  # pylint: disable=no-self-use
-            self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_sort(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @sort modifier.
 
         Arguments:
@@ -611,8 +607,7 @@ class GJSONObj:
         raise GJSONError(f'Sort modifier not supported for object of type {type(obj)}. '
                          'Expected a mapping or sequence like object.')
 
-    def _parse_modifier_valid(  # pylint: disable=no-self-use
-            self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_valid(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @valid modifier, checking that the current object can be converted to JSON.
 
         Arguments:
