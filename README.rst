@@ -96,9 +96,9 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Modifiers`_           | PARTIALLY              | See the table below                                 |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Modifier arguments`_  | YES                    |                                                     |
+| `Modifier arguments`_  | YES                    | Only a JSON object is accepted as argument          |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Custom modifier`_     | NO                     |                                                     |
+| `Custom modifiers`_    | YES                    | Only a JSON object is accepted as argument          |
 +------------------------+------------------------+-----------------------------------------------------+
 | `Multipaths`_          | NO                     |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
@@ -160,7 +160,7 @@ This is the list of modifiers and how they are supported by gjson-py:
 .. _`Dot vs Pipe`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#dot-vs-pipe
 .. _`Modifiers`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers
 .. _`Modifier arguments`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers
-.. _`Custom modifier`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers
+.. _`Custom modifiers`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#custom-modifiers
 .. _`Multipaths`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipaths
 .. _`Literals`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#literals
 .. _`JSON Lines`: https://github.com/tidwall/gjson#json-lines

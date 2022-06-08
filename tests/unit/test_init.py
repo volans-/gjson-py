@@ -195,7 +195,7 @@ class TestObject:
         # Modifiers
         ('@pretty:["invalid"]',
          re.escape("Invalid options for modifier pretty, expected mapping got <class 'list'>: ['invalid']")),
-        ('@invalid', 'Unknown modifier invalid'),
+        ('@invalid', 'Unknown modifier @invalid'),
         ('children.@keys', re.escape('The current object does not have a keys() method.')),
         ('children.@values', re.escape('The current object does not have a values() method.')),
         # JSON Lines
@@ -405,6 +405,72 @@ class TestJSONOutput:
     def test_modifier_ugly(self):
         """It should uglyfy the JSON string."""
         assert gjson.get(self.obj, '@ugly', as_str=True) == '{"key":"value"}'
+
+
+def custom_sum(options, obj, *, last):
+    """Custom modifier function."""
+    assert last is True
+    assert options == {}
+    if not isinstance(obj, list):
+        raise RuntimeError('@sum can be used only on lists')
+
+    return sum(obj)
+
+
+class TestCustomModifiers:
+    """Test class for custom modifiers."""
+
+    def setup_method(self):
+        """Initialize the test instance."""
+        self.valid_obj = [1, 2, 3, 4, 5]
+        self.invalid_obj = 'invalid'
+        self.query = '@sum'
+
+    def test_gjson_register_modifier_ok(self):
+        """It should register a valid modifier."""
+        obj = gjson.GJSON(self.valid_obj)
+        obj.register_modifier('sum', custom_sum)
+        assert obj.get(self.query) == 15
+
+    def test_gjson_register_modifier_override_builtin(self):
+        """It should raise a GJSONError if trying to register a modifier with the same name of a built-in one."""
+        obj = gjson.GJSON(self.valid_obj)
+        with pytest.raises(gjson.GJSONError,
+                           match='Unable to register a modifier with the same name of the built-in modifier: @valid'):
+            obj.register_modifier('valid', custom_sum)
+
+    def test_gjson_register_modifier_not_callable(self):
+        """It should raise a GJSONError if trying to register a modifier that is not callable."""
+        obj = gjson.GJSON(self.valid_obj)
+        with pytest.raises(gjson.GJSONError, match='The given func "not-callable" for the custom modifier @sum does'):
+            obj.register_modifier('sum', 'not-callable')
+
+    def test_gjsonobj_custom_modifiers_ok(self):
+        """It should register a valid modifier."""
+        obj = gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'sum': custom_sum})
+        assert obj.get() == 15
+
+    def test_gjsonobj_custom_modifiers_raise(self):
+        """It should encapsulate the modifier raised exception in a GJSONError."""
+        with pytest.raises(gjson.GJSONError,
+                           match='Modifier @sum raised an exception'):
+            gjson.GJSONObj(self.invalid_obj, self.query, custom_modifiers={'sum': custom_sum}).get()
+
+    def test_gjsonobj_custom_modifiers_override_builtin(self):
+        """It should raise a GJSONError if passing custom modifiers that have the same name of a built-in one."""
+        with pytest.raises(gjson.GJSONError,
+                           match="Some provided custom_modifiers have the same name of built-in ones: {'valid'}"):
+            gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'valid': custom_sum})
+
+    def test_gjsoniobj_custom_modifiers_not_callable(self):
+        """It should raise a GJSONError if passing custom modifiers that are not callable."""
+        with pytest.raises(gjson.GJSONError, match='The given func "not-callable" for the custom modifier @sum does'):
+            gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'sum': 'not-callable'})
+
+    def test_gjsonobj_builtin_modifiers(self):
+        """It should return a set with the names of the built-in modifiers."""
+        expected = {'keys', 'pretty', 'valid', 'sort', 'values', 'reverse', 'flatten', 'ugly'}
+        assert gjson.GJSONObj.builtin_modifiers() == expected
 
 
 def test_cli_stdin(monkeypatch, capsys):

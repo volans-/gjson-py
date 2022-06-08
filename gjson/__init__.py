@@ -5,7 +5,7 @@ import operator
 import re
 import sys
 from collections.abc import Mapping, Sequence
-from typing import Any, Callable, Dict, IO, Optional, Union
+from typing import Any, Callable, Dict, IO, Optional, Protocol, runtime_checkable, Union
 
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -60,6 +60,7 @@ class GJSON:
 
         """
         self._obj = obj
+        self._custom_modifiers: Dict[str, 'ModifierProtocol'] = {}
 
     def __str__(self) -> str:
         """Return the current object as a JSON-encoded string.
@@ -99,7 +100,7 @@ class GJSON:
 
         """
         try:
-            return GJSONObj(self._obj, query).get()
+            return GJSONObj(self._obj, query, custom_modifiers=self._custom_modifiers).get()
         except GJSONError:
             if quiet:
                 return None
@@ -128,7 +129,7 @@ class GJSON:
 
         """
         try:
-            return str(GJSONObj(self._obj, query))
+            return str(GJSONObj(self._obj, query, custom_modifiers=self._custom_modifiers))
         except GJSONError:
             if quiet:
                 return ''
@@ -161,9 +162,80 @@ class GJSON:
         """
         return GJSON(self.get(query, quiet=quiet))
 
+    def register_modifier(self, name: str, func: 'ModifierProtocol') -> None:
+        """Register a custom modifier.
+
+        Examples:
+            Register a custom modifier that sums all the numbers in a list:
+
+                >>> def custom_sum(options, obj, *, last):
+                ...     # insert sanity checks code here
+                ...     return sum(obj)
+                ...
+                >>> gjson_obj.register_modifier('sum', custom_sum)
+                >>> gjson_obj.get('items.#.size.@sum')
+                3
+
+        Arguments:
+            name: the modifier name. It will be called where ``@name`` is used in the query. If two custom modifiers
+                are registered with the same name the last one will be used.
+            func: the modifier code in the form of a callable object that adhere to the
+                :py:class:`gjson.ModifierProtocol`.
+
+        Raises:
+            gjson.GJSONError: if the provided callable doesn't adhere to the :py:class:`gjson.ModifierProtocol`.
+
+        """
+        if name in GJSONObj.builtin_modifiers():
+            raise GJSONError(f'Unable to register a modifier with the same name of the built-in modifier: @{name}')
+
+        if not isinstance(func, ModifierProtocol):
+            raise GJSONError(f'The given func "{func}" for the custom modifier @{name} does not adhere '
+                             'to the gjson.ModifierProtocol.')
+
+        self._custom_modifiers[name] = func
+
 
 class GJSONError(Exception):
     """Raised by the gjson module on error while performing queries or converting to JSON."""
+
+
+@runtime_checkable
+class ModifierProtocol(Protocol):
+    """Callback protocol for the custom modifiers."""
+
+    def __call__(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """To register a custom modifier a callable that adhere to this protocol must be provided.
+
+        Examples:
+            Register a custom modifier that sums all the numbers in a list:
+
+                >>> import gjson
+                >>> data = [1, 2, 3, 4, 5]
+                >>> def custom_sum(options, obj, *, last):
+                ...     # insert sanity checks code here
+                ...     return sum(obj)
+                ...
+                >>> gjson_obj = gjson.GJSON(data)
+                >>> gjson_obj.register_modifier('sum', custom_sum)
+                >>> gjson_obj.get('@sum')
+                15
+
+        Arguments:
+            options: a dictionary of options. If no options are present in the query the callable will be called with
+                an empty dictionary as options. The modifier can supports any number of options, or none.
+            obj: the current object already modifier by any previous parts of the query.
+            last: :py:data:`True` if the modifier is the last element in the query or :py:data:`False` otherwise.
+
+        Raises:
+            Exception: any exception that might be raised by the callable is catched by gjson and re-raised as a
+                :py:class:`gjson.GJSONError` exception to ensure that the normal gjson behaviour is respected according
+                to the selected verbosity (CLI) or ``quiet`` parameter (Python library).
+
+        Returns:
+            the resulting object after applying the modifier.
+
+        """
 
 
 DOT_DELIMITER = '.'
@@ -185,7 +257,7 @@ except DistributionNotFound:  # pragma: no cover - this should never happen duri
 class GJSONObj:
     """A low-level class to perform the GJSON query on a JSON-like object."""
 
-    def __init__(self, obj: Any, query: str):
+    def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[Dict[str, 'ModifierProtocol']] = None):
         """Initialize the instance with the starting object and query.
 
         Examples:
@@ -199,9 +271,22 @@ class GJSONObj:
             obj: the JSON-like object to query.
             query: the GJSON query to apply to the object.
 
+        Raises:
+            gjson.GJSONError: if any provided custom modifier overrides a built-in one or is not callable.
+
         """
         self._obj = obj
         self._query = query
+        if custom_modifiers is not None:
+            if (intersection := self.builtin_modifiers().intersection(set(custom_modifiers.keys()))):
+                raise GJSONError(f'Some provided custom_modifiers have the same name of built-in ones: {intersection}')
+
+            for name, modifier in custom_modifiers.items():
+                if not isinstance(modifier, ModifierProtocol):
+                    raise GJSONError(f'The given func "{modifier}" for the custom modifier @{name} does not adhere '
+                                     'to the gjson.ModifierProtocol')
+
+        self._custom_modifiers = custom_modifiers if custom_modifiers else {}
         self._dump_params: Dict[str, Any] = {}
         self._after_hash = False
         self._after_query_all = False
@@ -272,6 +357,17 @@ class GJSONObj:
 
         return json_string
 
+    @classmethod
+    def builtin_modifiers(cls) -> set[str]:
+        """Return the names of the built-in modifiers.
+
+        Returns:
+            the names of the built-in modifiers.
+
+        """
+        prefix = '_parse_modifier_'
+        return {modifier[len(prefix):] for modifier in dir(cls) if modifier.startswith(prefix)}
+
     def _parse_part(self, part: str, obj: Any, delimiter: Optional[str], *, last: bool) -> Any:  # noqa: MC0001
         """Parse the given part of the full query.
 
@@ -281,11 +377,11 @@ class GJSONObj:
             delimiter: the query part delimiter (dot, pipe or None) before the current query part.
             last: whether this is the final part of the query.
 
-        Returns:
-            the result of the query.
-
         Raises:
             gjson.GJSONError: on invalid query.
+
+        Returns:
+            the result of the query.
 
         """
         part = part.replace(r'\.', DOT_DELIMITER).replace(r'\|', PIPE_DELIMITER)
@@ -383,11 +479,11 @@ class GJSONObj:
             obj: the current object.
             all_items: whether to return all items or just the first one.
 
-        Returns:
-            the result of the query.
-
         Raises:
             gjson.GJSONError: on invalid query.
+
+        Returns:
+            the result of the query.
 
         """
         position: Optional[int] = None
@@ -459,11 +555,11 @@ class GJSONObj:
             obj: the current object before applying the modifier.
             last: whether this is the final part of the query.
 
-        Returns:
-            the object modifier according to the modifier.
-
         Raises:
             gjson.GJSONError: in case of unknown modifier or if the modifier options are invalid.
+
+        Returns:
+            the object modifier according to the modifier.
 
         """
         part = part[1:]
@@ -479,10 +575,17 @@ class GJSONObj:
 
         try:
             modifier_func = getattr(self, f'_parse_modifier_{modifier}')
-        except AttributeError as ex:
-            raise GJSONError(f'Unknown modifier {modifier}.') from ex
+        except AttributeError:
+            modifier_func = self._custom_modifiers.get(modifier)
+            if modifier_func is None:
+                raise GJSONError(f'Unknown modifier @{modifier}.') from None
 
-        return modifier_func(options, obj, last=last)
+        try:
+            return modifier_func(options, obj, last=last)
+        except GJSONError:
+            raise
+        except Exception as ex:
+            raise GJSONError(f'Modifier @{modifier} raised an exception') from ex
 
     def _parse_modifier_reverse(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @reverse modifier.
@@ -512,11 +615,11 @@ class GJSONObj:
             obj: the current object to get the keys from.
             last: whether this is the final part of the query.
 
-        Returns:
-            the current object keys as list.
-
         Raises:
             gjson.GJSONError: if the current object does not have a keys() method.
+
+        Returns:
+            the current object keys as list.
 
         """
         del last  # for pylint, unused argument
@@ -533,11 +636,11 @@ class GJSONObj:
             obj: the current object to get the values from.
             last: whether this is the final part of the query.
 
-        Returns:
-            the current object values as list.
-
         Raises:
             gjson.GJSONError: if the current object does not have a values() method.
+
+        Returns:
+            the current object values as list.
 
         """
         del last  # for pylint, unused argument
@@ -593,11 +696,11 @@ class GJSONObj:
             obj: the current object to sort.
             last: whether this is the final part of the query.
 
-        Returns:
-            the sorted object.
-
         Raises:
             gjson.GJSONError: if the current object is not sortable.
+
+        Returns:
+            the sorted object.
 
         """
         del last  # for pylint, unused argument
@@ -617,11 +720,11 @@ class GJSONObj:
             obj: the current element to validate.
             last: whether this is the final part of the query.
 
-        Returns:
-            the current object, unmodified.
-
         Raises:
             gjson.GJSONError: if the current object cannot be converted to JSON.
+
+        Returns:
+            the current object, unmodified.
 
         """
         del last  # for pylint, unused argument

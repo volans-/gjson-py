@@ -104,7 +104,7 @@ autodoc_default_options = {
     'members': None,
     'member-order': 'bysource',
     'show-inheritance': None,
-    'special-members': '__str__,__version__',
+    'special-members': '__str__,__version__,__call__',
 }
 autoclass_content = 'both'
 
