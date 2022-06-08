@@ -198,6 +198,8 @@ class TestObject:
         ('@invalid', 'Unknown modifier invalid'),
         ('children.@keys', re.escape('The current object does not have a keys() method.')),
         ('children.@values', re.escape('The current object does not have a values() method.')),
+        # JSON Lines
+        ('..name', 'Empty query part between two delimiters'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""

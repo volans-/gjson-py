@@ -292,6 +292,9 @@ class GJSONObj:
         in_hash = False
         in_query_all = False
         ret: Any
+        if not part:
+            raise GJSONError(f'Empty query part between two delimiters. Query is: {self._query}')
+
         if part == '#':  # Hash
             in_hash = True
             if last:
