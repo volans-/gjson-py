@@ -190,6 +190,7 @@ class TestObject:
         ('children.x*',
          re.escape("Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>")),
         # Queries
+        ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
         ('friends.#(invalid', r'Invalid query part #\(invalid. Expected in the format.'),
         ('#(first)', 'Queries are supported only for sequence like objects'),

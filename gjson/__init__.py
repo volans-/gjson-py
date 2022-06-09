@@ -398,8 +398,11 @@ class GJSONObj:
                     ret = []
                 elif delimiter == PIPE_DELIMITER and self._previous_part == '#':
                     raise GJSONError('The pipe delimiter cannot immediately follow the # element.')
-                else:
+                elif isinstance(obj, Sequence):
                     ret = len(obj)
+                else:
+                    raise GJSONError('Expected a sequence like object for query part # at the end of the query, '
+                                     f'got {type(obj)}.')
             else:
                 ret = obj
 
