@@ -184,6 +184,7 @@ class TestObject:
         ('age.0', "Integer query part on unsupported object type <class 'int'>"),
         ('friends.99', 'Index 99 out of range for sequence object with 3 items in query friends.99'),
         ('name.nonexistent', 'Mapping object does not have key nonexistent for query name.nonexistent'),
+        ('name.1', 'Mapping object does not have key 1 for query name.1'),
         # Wildcards
         ('x*', 'No key matching pattern with wildcard x*'),
         # Queries

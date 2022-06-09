@@ -424,6 +424,8 @@ class GJSONObj:
 
         elif re.match(r'^([1-9][0-9]*|0)$', part):  # Integer index
             if isinstance(obj, Mapping):  # Integer object keys not supported by JSON
+                if part not in obj:
+                    raise GJSONError(f'Mapping object does not have key {part} for query {self._query}')
                 ret = obj[part]
             elif isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
                 if self._after_hash:
@@ -438,7 +440,7 @@ class GJSONObj:
                     if index >= num:
                         raise GJSONError(
                             f'Index {part} out of range for sequence object with {num} items in query {self._query}')
-                    ret = obj[int(part)]
+                    ret = obj[index]
             else:
                 raise GJSONError(f'Integer query part on unsupported object type {type(obj)}, expected a mapping '
                                  'or sequence like object.')
