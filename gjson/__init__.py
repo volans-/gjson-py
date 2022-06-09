@@ -468,8 +468,10 @@ class GJSONObj:
                     raise GJSONError(f'Mapping object does not have key {part} for query {self._query}')
                 ret = obj[part]
             else:
-                if delimiter and delimiter == DOT_DELIMITER:
-                    ret = [i[part] for i in obj if part in i]  # Skip items without the property
+                if ((self._after_hash or self._after_query_all) and delimiter and delimiter == DOT_DELIMITER
+                        and isinstance(obj, Sequence)):
+                    # Skip non mapping items and items without the given key
+                    ret = [i[part] for i in obj if isinstance(i, Mapping) and part in i]
                 else:
                     raise GJSONError(f'Invalid or unsupported query part "{part}" for query {self._query}.')
 

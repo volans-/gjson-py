@@ -185,12 +185,14 @@ class TestObject:
         ('friends.99', 'Index 99 out of range for sequence object with 3 items in query friends.99'),
         ('name.nonexistent', 'Mapping object does not have key nonexistent for query name.nonexistent'),
         ('name.1', 'Mapping object does not have key 1 for query name.1'),
+        ('children.invalid', 'Invalid or unsupported query part "invalid" for query children.invalid.'),
         # Wildcards
         ('x*', 'No key matching pattern with wildcard x*'),
         ('children.x*',
          re.escape("Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>")),
         # Queries
         ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
+        ('#.invalid', 'Invalid or unsupported query part "invalid" for query #.invalid.'),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
         ('friends.#(invalid', r'Invalid query part #\(invalid. Expected in the format.'),
         ('#(first)', 'Queries are supported only for sequence like objects'),
