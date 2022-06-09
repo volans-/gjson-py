@@ -553,7 +553,7 @@ class GJSONObj:
 
         return ret[0] if ret else []
 
-    def _parse_modifier(self, part: str, obj: Any, *, last: bool) -> Any:
+    def _parse_modifier(self, part: str, obj: Any, *, last: bool) -> Any:  # noqa: MC0001
         """Parse a modifier.
 
         Arguments:
@@ -571,10 +571,14 @@ class GJSONObj:
         part = part[1:]
         if ':' in part:
             modifier, options_string = part.split(':', 1)
-            options = json.loads(options_string, strict=False)
+            try:
+                options = json.loads(options_string, strict=False)
+            except json.JSONDecodeError as ex:
+                raise GJSONError(f'Unable to load options for modifier @{modifier}') from ex
+
             if not isinstance(options, Mapping):
                 raise GJSONError(
-                    f'Invalid options for modifier {modifier}, expected mapping got {type(options)}: {options}')
+                    f'Invalid options for modifier @{modifier}, expected mapping got {type(options)}: {options}')
         else:
             modifier = part
             options = {}

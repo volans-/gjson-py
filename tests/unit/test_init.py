@@ -196,8 +196,10 @@ class TestObject:
         # Dot vs Pipe
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers
+        ('@pretty:', 'Unable to load options for modifier @pretty'),
+        ('@pretty:{invalid', 'Unable to load options for modifier @pretty'),
         ('@pretty:["invalid"]',
-         re.escape("Invalid options for modifier pretty, expected mapping got <class 'list'>: ['invalid']")),
+         re.escape("Invalid options for modifier @pretty, expected mapping got <class 'list'>: ['invalid']")),
         ('@invalid', 'Unknown modifier @invalid'),
         ('children.@keys', re.escape('The current object does not have a keys() method.')),
         ('children.@values', re.escape('The current object does not have a values() method.')),
