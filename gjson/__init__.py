@@ -446,6 +446,10 @@ class GJSONObj:
                                  'or sequence like object.')
 
         elif '*' in part or '?' in part:  # Wildcards
+            if not isinstance(obj, Mapping):
+                raise GJSONError(f'Wildcard matching key {part} in query {self._query} requires a mapping object, '
+                                 f'got {type(obj)} instead.')
+
             pattern = re.sub(r'([^\\])\*', '\\1.*', part)
             pattern = re.sub(r'([^\\])\?', '\\1.?', pattern)
             for key in obj.keys():

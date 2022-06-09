@@ -187,6 +187,8 @@ class TestObject:
         ('name.1', 'Mapping object does not have key 1 for query name.1'),
         # Wildcards
         ('x*', 'No key matching pattern with wildcard x*'),
+        ('children.x*',
+         re.escape("Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>")),
         # Queries
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
         ('friends.#(invalid', r'Invalid query part #\(invalid. Expected in the format.'),
