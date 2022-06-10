@@ -140,6 +140,7 @@ class TestObject:
         ('friends.#.invalid.#()#', []),
         ('friends.#(last=="Murphy").first', 'Dale'),
         ('friends.#(last=="Murphy")#.first', ['Dale', 'Jane']),
+        ('friends.#(=="Murphy")#', []),
         ('friends.#(age>47)#.last', ['Craig']),
         ('friends.#(age>=47)#.last', ['Craig', 'Murphy']),
         ('friends.#(age<47)#.last', ['Murphy']),
@@ -148,6 +149,7 @@ class TestObject:
         ('friends.#(age!=44)#.last', ['Craig', 'Murphy']),
         ('friends.#(first%"D*").last', 'Murphy'),
         ('friends.#(first!%"D*").last', 'Craig'),
+        ('friends.#(%0)#', []),
         ('children.#(!%"*a*")', 'Alex'),
         ('children.#(%"*a*")#', ['Sara', 'Jack']),
         # Nested queries (TODO)

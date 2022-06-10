@@ -527,7 +527,7 @@ class GJSONObj:
         except json.JSONDecodeError as ex:
             raise GJSONError(f'Invalid value "{string_value}" for the query key "{key}".') from ex
 
-        if not key and obj and isinstance(obj[0], Mapping):
+        if not key and not all_items and obj and isinstance(obj[0], Mapping):
             raise GJSONError('Query on mapping like objects require a key before the operator.')
 
         oper: Callable[[Any, Any], bool]
@@ -544,7 +544,7 @@ class GJSONObj:
         elif op_str == '>=':
             oper = operator.ge
         elif op_str in ('%', '!%'):
-            value = value.replace('*', '.*').replace('?', '.?')
+            value = str(value).replace('*', '.*').replace('?', '.?')
             value = f'^{value}$'
             if op_str == '%':
                 def match_op(obj_a: Any, obj_b: Any) -> bool:
