@@ -125,6 +125,8 @@ class TestObject:
         ('friends.1', {'first': 'Roger', 'last': 'Craig', 'age': 68, 'nets': ['fb', 'tw']}),
         ('friends.1.first', 'Roger'),
         # Wildcards
+        ('*.first', 'Tom'),
+        ('?a??.first', 'Tom'),
         ('child*.2', 'Jack'),
         ('c?ildren.0', 'Sara'),
         # Escape characters
@@ -194,8 +196,10 @@ class TestObject:
         ('children.invalid', 'Invalid or unsupported query part "invalid" for query children.invalid.'),
         # Wildcards
         ('x*', 'No key matching pattern with wildcard x*'),
+        ('??????????', re.escape('No key matching pattern with wildcard ??????????')),
         ('children.x*',
          re.escape("Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>")),
+        ('(-?', re.escape('No key matching pattern with wildcard (-?.')),
         # Queries
         ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
         ('#.invalid', 'Invalid or unsupported query part "invalid" for query #.invalid.'),

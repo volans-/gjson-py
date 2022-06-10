@@ -453,10 +453,23 @@ class GJSONObj:
                 raise GJSONError(f'Wildcard matching key {part} in query {self._query} requires a mapping object, '
                                  f'got {type(obj)} instead.')
 
-            pattern = re.sub(r'([^\\])\*', '\\1.*', part)
-            pattern = re.sub(r'([^\\])\?', '\\1.?', pattern)
+            input_parts = re.split(r'(?<!\\)(\?|\*)', part)
+            pattern_parts = ['^']
+            for input_part in input_parts:
+                if not input_part:
+                    continue
+                if input_part == '*':
+                    if pattern_parts[-1] != '.*':  # Squash all consecutive * to avoid re.match() performance issues
+                        pattern_parts.append('.*')
+                elif input_part == '?':
+                    pattern_parts.append('.')
+                else:
+                    pattern_parts.append(re.escape(re.sub(r'\\(\*|\?)', r'\1', input_part)))
+            pattern_parts.append('$')
+            pattern = ''.join(pattern_parts)
+
             for key in obj.keys():
-                if re.match(f'^{pattern}$', key):
+                if re.match(pattern, key):
                     ret = obj[key]
                     break
             else:
