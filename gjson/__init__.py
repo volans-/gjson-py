@@ -497,6 +497,12 @@ class GJSONObj:
             the result of the query.
 
         """
+        if not query:
+            if all_items:
+                return obj
+
+            return obj[0] if obj else []
+
         position: Optional[int] = None
         op_str: Optional[str] = None
         for curr_op in QUERIES_OPERATORS:  # Find the first operator

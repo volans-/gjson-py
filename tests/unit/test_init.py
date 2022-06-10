@@ -134,6 +134,10 @@ class TestObject:
         ('friends.#.age', [44, 68, 47]),
         ('friends.#.first', ['Dale', 'Roger', 'Jane']),
         # Queries
+        ('children.#()', "Sara"),
+        ('children.#()#', ["Sara", "Alex", "Jack"]),
+        ('friends.#.invalid.#()', []),
+        ('friends.#.invalid.#()#', []),
         ('friends.#(last=="Murphy").first', 'Dale'),
         ('friends.#(last=="Murphy")#.first', ['Dale', 'Jane']),
         ('friends.#(age>47)#.last', ['Craig']),
