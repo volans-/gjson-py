@@ -194,6 +194,7 @@ class TestObject:
         ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
         ('#.invalid', 'Invalid or unsupported query part "invalid" for query #.invalid.'),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
+        ('friends.#(last=={1: 2})', 'Invalid value "{1: 2}" for the query key "last".'),
         ('friends.#(invalid', r'Invalid query part #\(invalid. Expected in the format.'),
         ('#(first)', 'Queries are supported only for sequence like objects'),
         # Dot vs Pipe

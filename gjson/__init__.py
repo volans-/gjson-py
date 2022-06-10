@@ -515,7 +515,12 @@ class GJSONObj:
             return ret[0] if ret else []
 
         key = query[:position].strip()
-        value = json.loads(query[position + len(op_str):].strip())
+        try:
+            string_value = query[position + len(op_str):].strip()
+            value = json.loads(string_value)
+        except json.JSONDecodeError as ex:
+            raise GJSONError(f'Invalid value "{string_value}" for the query key "{key}".') from ex
+
         if not key and obj and isinstance(obj[0], Mapping):
             raise GJSONError('Query on mapping like objects require a key before the operator.')
 
