@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+`v0.0.4`_ (2022-06-11)
+^^^^^^^^^^^^^^^^^^^^^^
+
+New features
+""""""""""""
+
+* CLI: improve the JSON Lines support allowing to use the ``-l/--lines`` CLI argument and the special query prefix
+  ``..`` syntax together to encapsulate each parsed line in an array to enable filtering using the Queries
+  capabilities.
+
+Minor improvements
+""""""""""""""""""
+
+* CLI: the input file CLI argument is now optional, defaulting to read from stdin. The equivalent of passing ``-``.
+* Modifiers: add support for the upstream Go GJSON modifier ``@this``, that just returns the current object.
+
+Miscellanea
+"""""""""""
+
+* Documentation: add a section to with examples on how to use the CLI.
+* CLI: add a link at the bottom of the help message of the CLI to the online documentation.
+
 `v0.0.3`_ (2022-06-11)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -92,3 +114,4 @@ Miscellanea
 .. _`v0.0.1`: https://github.com/volans-/gjson-py/releases/tag/v0.0.1
 .. _`v0.0.2`: https://github.com/volans-/gjson-py/releases/tag/v0.0.2
 .. _`v0.0.3`: https://github.com/volans-/gjson-py/releases/tag/v0.0.3
+.. _`v0.0.4`: https://github.com/volans-/gjson-py/releases/tag/v0.0.4
