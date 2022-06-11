@@ -153,6 +153,7 @@ class TestObject:
         ('friends.#(first!%"D*").last', 'Craig'),
         ('friends.#(first!%"D???").last', 'Craig'),
         ('friends.#(%0)#', []),
+        ('friends.#(>40)#', []),
         ('children.#(!%"*a*")', 'Alex'),
         ('children.#(%"*a*")#', ['Sara', 'Jack']),
         # Nested queries (TODO)

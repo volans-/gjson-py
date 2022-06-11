@@ -572,10 +572,13 @@ class GJSONObj:
                     return re.match(obj_b, obj_a) is None
                 oper = not_match_op
 
-        if key:
-            ret = [i for i in obj if key in i and oper(i[key], value)]
-        else:  # Query on an array of non-objects, match them directly
-            ret = [i for i in obj if oper(i, value)]
+        try:
+            if key:
+                ret = [i for i in obj if key in i and oper(i[key], value)]
+            else:  # Query on an array of non-objects, match them directly
+                ret = [i for i in obj if oper(i, value)]
+        except TypeError:
+            ret = []
 
         if all_items:
             return ret
