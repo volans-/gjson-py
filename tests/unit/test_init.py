@@ -338,10 +338,11 @@ class TestFlatten:
         assert self.list.get(query, quiet=True) == expected
 
 
-def test_get_modifier_valid_ok():
-    """It should validate that the JSON is correct."""
+@pytest.mark.parametrize('modifier', ('@valid', '@this'))
+def test_get_modifier_unmodified_ok(modifier):
+    """It should return the same object."""
     obj = gjson.GJSON(INPUT_OBJECT)
-    assert obj.get('@valid', quiet=True) == INPUT_OBJECT
+    assert obj.get(modifier, quiet=True) == INPUT_OBJECT
 
 
 def test_get_modifier_valid_raise():
@@ -491,7 +492,7 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'keys', 'pretty', 'valid', 'sort', 'values', 'reverse', 'flatten', 'ugly'}
+        expected = {'flatten', 'keys', 'pretty', 'reverse', 'sort', 'this', 'valid', 'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
 
 

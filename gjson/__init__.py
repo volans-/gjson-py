@@ -780,6 +780,21 @@ class GJSONObj:
 
         return obj
 
+    def _parse_modifier_this(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @this modifier, that returns the current object.
+
+        Arguments:
+            options: the eventual options for the modifier, currently unused.
+            obj: the current element to return.
+            last: whether this is the final part of the query.
+
+        Returns:
+            the current object, unmodified.
+
+        """
+        del last  # for pylint, unused argument
+        return obj
+
     def _parse_modifier_flatten(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @flatten modifier.
 
