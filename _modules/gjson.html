@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson &mdash; gjson-py 0.0.1 documentation</title>
+  <title>gjson &mdash; gjson-py 0.0.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -13,6 +13,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -27,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.1
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -76,8 +77,7 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">DistributionNotFound</span><span class="p">,</span> <span class="n">get_distribution</span>
 
@@ -132,6 +132,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;ModifierProtocol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="GJSON.__str__"><a class="viewcode-back" href="../api.html#gjson.GJSON.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the current object as a JSON-encoded string.</span>
@@ -171,7 +172,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">GJSONObj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">GJSONObj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
@@ -200,7 +201,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">GJSONObj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">query</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">GJSONObj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
                 <span class="k">return</span> <span class="s1">&#39;&#39;</span>
@@ -231,11 +232,82 @@
 <span class="sd">            parameter is :py:data:`True` and there was an error.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">GJSON</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="n">GJSON</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="GJSON.register_modifier"><a class="viewcode-back" href="../api.html#gjson.GJSON.register_modifier">[docs]</a>    <span class="k">def</span> <span class="nf">register_modifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="s1">&#39;ModifierProtocol&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Register a custom modifier.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            Register a custom modifier that sums all the numbers in a list:</span>
+
+<span class="sd">                &gt;&gt;&gt; def custom_sum(options, obj, *, last):</span>
+<span class="sd">                ...     # insert sanity checks code here</span>
+<span class="sd">                ...     return sum(obj)</span>
+<span class="sd">                ...</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj.register_modifier(&#39;sum&#39;, custom_sum)</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj.get(&#39;items.#.size.@sum&#39;)</span>
+<span class="sd">                3</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            name: the modifier name. It will be called where ``@name`` is used in the query. If two custom modifiers</span>
+<span class="sd">                are registered with the same name the last one will be used.</span>
+<span class="sd">            func: the modifier code in the form of a callable object that adhere to the</span>
+<span class="sd">                :py:class:`gjson.ModifierProtocol`.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONError: if the provided callable doesn&#39;t adhere to the :py:class:`gjson.ModifierProtocol`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">GJSONObj</span><span class="o">.</span><span class="n">builtin_modifiers</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to register a modifier with the same name of the built-in modifier: @</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">ModifierProtocol</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The given func &quot;</span><span class="si">{</span><span class="n">func</span><span class="si">}</span><span class="s1">&quot; for the custom modifier @</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> does not adhere &#39;</span>
+                             <span class="s1">&#39;to the gjson.ModifierProtocol.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span></div></div>
 
 
 <div class="viewcode-block" id="GJSONError"><a class="viewcode-back" href="../api.html#gjson.GJSONError">[docs]</a><span class="k">class</span> <span class="nc">GJSONError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Raised by the gjson module on error while performing queries or converting to JSON.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ModifierProtocol"><a class="viewcode-back" href="../api.html#gjson.ModifierProtocol">[docs]</a><span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">ModifierProtocol</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback protocol for the custom modifiers.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ModifierProtocol.__call__"><a class="viewcode-back" href="../api.html#gjson.ModifierProtocol.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;To register a custom modifier a callable that adhere to this protocol must be provided.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            Register a custom modifier that sums all the numbers in a list:</span>
+
+<span class="sd">                &gt;&gt;&gt; import gjson</span>
+<span class="sd">                &gt;&gt;&gt; data = [1, 2, 3, 4, 5]</span>
+<span class="sd">                &gt;&gt;&gt; def custom_sum(options, obj, *, last):</span>
+<span class="sd">                ...     # insert sanity checks code here</span>
+<span class="sd">                ...     return sum(obj)</span>
+<span class="sd">                ...</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj = gjson.GJSON(data)</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj.register_modifier(&#39;sum&#39;, custom_sum)</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj.get(&#39;@sum&#39;)</span>
+<span class="sd">                15</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            options: a dictionary of options. If no options are present in the query the callable will be called with</span>
+<span class="sd">                an empty dictionary as options. The modifier can supports any number of options, or none.</span>
+<span class="sd">            obj: the current object already modifier by any previous parts of the query.</span>
+<span class="sd">            last: :py:data:`True` if the modifier is the last element in the query or :py:data:`False` otherwise.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: any exception that might be raised by the callable is catched by gjson and re-raised as a</span>
+<span class="sd">                :py:class:`gjson.GJSONError` exception to ensure that the normal gjson behaviour is respected according</span>
+<span class="sd">                to the selected verbosity (CLI) or ``quiet`` parameter (Python library).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the resulting object after applying the modifier.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
 
 
 <span class="n">DOT_DELIMITER</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
@@ -257,7 +329,7 @@
 <div class="viewcode-block" id="GJSONObj"><a class="viewcode-back" href="../api.html#gjson.GJSONObj">[docs]</a><span class="k">class</span> <span class="nc">GJSONObj</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A low-level class to perform the GJSON query on a JSON-like object.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;ModifierProtocol&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the instance with the starting object and query.</span>
 
 <span class="sd">        Examples:</span>
@@ -271,9 +343,22 @@
 <span class="sd">            obj: the JSON-like object to query.</span>
 <span class="sd">            query: the GJSON query to apply to the object.</span>
 
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONError: if any provided custom modifier overrides a built-in one or is not callable.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_query</span> <span class="o">=</span> <span class="n">query</span>
+        <span class="k">if</span> <span class="n">custom_modifiers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">intersection</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builtin_modifiers</span><span class="p">()</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">custom_modifiers</span><span class="o">.</span><span class="n">keys</span><span class="p">()))):</span>
+                <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Some provided custom_modifiers have the same name of built-in ones: </span><span class="si">{</span><span class="n">intersection</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">modifier</span> <span class="ow">in</span> <span class="n">custom_modifiers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modifier</span><span class="p">,</span> <span class="n">ModifierProtocol</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The given func &quot;</span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1">&quot; for the custom modifier @</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> does not adhere &#39;</span>
+                                     <span class="s1">&#39;to the gjson.ModifierProtocol&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span> <span class="o">=</span> <span class="n">custom_modifiers</span> <span class="k">if</span> <span class="n">custom_modifiers</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span> <span class="o">=</span> <span class="kc">False</span>
@@ -344,6 +429,17 @@
 
         <span class="k">return</span> <span class="n">json_string</span></div>
 
+<div class="viewcode-block" id="GJSONObj.builtin_modifiers"><a class="viewcode-back" href="../api.html#gjson.GJSONObj.builtin_modifiers">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">builtin_modifiers</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the names of the built-in modifiers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the names of the built-in modifiers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;_parse_modifier_&#39;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">modifier</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span> <span class="k">for</span> <span class="n">modifier</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="k">if</span> <span class="n">modifier</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)}</span></div>
+
     <span class="k">def</span> <span class="nf">_parse_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># noqa: MC0001</span>
         <span class="sd">&quot;&quot;&quot;Parse the given part of the full query.</span>
 
@@ -353,17 +449,20 @@
 <span class="sd">            delimiter: the query part delimiter (dot, pipe or None) before the current query part.</span>
 <span class="sd">            last: whether this is the final part of the query.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            the result of the query.</span>
-
 <span class="sd">        Raises:</span>
 <span class="sd">            gjson.GJSONError: on invalid query.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the result of the query.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">part</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\.&#39;</span><span class="p">,</span> <span class="n">DOT_DELIMITER</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\|&#39;</span><span class="p">,</span> <span class="n">PIPE_DELIMITER</span><span class="p">)</span>
         <span class="n">in_hash</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">in_query_all</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">ret</span><span class="p">:</span> <span class="n">Any</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">part</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Empty query part between two delimiters. Query is: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">part</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">:</span>  <span class="c1"># Hash</span>
             <span class="n">in_hash</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">last</span><span class="p">:</span>
@@ -371,8 +470,11 @@
                     <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">elif</span> <span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_previous_part</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The pipe delimiter cannot immediately follow the # element.&#39;</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;Expected a sequence like object for query part # at the end of the query, &#39;</span>
+                                     <span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="n">obj</span>
 
@@ -397,6 +499,8 @@
 
         <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^([1-9][0-9]*|0)$&#39;</span><span class="p">,</span> <span class="n">part</span><span class="p">):</span>  <span class="c1"># Integer index</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>  <span class="c1"># Integer object keys not supported by JSON</span>
+                <span class="k">if</span> <span class="n">part</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mapping object does not have key </span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s1"> for query </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="n">part</span><span class="p">]</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span><span class="p">:</span>
@@ -411,16 +515,33 @@
                     <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">num</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span>
                             <span class="sa">f</span><span class="s1">&#39;Index </span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s1"> out of range for sequence object with </span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="s1"> items in query </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="p">)]</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Integer query part on unsupported object type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">, expected a mapping &#39;</span>
                                  <span class="s1">&#39;or sequence like object.&#39;</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="s1">&#39;*&#39;</span> <span class="ow">in</span> <span class="n">part</span> <span class="ow">or</span> <span class="s1">&#39;?&#39;</span> <span class="ow">in</span> <span class="n">part</span><span class="p">:</span>  <span class="c1"># Wildcards</span>
-            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([^</span><span class="se">\\</span><span class="s1">])\*&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">1.*&#39;</span><span class="p">,</span> <span class="n">part</span><span class="p">)</span>
-            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([^</span><span class="se">\\</span><span class="s1">])\?&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">1.?&#39;</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Wildcard matching key </span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s1"> in query </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="si">}</span><span class="s1"> requires a mapping object, &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1"> instead.&#39;</span><span class="p">)</span>
+
+            <span class="n">input_parts</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?&lt;!</span><span class="se">\\</span><span class="s1">)(\?|\*)&#39;</span><span class="p">,</span> <span class="n">part</span><span class="p">)</span>
+            <span class="n">pattern_parts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;^&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">input_part</span> <span class="ow">in</span> <span class="n">input_parts</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">input_part</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">input_part</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pattern_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;.*&#39;</span><span class="p">:</span>  <span class="c1"># Squash all consecutive * to avoid re.match() performance issues</span>
+                        <span class="n">pattern_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.*&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">input_part</span> <span class="o">==</span> <span class="s1">&#39;?&#39;</span><span class="p">:</span>
+                    <span class="n">pattern_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pattern_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">(\*|\?)&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1&#39;</span><span class="p">,</span> <span class="n">input_part</span><span class="p">)))</span>
+            <span class="n">pattern_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pattern_parts</span><span class="p">)</span>
+
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;^</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
@@ -432,8 +553,10 @@
                     <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mapping object does not have key </span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s1"> for query </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="n">part</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">delimiter</span> <span class="ow">and</span> <span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span><span class="p">:</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="n">part</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>  <span class="c1"># Skip items without the property</span>
+                <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span><span class="p">)</span> <span class="ow">and</span> <span class="n">delimiter</span> <span class="ow">and</span> <span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span>
+                        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)):</span>
+                    <span class="c1"># Skip non mapping items and items without the given key</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="n">part</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid or unsupported query part &quot;</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s1">&quot; for query </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
@@ -444,7 +567,7 @@
 
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_parse_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">all_items</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-self-use # noqa: MC0001</span>
+    <span class="k">def</span> <span class="nf">_parse_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">all_items</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># noqa: MC0001</span>
         <span class="sd">&quot;&quot;&quot;Parse an inline query #(...) / #(...)#.</span>
 
 <span class="sd">        Arguments:</span>
@@ -452,13 +575,19 @@
 <span class="sd">            obj: the current object.</span>
 <span class="sd">            all_items: whether to return all items or just the first one.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            the result of the query.</span>
-
 <span class="sd">        Raises:</span>
 <span class="sd">            gjson.GJSONError: on invalid query.</span>
 
+<span class="sd">        Returns:</span>
+<span class="sd">            the result of the query.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">all_items</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">obj</span>
+
+            <span class="k">return</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">obj</span> <span class="k">else</span> <span class="p">[]</span>
+
         <span class="n">position</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">op_str</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">curr_op</span> <span class="ow">in</span> <span class="n">QUERIES_OPERATORS</span><span class="p">:</span>  <span class="c1"># Find the first operator</span>
@@ -477,8 +606,13 @@
             <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ret</span> <span class="k">else</span> <span class="p">[]</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="n">query</span><span class="p">[:</span><span class="n">position</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="n">position</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">op_str</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">and</span> <span class="n">obj</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">string_value</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="n">position</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">op_str</span><span class="p">):]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">string_value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid value &quot;</span><span class="si">{</span><span class="n">string_value</span><span class="si">}</span><span class="s1">&quot; for the query key &quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">all_items</span> <span class="ow">and</span> <span class="n">obj</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;Query on mapping like objects require a key before the operator.&#39;</span><span class="p">)</span>
 
         <span class="n">oper</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
@@ -495,7 +629,7 @@
         <span class="k">elif</span> <span class="n">op_str</span> <span class="o">==</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span>
             <span class="n">oper</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span>
         <span class="k">elif</span> <span class="n">op_str</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;!%&#39;</span><span class="p">):</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;.*&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;.?&#39;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;.*&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
             <span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;^</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">$&#39;</span>
             <span class="k">if</span> <span class="n">op_str</span> <span class="o">==</span> <span class="s1">&#39;%&#39;</span><span class="p">:</span>
                 <span class="k">def</span> <span class="nf">match_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -510,17 +644,23 @@
                     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">obj_b</span><span class="p">,</span> <span class="n">obj_a</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
                 <span class="n">oper</span> <span class="o">=</span> <span class="n">not_match_op</span>
 
-        <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Query on an array of non-objects, match them directly</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">)]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Query on an array of non-objects, match them directly</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">)]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">all_items</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ret</span>
 
-        <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ret</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Query part </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s1"> for first element does not match anything.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_modifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># noqa: MC0001</span>
         <span class="sd">&quot;&quot;&quot;Parse a modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -528,33 +668,43 @@
 <span class="sd">            obj: the current object before applying the modifier.</span>
 <span class="sd">            last: whether this is the final part of the query.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            the object modifier according to the modifier.</span>
-
 <span class="sd">        Raises:</span>
 <span class="sd">            gjson.GJSONError: in case of unknown modifier or if the modifier options are invalid.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the object modifier according to the modifier.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">part</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">part</span><span class="p">:</span>
             <span class="n">modifier</span><span class="p">,</span> <span class="n">options_string</span> <span class="o">=</span> <span class="n">part</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">options</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">options_string</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">options_string</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to load options for modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;Invalid options for modifier </span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1">, expected mapping got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">options</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">options</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s1">&#39;Invalid options for modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1">, expected mapping got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">options</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">options</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">modifier</span> <span class="o">=</span> <span class="n">part</span>
             <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">modifier_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_parse_modifier_</span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown modifier </span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">modifier_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modifier</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">modifier_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
 
-        <span class="k">return</span> <span class="n">modifier_func</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">last</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">modifier_func</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">last</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1"> raised an exception&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_reverse</span><span class="p">(</span>  <span class="c1"># pylint: disable=no-self-use</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @reverse modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -574,8 +724,7 @@
 
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_keys</span><span class="p">(</span>  <span class="c1"># pylint: disable=no-self-use</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @keys modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -583,11 +732,11 @@
 <span class="sd">            obj: the current object to get the keys from.</span>
 <span class="sd">            last: whether this is the final part of the query.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            the current object keys as list.</span>
-
 <span class="sd">        Raises:</span>
 <span class="sd">            gjson.GJSONError: if the current object does not have a keys() method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the current object keys as list.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
@@ -596,8 +745,7 @@
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object does not have a keys() method.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_values</span><span class="p">(</span>  <span class="c1"># pylint: disable=no-self-use</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @values modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -605,11 +753,11 @@
 <span class="sd">            obj: the current object to get the values from.</span>
 <span class="sd">            last: whether this is the final part of the query.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            the current object values as list.</span>
-
 <span class="sd">        Raises:</span>
 <span class="sd">            gjson.GJSONError: if the current object does not have a values() method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the current object values as list.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
@@ -657,8 +805,7 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_sort</span><span class="p">(</span>  <span class="c1"># pylint: disable=no-self-use</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @sort modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -666,11 +813,11 @@
 <span class="sd">            obj: the current object to sort.</span>
 <span class="sd">            last: whether this is the final part of the query.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            the sorted object.</span>
-
 <span class="sd">        Raises:</span>
 <span class="sd">            gjson.GJSONError: if the current object is not sortable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the sorted object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
@@ -682,8 +829,7 @@
         <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sort modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
                          <span class="s1">&#39;Expected a mapping or sequence like object.&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_valid</span><span class="p">(</span>  <span class="c1"># pylint: disable=no-self-use</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @valid modifier, checking that the current object can be converted to JSON.</span>
 
 <span class="sd">        Arguments:</span>
@@ -691,11 +837,11 @@
 <span class="sd">            obj: the current element to validate.</span>
 <span class="sd">            last: whether this is the final part of the query.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            the current object, unmodified.</span>
-
 <span class="sd">        Raises:</span>
 <span class="sd">            gjson.GJSONError: if the current object cannot be converted to JSON.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the current object, unmodified.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
@@ -746,7 +892,7 @@
                 <span class="k">yield</span> <span class="n">elem</span></div>
 
 
-<div class="viewcode-block" id="cli"><a class="viewcode-back" href="../api.html#gjson.cli">[docs]</a><span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="cli"><a class="viewcode-back" href="../api.html#gjson.cli">[docs]</a><span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>  <span class="c1"># noqa: MC0001</span>
     <span class="sd">&quot;&quot;&quot;Command line entry point to run gjson as a CLI tool.</span>
 
 <span class="sd">    Arguments:</span>
@@ -763,26 +909,62 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">get_parser</span><span class="p">()</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">lines</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Argument --lines and query starting with &quot;..&quot; (JSON Lines) are mutually exclusive.&#39;</span><span class="p">)</span>
 
+    <span class="n">encapsulate</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">):</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">encapsulate</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Use argparse.FileType here instead of putting it as type in the --file argument parsing, to allow to handle the</span>
+    <span class="c1"># verbosity in case of error and make sure the file is always closed in case other arguments fail the validation.</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
-
-        <span class="n">result</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">as_str</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">,</span> <span class="n">GJSONError</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ex</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span>
 
-    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">IO</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">load_json</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">encapsulate</span><span class="p">:</span>
+                <span class="n">input_data</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                        <span class="n">input_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">input_data</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">as_str</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="n">GJSONError</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ex</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">exit_code</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">_execute</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">load_json</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="o">&gt;</span> <span class="n">exit_code</span><span class="p">:</span>
+                <span class="n">exit_code</span> <span class="o">=</span> <span class="n">ret</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="n">_execute</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">load_json</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">exit_code</span></div>
 
@@ -802,7 +984,10 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Verbosity level. By default on error no output will be printed. Use -v to get the &#39;</span>
                               <span class="s1">&#39;error message to stderr and -vv to get the full traceback.&#39;</span><span class="p">))</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Input JSON file to query/filter. Use &quot;-&quot; to read from stdin.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="s1">&#39;--lines&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Treat the input as JSON Lines, parse each line and apply the query to each line.&#39;</span><span class="p">)</span>
+    <span class="c1"># argparse.FileType is used later to parse this argument.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Input JSON file to query/filter. Use &quot;-&quot; to read from stdin.&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;A GJSON query to apply to the input data.&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parser</span></div>

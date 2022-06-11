@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; gjson-py 0.0.1 documentation</title>
+  <title>Introduction &mdash; gjson-py 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,12 +14,13 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CLI" href="cli.html" />
-    <link rel="prev" title="gjson-py 0.0.1 documentation" href="index.html" /> 
+    <link rel="prev" title="gjson-py 0.0.3 documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.1
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -85,7 +86,7 @@
              
   <a class="reference external image-reference" href="https://github.com/volans-/gjson-py/actions/workflows/run-tox.yaml"><img alt="CI results" src="https://github.com/volans-/gjson-py/actions/workflows/run-tox.yaml/badge.svg" /></a>
 <section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h1>
 <p>gjson-py is a Python package that provides a simple way to filter and extract data from JSON-like objects or JSON
 files, using the <a class="reference external" href="https://github.com/tidwall/gjson">GJSON</a> syntax.</p>
 <p>It is, compatibly with the language differences and with some limitation, the Python equivalent of the Go
@@ -96,17 +97,17 @@ or any Python object that is JSON-serializable.</p>
 <p>A detailed list of the GJSON features supported by gjson-py is provided below.</p>
 <p>See also the full <a class="reference external" href="https://volans-.github.io/gjson-py/index.html">gjson-py documentation</a>.</p>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
 <p>gjson-py is available on the <a class="reference external" href="https://pypi.org/project/gjson/">Python Package Index</a> (PyPI) and can be easily installed with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">gjson</span>
 </pre></div>
 </div>
 </section>
 <section id="how-to-use-the-library">
-<h2>How to use the library<a class="headerlink" href="#how-to-use-the-library" title="Permalink to this headline">¶</a></h2>
+<h2>How to use the library<a class="headerlink" href="#how-to-use-the-library" title="Permalink to this heading">¶</a></h2>
 <p>gjson-py provides different ways to perform queries on JSON-like objects.</p>
 <section id="gjson-get">
-<h3><code class="docutils literal notranslate"><span class="pre">gjson.get()</span></code><a class="headerlink" href="#gjson-get" title="Permalink to this headline">¶</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">gjson.get()</span></code><a class="headerlink" href="#gjson-get" title="Permalink to this heading">¶</a></h3>
 <p>A quick accessor to GJSON functionalities exposed for simplicity of use. Particularly useful to perform a single
 query on a given object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gjson</span>
@@ -119,7 +120,7 @@ query on a given object:</p>
 or return <cite>None</cite>. See the full API documentation for more details.</p>
 </section>
 <section id="gjson-class">
-<h3><code class="docutils literal notranslate"><span class="pre">GJSON</span></code> class<a class="headerlink" href="#gjson-class" title="Permalink to this headline">¶</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">GJSON</span></code> class<a class="headerlink" href="#gjson-class" title="Permalink to this heading">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">GJSON</span></code> class provides full access to the gjson-py API allowing to perform multiple queries on the same object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gjson</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;first&#39;</span><span class="p">:</span> <span class="s1">&#39;Tom&#39;</span><span class="p">,</span> <span class="s1">&#39;last&#39;</span><span class="p">:</span> <span class="s1">&#39;Anderson&#39;</span><span class="p">},</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">37</span><span class="p">}</span>
@@ -141,10 +142,10 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
 </section>
 </section>
 <section id="query-syntax">
-<h2>Query syntax<a class="headerlink" href="#query-syntax" title="Permalink to this headline">¶</a></h2>
+<h2>Query syntax<a class="headerlink" href="#query-syntax" title="Permalink to this heading">¶</a></h2>
 <p>For the generic query syntax refer to the original <a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md">GJSON Path Syntax</a> documentation.</p>
 <section id="supported-gjson-features">
-<h3>Supported GJSON features<a class="headerlink" href="#supported-gjson-features" title="Permalink to this headline">¶</a></h3>
+<h3>Supported GJSON features<a class="headerlink" href="#supported-gjson-features" title="Permalink to this heading">¶</a></h3>
 <p>This is the list of GJSON features and how they are supported by gjson-py:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -193,11 +194,11 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers">Modifier arguments</a></p></td>
 <td><p>YES</p></td>
-<td></td>
+<td><p>Only a JSON object is accepted as argument</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers">Custom modifier</a></p></td>
-<td><p>NO</p></td>
-<td></td>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#custom-modifiers">Custom modifiers</a></p></td>
+<td><p>YES</p></td>
+<td><p>Only a JSON object is accepted as argument</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipaths">Multipaths</a></p></td>
 <td><p>NO</p></td>
@@ -207,8 +208,24 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
 <td><p>NO</p></td>
 <td></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a></p></td>
+<td><p>YES</p></td>
+<td><p>CLI support <a class="footnote-reference brackets" href="#id3" id="id1">1</a> <a class="footnote-reference brackets" href="#id4" id="id2">2</a></p></td>
+</tr>
 </tbody>
 </table>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Both for applying the same query to each line using the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> argument and to automatically encapsulate
+the input lines in a list and apply the query to the list using the <code class="docutils literal notranslate"><span class="pre">..</span></code> special query prefix described in
+<a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a>.</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Library support is not currently present because gjson-py accepts only Python objects, making it impossible to
+pass JSON Lines directly. The client is free to choose if calling gjson-py for each line or to encapsulate them in
+a list before calling gjson-py.</p>
+</dd>
+</dl>
 <p>This is the list of modifiers and how they are supported by gjson-py:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -283,7 +300,7 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.0.1 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.0.3 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cli.html" class="btn btn-neutral float-right" title="CLI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

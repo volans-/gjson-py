@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release Notes &mdash; gjson-py 0.0.1 documentation</title>
+  <title>Release Notes &mdash; gjson-py 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -29,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.1
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -44,9 +45,15 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#v0-0-2-2022-05-31">v0.0.2 (2022-05-31)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-3-2022-06-11">v0.0.3 (2022-06-11)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#new-features">New features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#miscellanea">Miscellanea</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-2-2022-05-31">v0.0.2 (2022-05-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Miscellanea</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-1-2022-05-22">v0.0.1 (2022-05-22)</a></li>
@@ -79,18 +86,90 @@
            <div itemprop="articleBody">
              
   <section id="release-notes">
-<h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
-<section id="v0-0-2-2022-05-31">
-<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.2">v0.0.2</a> (2022-05-31)<a class="headerlink" href="#v0-0-2-2022-05-31" title="Permalink to this headline">¶</a></h2>
+<h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this heading">¶</a></h1>
+<section id="v0-0-3-2022-06-11">
+<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.3">v0.0.3</a> (2022-06-11)<a class="headerlink" href="#v0-0-3-2022-06-11" title="Permalink to this heading">¶</a></h2>
+<section id="new-features">
+<h3>New features<a class="headerlink" href="#new-features" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add CLI support for JSON Lines:</p>
+<ul>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> CLI argument to specify that the input file/stream is made of one JSON per line.</p></li>
+<li><p>When used, gjson applies the same query to all lines.</p></li>
+<li><p>Based on the verbosity level the failing lines are completely ignored, an error message is printed to stderr or
+the execution is interrupted at the first error printing the full traceback.</p></li>
+</ul>
+</li>
+<li><p>Add CLI support for GJSON JSON Lines queries:</p>
+<ul>
+<li><p>Add support for the GJSON queries that encapsulates a JSON Lines input in an array when the query starts with
+<code class="docutils literal notranslate"><span class="pre">..</span></code> so that they the data can be queries as if it was an array of objects in the CLI.</p></li>
+</ul>
+</li>
+<li><p>Add support for custom modifiers:</p>
+<ul>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">ModifierProtocol</span></code> to describe the interface that custom modifiers callable need to have.</p></li>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">register_modifier()</span></code> method in the <code class="docutils literal notranslate"><span class="pre">GJSON</span></code> class to register custom modifiers.</p></li>
+<li><p>Allow to pass a dictionary of modifiers to the low-level <code class="docutils literal notranslate"><span class="pre">GJSONObj</span></code> class constructor.</p></li>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">GJSONObj.builtin_modifiers()</span></code> static method that returns a set with the names of the built-in modifiers.</p></li>
+<li><p>Is not possible to register a custom modifier with the same name of a built-in modifier.</p></li>
+<li><p>Clarify in the documentation that only JSON objects are accepted as modifier arguments.</p></li>
+</ul>
+</li>
+</ul>
+</section>
 <section id="bug-fixes">
-<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Query parsing: when using the queries GJSON syntax <code class="docutils literal notranslate"><span class="pre">#(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">#(...)#</span></code> fix the return value in case of a key
+matching that doesn’t match any element.</p></li>
+<li><p>Query parsing fixes/improvements found with the Python fuzzing engine Atheris:</p>
+<ul>
+<li><p>If any query parts between delimiters is empty error out with a specific message instead of hitting a generic
+<code class="docutils literal notranslate"><span class="pre">IndexError</span></code>.</p></li>
+<li><p>When a query has an integer index on a mapping object, in case the element is not present, raise a <code class="docutils literal notranslate"><span class="pre">GJSONError</span></code>
+instead of a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> one.</p></li>
+<li><p>When the query has a wildcard matching, ensure that it’s applied on a mapping object. Fail with a <code class="docutils literal notranslate"><span class="pre">GJSONError</span></code>
+otherwise.</p></li>
+<li><p>Explicitly catch malformed modifier options and raise a <code class="docutils literal notranslate"><span class="pre">GJSONError</span></code> instead.</p></li>
+<li><p>If the last part of the query is a <code class="docutils literal notranslate"><span class="pre">#</span></code>, check that the object is actually a sequence like object and fail with
+a specific message if not.</p></li>
+<li><p>Ensure all the conditions are valid before attempting to extract the inner element of a sequence like object.
+Ignore both non-mapping like objects inside the sequence or mapping like objects that don’t have the specified key.</p></li>
+<li><p>When parsing the query value as JSON catch the eventual decoding error to encapsulate it into a <code class="docutils literal notranslate"><span class="pre">GJSONError</span></code> one.</p></li>
+<li><p>When using the queries GJSON syntax <code class="docutils literal notranslate"><span class="pre">#(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">#(...)#</span></code> accept also an empty query to follow the same
+behaviour of the upstream Go GJSON.</p></li>
+<li><p>When using the queries GJSON syntax <code class="docutils literal notranslate"><span class="pre">#(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">#(...)#</span></code> follow closely the upstream behaviour of Go GJSON
+for all items queries <code class="docutils literal notranslate"><span class="pre">#(..)#</span></code> with regex matching.</p></li>
+<li><p>When using the queries GJSON syntax <code class="docutils literal notranslate"><span class="pre">#(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">#(...)#</span></code> fix the wildcard matching regular expression when
+using pattern matching.</p></li>
+<li><p>Fix the regex to match keys in presence of wildcards escaping only the non-wildcards and ensuring to not
+double-escaping any already escaped wildcard.</p></li>
+<li><p>When using the queries GJSON syntax <code class="docutils literal notranslate"><span class="pre">#(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">#(...)#</span></code> ensure any exception raised while comparing
+incompatible objects is catched and raise as a GJSONError.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="miscellanea">
+<h3>Miscellanea<a class="headerlink" href="#miscellanea" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>tests: when matching exception messages always escape the string or use raw strings to avoid false matchings.</p></li>
+<li><p>pylint: remove unnecessary comments</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-0-2-2022-05-31">
+<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.2">v0.0.2</a> (2022-05-31)<a class="headerlink" href="#v0-0-2-2022-05-31" title="Permalink to this heading">¶</a></h2>
+<section id="id1">
+<h3>Bug fixes<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&#64;sort</span></code> modifier: fix the actual sorting.</p></li>
 <li><p>tests: ensure that mapping-like objects are compared also in the order of their keys.</p></li>
 </ul>
 </section>
-<section id="miscellanea">
-<h3>Miscellanea<a class="headerlink" href="#miscellanea" title="Permalink to this headline">¶</a></h3>
+<section id="id2">
+<h3>Miscellanea<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>GitHub actions: add workflow to run tox.</p></li>
 <li><p>GitHub actions: fix branch name for pushes</p></li>
@@ -102,7 +181,7 @@
 </section>
 </section>
 <section id="v0-0-1-2022-05-22">
-<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.1">v0.0.1</a> (2022-05-22)<a class="headerlink" href="#v0-0-1-2022-05-22" title="Permalink to this headline">¶</a></h2>
+<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.1">v0.0.1</a> (2022-05-22)<a class="headerlink" href="#v0-0-1-2022-05-22" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Initial version.</p></li>
 </ul>

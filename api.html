@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; gjson-py 0.0.1 documentation</title>
+  <title>API &mdash; gjson-py 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.1
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -72,7 +73,7 @@
            <div itemprop="articleBody">
              
   <section id="module-gjson">
-<span id="api"></span><h1>API<a class="headerlink" href="#module-gjson" title="Permalink to this headline">¶</a></h1>
+<span id="api"></span><h1>API<a class="headerlink" href="#module-gjson" title="Permalink to this heading">¶</a></h1>
 <p>GJSON module.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="gjson.get">
@@ -241,6 +242,39 @@ parameter is <a class="reference external" href="https://docs.python.org/3/libra
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="gjson.GJSON.register_modifier">
+<span class="sig-name descname"><span class="pre">register_modifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#GJSON.register_modifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSON.register_modifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a custom modifier.</p>
+<p class="rubric">Examples</p>
+<p>Register a custom modifier that sums all the numbers in a list:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">custom_sum</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># insert sanity checks code here</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gjson_obj</span><span class="o">.</span><span class="n">register_modifier</span><span class="p">(</span><span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="n">custom_sum</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gjson_obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;items.#.size.@sum&#39;</span><span class="p">)</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the modifier name. It will be called where <code class="docutils literal notranslate"><span class="pre">&#64;name</span></code> is used in the query. If two custom modifiers
+are registered with the same name the last one will be used.</p></li>
+<li><p><strong>func</strong> (<a class="reference internal" href="#gjson.ModifierProtocol" title="gjson.ModifierProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModifierProtocol</span></code></a>) – the modifier code in the form of a callable object that adhere to the
+<a class="reference internal" href="#gjson.ModifierProtocol" title="gjson.ModifierProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">gjson.ModifierProtocol</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#gjson.GJSONError" title="gjson.GJSONError"><strong>gjson.GJSONError</strong></a> – if the provided callable doesn’t adhere to the <a class="reference internal" href="#gjson.ModifierProtocol" title="gjson.ModifierProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">gjson.ModifierProtocol</span></code></a>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py exception">
@@ -248,6 +282,54 @@ parameter is <a class="reference external" href="https://docs.python.org/3/libra
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONError</span></span><a class="reference internal" href="_modules/gjson.html#GJSONError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised by the gjson module on error while performing queries or converting to JSON.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gjson.ModifierProtocol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">ModifierProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#ModifierProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.ModifierProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
+<p>Callback protocol for the custom modifiers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gjson.ModifierProtocol.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#ModifierProtocol.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.ModifierProtocol.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>To register a custom modifier a callable that adhere to this protocol must be provided.</p>
+<p class="rubric">Examples</p>
+<p>Register a custom modifier that sums all the numbers in a list:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gjson</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">custom_sum</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># insert sanity checks code here</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gjson_obj</span> <span class="o">=</span> <span class="n">gjson</span><span class="o">.</span><span class="n">GJSON</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gjson_obj</span><span class="o">.</span><span class="n">register_modifier</span><span class="p">(</span><span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="n">custom_sum</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gjson_obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;@sum&#39;</span><span class="p">)</span>
+<span class="go">15</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – a dictionary of options. If no options are present in the query the callable will be called with
+an empty dictionary as options. The modifier can supports any number of options, or none.</p></li>
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – the current object already modifier by any previous parts of the query.</p></li>
+<li><p><strong>last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code></a> if the modifier is the last element in the query or <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code></a> otherwise.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><strong>Exception</strong></a> – any exception that might be raised by the callable is catched by gjson and re-raised as a
+    <a class="reference internal" href="#gjson.GJSONError" title="gjson.GJSONError"><code class="xref py py-class docutils literal notranslate"><span class="pre">gjson.GJSONError</span></code></a> exception to ensure that the normal gjson behaviour is respected according
+    to the selected verbosity (CLI) or <code class="docutils literal notranslate"><span class="pre">quiet</span></code> parameter (Python library).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the resulting object after applying the modifier.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py data">
@@ -285,7 +367,7 @@ parameter is <a class="reference external" href="https://docs.python.org/3/libra
 
 <dl class="py data">
 <dt class="sig sig-object py" id="gjson.__version__">
-<span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">__version__</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.0.1'</span></em><a class="headerlink" href="#gjson.__version__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">__version__</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.0.3'</span></em><a class="headerlink" href="#gjson.__version__" title="Permalink to this definition">¶</a></dt>
 <dd><p>the version of the current gjson module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -296,7 +378,7 @@ parameter is <a class="reference external" href="https://docs.python.org/3/libra
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gjson.GJSONObj">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#GJSONObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_modifiers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#GJSONObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A low-level class to perform the GJSON query on a JSON-like object.</p>
 <p>Initialize the instance with the starting object and query.</p>
@@ -313,6 +395,9 @@ parameter is <a class="reference external" href="https://docs.python.org/3/libra
 <li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – the JSON-like object to query.</p></li>
 <li><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the GJSON query to apply to the object.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="#gjson.GJSONError" title="gjson.GJSONError"><strong>gjson.GJSONError</strong></a> – if any provided custom modifier overrides a built-in one or is not callable.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -357,6 +442,20 @@ parameter is <a class="reference external" href="https://docs.python.org/3/libra
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>the JSON encoded string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gjson.GJSONObj.builtin_modifiers">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">builtin_modifiers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#GJSONObj.builtin_modifiers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj.builtin_modifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the names of the built-in modifiers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the names of the built-in modifiers.</p>
 </dd>
 </dl>
 </dd></dl>

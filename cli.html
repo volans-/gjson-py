@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CLI &mdash; gjson-py 0.0.1 documentation</title>
+  <title>CLI &mdash; gjson-py 0.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -30,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.1
+                0.0.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -76,14 +77,14 @@
            <div itemprop="articleBody">
              
   <section id="cli">
-<h1>CLI<a class="headerlink" href="#cli" title="Permalink to this headline">¶</a></h1>
+<h1>CLI<a class="headerlink" href="#cli" title="Permalink to this heading">¶</a></h1>
 <p><p>A simple way to filter and extract data from JSON-like data structures. Python porting of the Go GJSON package.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">gjson</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="n">file</span> <span class="n">query</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">gjson</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="n">file</span> <span class="n">query</span>
 </pre></div>
 </div>
 <section id="Positional Arguments">
-<h2>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h2>
+<h2>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h2>
 <dl class="option-list">
 <dt><kbd>file</kbd></dt>
 <dd><p>Input JSON file to query/filter. Use “-” to read from stdin.</p>
@@ -94,10 +95,13 @@
 </dl>
 </section>
 <section id="Named Arguments">
-<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h2>
 <dl class="option-list">
 <dt><kbd>-v, --verbose</kbd></dt>
 <dd><p>Verbosity level. By default on error no output will be printed. Use -v to get the error message to stderr and -vv to get the full traceback.</p>
+</dd>
+<dt><kbd>-l, --lines</kbd></dt>
+<dd><p>Treat the input as JSON Lines, parse each line and apply the query to each line.</p>
 </dd>
 </dl>
 </section>
