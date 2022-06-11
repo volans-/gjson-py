@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release Notes &mdash; gjson-py 0.0.3 documentation</title>
+  <title>Release Notes &mdash; gjson-py 0.0.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.3
+                0.0.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -45,15 +45,21 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#v0-0-3-2022-06-11">v0.0.3 (2022-06-11)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-4-2022-06-11">v0.0.4 (2022-06-11)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#new-features">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minor-improvements">Minor improvements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#miscellanea">Miscellanea</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#v0-0-2-2022-05-31">v0.0.2 (2022-05-31)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Bug fixes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-3-2022-06-11">v0.0.3 (2022-06-11)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id2">Miscellanea</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-2-2022-05-31">v0.0.2 (2022-05-31)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Miscellanea</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-1-2022-05-22">v0.0.1 (2022-05-22)</a></li>
@@ -87,10 +93,35 @@
              
   <section id="release-notes">
 <h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this heading">¶</a></h1>
-<section id="v0-0-3-2022-06-11">
-<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.3">v0.0.3</a> (2022-06-11)<a class="headerlink" href="#v0-0-3-2022-06-11" title="Permalink to this heading">¶</a></h2>
+<section id="v0-0-4-2022-06-11">
+<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.4">v0.0.4</a> (2022-06-11)<a class="headerlink" href="#v0-0-4-2022-06-11" title="Permalink to this heading">¶</a></h2>
 <section id="new-features">
 <h3>New features<a class="headerlink" href="#new-features" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>CLI: improve the JSON Lines support allowing to use the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> CLI argument and the special query prefix
+<code class="docutils literal notranslate"><span class="pre">..</span></code> syntax together to encapsulate each parsed line in an array to enable filtering using the Queries
+capabilities.</p></li>
+</ul>
+</section>
+<section id="minor-improvements">
+<h3>Minor improvements<a class="headerlink" href="#minor-improvements" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>CLI: the input file CLI argument is now optional, defaulting to read from stdin. The equivalent of passing <code class="docutils literal notranslate"><span class="pre">-</span></code>.</p></li>
+<li><p>Modifiers: add support for the upstream Go GJSON modifier <code class="docutils literal notranslate"><span class="pre">&#64;this</span></code>, that just returns the current object.</p></li>
+</ul>
+</section>
+<section id="miscellanea">
+<h3>Miscellanea<a class="headerlink" href="#miscellanea" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Documentation: add a section to with examples on how to use the CLI.</p></li>
+<li><p>CLI: add a link at the bottom of the help message of the CLI to the online documentation.</p></li>
+</ul>
+</section>
+</section>
+<section id="v0-0-3-2022-06-11">
+<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.3">v0.0.3</a> (2022-06-11)<a class="headerlink" href="#v0-0-3-2022-06-11" title="Permalink to this heading">¶</a></h2>
+<section id="id1">
+<h3>New features<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Add CLI support for JSON Lines:</p>
 <ul>
@@ -151,8 +182,8 @@ incompatible objects is catched and raise as a GJSONError.</p></li>
 </li>
 </ul>
 </section>
-<section id="miscellanea">
-<h3>Miscellanea<a class="headerlink" href="#miscellanea" title="Permalink to this heading">¶</a></h3>
+<section id="id2">
+<h3>Miscellanea<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>tests: when matching exception messages always escape the string or use raw strings to avoid false matchings.</p></li>
 <li><p>pylint: remove unnecessary comments</p></li>
@@ -161,15 +192,15 @@ incompatible objects is catched and raise as a GJSONError.</p></li>
 </section>
 <section id="v0-0-2-2022-05-31">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.2">v0.0.2</a> (2022-05-31)<a class="headerlink" href="#v0-0-2-2022-05-31" title="Permalink to this heading">¶</a></h2>
-<section id="id1">
-<h3>Bug fixes<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<section id="id3">
+<h3>Bug fixes<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&#64;sort</span></code> modifier: fix the actual sorting.</p></li>
 <li><p>tests: ensure that mapping-like objects are compared also in the order of their keys.</p></li>
 </ul>
 </section>
-<section id="id2">
-<h3>Miscellanea<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<section id="id4">
+<h3>Miscellanea<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>GitHub actions: add workflow to run tox.</p></li>
 <li><p>GitHub actions: fix branch name for pushes</p></li>

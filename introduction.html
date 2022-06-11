@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; gjson-py 0.0.3 documentation</title>
+  <title>Introduction &mdash; gjson-py 0.0.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CLI" href="cli.html" />
-    <link rel="prev" title="gjson-py 0.0.3 documentation" href="index.html" /> 
+    <link rel="prev" title="gjson-py 0.0.4 documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.3
+                0.0.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -47,6 +47,16 @@
 <li class="toctree-l2"><a class="reference internal" href="#how-to-use-the-library">How to use the library</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#gjson-get"><code class="docutils literal notranslate"><span class="pre">gjson.get()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#gjson-class"><code class="docutils literal notranslate"><span class="pre">GJSON</span></code> class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-use-the-cli">How to use the CLI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#json-lines">JSON Lines</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#apply-the-same-query-to-each-line">Apply the same query to each line</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#encapsulate-all-lines-in-an-array-then-apply-the-query">Encapsulate all lines in an array, then apply the query</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filter-lines-based-on-their-values">Filter lines based on their values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filter-lines-and-apply-query-to-the-result">Filter lines and apply query to the result</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#query-syntax">Query syntax</a><ul>
@@ -139,6 +149,75 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
 </pre></div>
 </div>
 <p>See the full API documentation for more details.</p>
+</section>
+</section>
+<section id="how-to-use-the-cli">
+<h2>How to use the CLI<a class="headerlink" href="#how-to-use-the-cli" title="Permalink to this heading">¶</a></h2>
+<p>gjson-py provides also a command line interface (CLI) for ease of use:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;{&quot;name&quot;: {&quot;first&quot;: &quot;Tom&quot;, &quot;last&quot;: &quot;Anderson&quot;}, &quot;age&quot;: 37}&#39;</span> &gt; test.json
+<span class="gp">$ </span>cat test.json <span class="p">|</span> gjson <span class="s1">&#39;name.first&#39;</span>  <span class="c1"># Read from stdin</span>
+<span class="go">&quot;Tom&quot;</span>
+<span class="gp">$ </span>gjson test.json <span class="s1">&#39;age&#39;</span>  <span class="c1"># Read from a file</span>
+<span class="go">37</span>
+<span class="gp">$ </span>cat test.json <span class="p">|</span> gjson - <span class="s1">&#39;name.first&#39;</span>  <span class="c1"># Explicitely read from stdin</span>
+<span class="go">&quot;Tom&quot;</span>
+</pre></div>
+</div>
+<section id="json-lines">
+<h3>JSON Lines<a class="headerlink" href="#json-lines" title="Permalink to this heading">¶</a></h3>
+<p>JSON Lines support in the CLI allows for different use cases. All the examples in this section operates on a
+<code class="docutils literal notranslate"><span class="pre">test.json</span></code> file generated with:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> -e <span class="s1">&#39;{&quot;name&quot;: &quot;Gilbert&quot;, &quot;age&quot;: 61}\n{&quot;name&quot;: &quot;Alexa&quot;, &quot;age&quot;: 34}\n{&quot;name&quot;: &quot;May&quot;, &quot;age&quot;: 57}&#39;</span> &gt; test.json
+</pre></div>
+</div>
+<section id="apply-the-same-query-to-each-line">
+<h4>Apply the same query to each line<a class="headerlink" href="#apply-the-same-query-to-each-line" title="Permalink to this heading">¶</a></h4>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> CLI argument, for each input line gjson-py applies the query and filters the data according
+to it. Lines are read one by one so there is no memory overhead for the processing. It can be used while tailing log
+files in JSON format for example.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;age&#39;</span>
+<span class="go">61</span>
+<span class="go">34</span>
+<span class="go">57</span>
+<span class="gp">$ </span>tail -f log.json <span class="p">|</span> gjson --lines <span class="s1">&#39;bytes_sent&#39;</span>  <span class="c1"># Dummy example</span>
+</pre></div>
+</div>
+</section>
+<section id="encapsulate-all-lines-in-an-array-then-apply-the-query">
+<h4>Encapsulate all lines in an array, then apply the query<a class="headerlink" href="#encapsulate-all-lines-in-an-array-then-apply-the-query" title="Permalink to this heading">¶</a></h4>
+<p>Using the special query prefix syntax <code class="docutils literal notranslate"><span class="pre">..</span></code>, as described in GJSON’s documentation for <a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a>, gjson-py will
+read all lines from the input and encapsulate them into an array. This approach has of course the memory overhead of
+loading the whole input to perform the query.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson test.json <span class="s1">&#39;..#.name&#39;</span>
+<span class="go">[&quot;Gilbert&quot;, &quot;Alexa&quot;, &quot;May&quot;]</span>
+</pre></div>
+</div>
+</section>
+<section id="filter-lines-based-on-their-values">
+<h4>Filter lines based on their values<a class="headerlink" href="#filter-lines-based-on-their-values" title="Permalink to this heading">¶</a></h4>
+<p>Combining the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> CLI argument with the special query prefix <code class="docutils literal notranslate"><span class="pre">..</span></code> described above, it’s possible to filter
+input lines based on their values. In this case gjson-py encapsulates each line in an array so that is possible to use
+the <a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#queries">Queries</a> GJSON syntax to filter them. As the ecapsulation is performed on each line, there is no memory overhead.
+Because technically when a line is filtered is because there was no match on the whole line query, the final exit code,
+if any line is filtered, will be <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;..#(age&gt;40).name&#39;</span>
+<span class="go">&quot;Gilbert&quot;</span>
+<span class="go">&quot;May&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="filter-lines-and-apply-query-to-the-result">
+<h4>Filter lines and apply query to the result<a class="headerlink" href="#filter-lines-and-apply-query-to-the-result" title="Permalink to this heading">¶</a></h4>
+<p>Combining the methods above is possible for example to filter/extract data from the lines first and then apply a query
+to the aggregated result. The memory overhead in this case is based on the amount of data resulting from the first
+filtering/extraction.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;age&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;..@sort&#39;</span>
+<span class="go">[34, 57, 61]</span>
+<span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;..#(age&gt;40).age&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;..@sort&#39;</span>
+<span class="go">[57, 61]</span>
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 <section id="query-syntax">
@@ -251,7 +330,7 @@ a list before calling gjson-py.</p>
 <td><p>The <code class="docutils literal notranslate"><span class="pre">width</span></code> argument is not supported</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;this</span></code></p></td>
-<td><p>NO</p></td>
+<td><p>YES</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;valid</span></code></p></td>
@@ -300,7 +379,7 @@ a list before calling gjson-py.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.0.3 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.0.4 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cli.html" class="btn btn-neutral float-right" title="CLI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
