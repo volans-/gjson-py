@@ -208,6 +208,9 @@ class TestObject:
         ('friends.#(last=={1: 2})', 'Invalid value "{1: 2}" for the query key "last".'),
         ('friends.#(invalid', r'Invalid query part #\(invalid. Expected in the format.'),
         ('#(first)', 'Queries are supported only for sequence like objects'),
+        ('friends.#(last=="invalid")',
+         re.escape('Query part last=="invalid" for first element does not match anything.')),
+        ('friends.#(first%"D?")', re.escape('Query part first%"D?" for first element does not match anything.')),
         # Dot vs Pipe
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers

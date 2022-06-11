@@ -580,7 +580,10 @@ class GJSONObj:
         if all_items:
             return ret
 
-        return ret[0] if ret else []
+        if ret:
+            return ret[0]
+
+        raise GJSONError(f'Query part {query} for first element does not match anything.')
 
     def _parse_modifier(self, part: str, obj: Any, *, last: bool) -> Any:  # noqa: MC0001
         """Parse a modifier.
