@@ -557,7 +557,7 @@ class GJSONObj:
         elif op_str == '>=':
             oper = operator.ge
         elif op_str in ('%', '!%'):
-            value = str(value).replace('*', '.*').replace('?', '.?')
+            value = str(value).replace('*', '.*').replace('?', '.')
             value = f'^{value}$'
             if op_str == '%':
                 def match_op(obj_a: Any, obj_b: Any) -> bool:

@@ -151,6 +151,7 @@ class TestObject:
         ('friends.#(age!=44)#.last', ['Craig', 'Murphy']),
         ('friends.#(first%"D*").last', 'Murphy'),
         ('friends.#(first!%"D*").last', 'Craig'),
+        ('friends.#(first!%"D???").last', 'Craig'),
         ('friends.#(%0)#', []),
         ('children.#(!%"*a*")', 'Alex'),
         ('children.#(%"*a*")#', ['Sara', 'Jack']),
