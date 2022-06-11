@@ -197,36 +197,34 @@ class TestObject:
         ('children.invalid', 'Invalid or unsupported query part "invalid" for query children.invalid.'),
         # Wildcards
         ('x*', 'No key matching pattern with wildcard x*'),
-        ('??????????', re.escape('No key matching pattern with wildcard ??????????')),
-        ('children.x*',
-         re.escape("Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>")),
-        ('(-?', re.escape('No key matching pattern with wildcard (-?.')),
+        ('??????????', 'No key matching pattern with wildcard ??????????'),
+        ('children.x*', "Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>"),
+        ('(-?', 'No key matching pattern with wildcard (-?.'),
         # Queries
         ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
         ('#.invalid', 'Invalid or unsupported query part "invalid" for query #.invalid.'),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
         ('friends.#(last=={1: 2})', 'Invalid value "{1: 2}" for the query key "last".'),
-        ('friends.#(invalid', r'Invalid query part #\(invalid. Expected in the format.'),
+        ('friends.#(invalid', 'Invalid query part #(invalid. Expected in the format'),
         ('#(first)', 'Queries are supported only for sequence like objects'),
-        ('friends.#(last=="invalid")',
-         re.escape('Query part last=="invalid" for first element does not match anything.')),
-        ('friends.#(first%"D?")', re.escape('Query part first%"D?" for first element does not match anything.')),
+        ('friends.#(last=="invalid")', 'Query part last=="invalid" for first element does not match anything.'),
+        ('friends.#(first%"D?")', 'Query part first%"D?" for first element does not match anything.'),
         # Dot vs Pipe
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers
         ('@pretty:', 'Unable to load options for modifier @pretty'),
         ('@pretty:{invalid', 'Unable to load options for modifier @pretty'),
         ('@pretty:["invalid"]',
-         re.escape("Invalid options for modifier @pretty, expected mapping got <class 'list'>: ['invalid']")),
+         "Invalid options for modifier @pretty, expected mapping got <class 'list'>: ['invalid']"),
         ('@invalid', 'Unknown modifier @invalid'),
-        ('children.@keys', re.escape('The current object does not have a keys() method.')),
-        ('children.@values', re.escape('The current object does not have a values() method.')),
+        ('children.@keys', 'The current object does not have a keys() method.'),
+        ('children.@values', 'The current object does not have a values() method.'),
         # JSON Lines
         ('..name', 'Empty query part between two delimiters'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=error):
+        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
             self.object.get(query)
 
 
@@ -313,13 +311,13 @@ class TestList:
 
     @pytest.mark.parametrize('query, error', (
         # Dot vs Pipe
-        ('#|first', 'Invalid or unsupported query #|first.'),
+        ('#|first', 'Invalid or unsupported query part "first" for query #|first.'),
         ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
         ('#|#', 'The pipe delimiter cannot immediately follow the # element.'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=error):
+        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
             self.list.get(query)
 
 
@@ -459,13 +457,13 @@ class TestCustomModifiers:
         """It should raise a GJSONError if trying to register a modifier with the same name of a built-in one."""
         obj = gjson.GJSON(self.valid_obj)
         with pytest.raises(gjson.GJSONError,
-                           match='Unable to register a modifier with the same name of the built-in modifier: @valid'):
+                           match=r'Unable to register a modifier with the same name of the built-in modifier: @valid'):
             obj.register_modifier('valid', custom_sum)
 
     def test_gjson_register_modifier_not_callable(self):
         """It should raise a GJSONError if trying to register a modifier that is not callable."""
         obj = gjson.GJSON(self.valid_obj)
-        with pytest.raises(gjson.GJSONError, match='The given func "not-callable" for the custom modifier @sum does'):
+        with pytest.raises(gjson.GJSONError, match=r'The given func "not-callable" for the custom modifier @sum does'):
             obj.register_modifier('sum', 'not-callable')
 
     def test_gjsonobj_custom_modifiers_ok(self):
@@ -476,18 +474,18 @@ class TestCustomModifiers:
     def test_gjsonobj_custom_modifiers_raise(self):
         """It should encapsulate the modifier raised exception in a GJSONError."""
         with pytest.raises(gjson.GJSONError,
-                           match='Modifier @sum raised an exception'):
+                           match=r'Modifier @sum raised an exception'):
             gjson.GJSONObj(self.invalid_obj, self.query, custom_modifiers={'sum': custom_sum}).get()
 
     def test_gjsonobj_custom_modifiers_override_builtin(self):
         """It should raise a GJSONError if passing custom modifiers that have the same name of a built-in one."""
         with pytest.raises(gjson.GJSONError,
-                           match="Some provided custom_modifiers have the same name of built-in ones: {'valid'}"):
+                           match=r"Some provided custom_modifiers have the same name of built-in ones: {'valid'}"):
             gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'valid': custom_sum})
 
     def test_gjsoniobj_custom_modifiers_not_callable(self):
         """It should raise a GJSONError if passing custom modifiers that are not callable."""
-        with pytest.raises(gjson.GJSONError, match='The given func "not-callable" for the custom modifier @sum does'):
+        with pytest.raises(gjson.GJSONError, match=r'The given func "not-callable" for the custom modifier @sum does'):
             gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'sum': 'not-callable'})
 
     def test_gjsonobj_builtin_modifiers(self):
@@ -557,7 +555,7 @@ def test_cli_stdin_query_verbosity_2(monkeypatch):
     """It should exit with a failure exit code and print the full traceback."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
     with pytest.raises(
-            gjson.GJSONError, match='Mapping object does not have key nonexistent for query nonexistent'):
+            gjson.GJSONError, match=r'Mapping object does not have key nonexistent for query nonexistent'):
         gjson.cli(['-vv', '-', 'nonexistent'])
 
 
@@ -595,14 +593,14 @@ def test_cli_lines_failed_linesi_verbosity_2(monkeypatch):
     """It should interrupt the processing and print the full traceback."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
     with pytest.raises(
-            json.decoder.JSONDecodeError, match='Expecting property name enclosed in double quotes'):
+            json.decoder.JSONDecodeError, match=r'Expecting property name enclosed in double quotes'):
         gjson.cli(['-vv', '--lines', '-', 'name'])
 
 
 def test_cli_lines_double_dot_query(monkeypatch):
     """It should fail the argument parsing and exit."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    with pytest.raises(SystemExit, match='2'):
+    with pytest.raises(SystemExit, match=r'2'):
         gjson.cli(['--lines', '-', '..name'])
 
 
@@ -639,5 +637,5 @@ def test_cli_double_dot_query_failed_lines_verbosity_1(monkeypatch, capsys):
 def test_cli_double_dot_query_failed_lines_verbosity_2(monkeypatch):
     """It should interrupt the execution at the first invalid line and exit printing the traceback."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    with pytest.raises(json.decoder.JSONDecodeError, match='Expecting property name enclosed in double quotes'):
+    with pytest.raises(json.decoder.JSONDecodeError, match=r'Expecting property name enclosed in double quotes'):
         gjson.cli(['-vv', '-', '..#.name'])
