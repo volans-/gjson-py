@@ -581,7 +581,7 @@ def test_cli_lines_failed_lines_verbosity_0(monkeypatch, capsys):
     assert not captured.err
 
 
-def test_cli_lines_failed_linesi_verbosity_1(monkeypatch, capsys):
+def test_cli_lines_failed_lines_verbosity_1(monkeypatch, capsys):
     """It should keep going with the other lines printing an error for the failed lines."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
     ret = gjson.cli(['-v', '--lines', '-', 'name'])
@@ -591,7 +591,7 @@ def test_cli_lines_failed_linesi_verbosity_1(monkeypatch, capsys):
     assert captured.err.count('JSONDecodeError') == 2
 
 
-def test_cli_lines_failed_linesi_verbosity_2(monkeypatch):
+def test_cli_lines_failed_lines_verbosity_2(monkeypatch):
     """It should interrupt the processing and print the full traceback."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
     with pytest.raises(
@@ -599,11 +599,14 @@ def test_cli_lines_failed_linesi_verbosity_2(monkeypatch):
         gjson.cli(['-vv', '--lines', '-', 'name'])
 
 
-def test_cli_lines_double_dot_query(monkeypatch):
-    """It should fail the argument parsing and exit."""
+def test_cli_lines_double_dot_query(monkeypatch, capsys):
+    """It should encapsulate each line in an array to allow queries."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    with pytest.raises(SystemExit, match=r'2'):
-        gjson.cli(['--lines', '-', '..name'])
+    ret = gjson.cli(['--lines', '..#(age>45).name'])
+    assert ret == 1
+    captured = capsys.readouterr()
+    assert captured.out == '"Gilbert"\n"May"\n'
+    assert not captured.err
 
 
 def test_cli_double_dot_query_ok(monkeypatch, capsys):

@@ -5,7 +5,7 @@ import operator
 import re
 import sys
 from collections.abc import Mapping, Sequence
-from typing import Any, Callable, Dict, IO, Optional, Protocol, runtime_checkable, Union
+from typing import Any, Callable, Dict, IO, Optional, Protocol, runtime_checkable
 
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -852,8 +852,6 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     """
     parser = get_parser()
     args = parser.parse_args(argv)
-    if args.lines and args.query.startswith('..'):
-        parser.error('Argument --lines and query starting with ".." (JSON Lines) are mutually exclusive.')
 
     encapsulate = False
     if args.query.startswith('..'):
@@ -872,15 +870,21 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
 
         return 1
 
-    def _execute(source: Union[str, IO[Any]], load_json: Callable[..., Any]) -> int:
+    def _execute(line: str, file_obj: Optional[IO[Any]]) -> int:
         try:
             if encapsulate:
-                input_data = []
-                for line in source:
-                    if line.strip():
-                        input_data.append(json.loads(line))
+                if line:
+                    input_data = [json.loads(line)]
+                elif file_obj is not None:
+                    input_data = []
+                    for input_line in file_obj:
+                        if input_line.strip():
+                            input_data.append(json.loads(input_line))
             else:
-                input_data = load_json(source)
+                if line:
+                    input_data = json.loads(line)
+                elif file_obj is not None:
+                    input_data = json.load(file_obj)
 
             result = get(input_data, args.query, as_str=True)
             exit_code = 0
@@ -903,11 +907,11 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
             line = line.strip()
             if not line:
                 continue
-            ret = _execute(line, load_json=json.loads)
+            ret = _execute(line, None)
             if ret > exit_code:
                 exit_code = ret
     else:
-        exit_code = _execute(args.file, load_json=json.load)
+        exit_code = _execute('', args.file)
 
     return exit_code
 
@@ -923,6 +927,8 @@ def get_parser() -> argparse.ArgumentParser:
         prog='gjson',
         description=('A simple way to filter and extract data from JSON-like data structures. Python porting of the '
                      'Go GJSON package.'),
+        epilog='See also the full documentation available at https://volans-.github.io/gjson-py/index.html',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument('-v', '--verbose', action='count', default=0,
                         help=('Verbosity level. By default on error no output will be printed. Use -v to get the '
@@ -930,7 +936,8 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument('-l', '--lines', action='store_true',
                         help='Treat the input as JSON Lines, parse each line and apply the query to each line.')
     # argparse.FileType is used later to parse this argument.
-    parser.add_argument('file', help='Input JSON file to query/filter. Use "-" to read from stdin.')
+    parser.add_argument('file', default='-', nargs='?',
+                        help='Input JSON file to query. Reads from stdin if the argument is missing or set to "-".')
     parser.add_argument('query', help='A GJSON query to apply to the input data.')
 
     return parser

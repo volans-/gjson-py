@@ -66,6 +66,88 @@ The ``GJSON`` class provides full access to the gjson-py API allowing to perform
 
 See the full API documentation for more details.
 
+How to use the CLI
+------------------
+
+gjson-py provides also a command line interface (CLI) for ease of use:
+
+.. code-block:: console
+
+    $ echo '{"name": {"first": "Tom", "last": "Anderson"}, "age": 37}' > test.json
+    $ cat test.json | gjson 'name.first'  # Read from stdin
+    "Tom"
+    $ gjson test.json 'age'  # Read from a file
+    37
+    $ cat test.json | gjson - 'name.first'  # Explicitely read from stdin
+    "Tom"
+
+JSON Lines
+^^^^^^^^^^
+
+JSON Lines support in the CLI allows for different use cases. All the examples in this section operates on a
+``test.json`` file generated with:
+
+.. code-block:: console
+
+    $ echo -e '{"name": "Gilbert", "age": 61}\n{"name": "Alexa", "age": 34}\n{"name": "May", "age": 57}' > test.json
+
+Apply the same query to each line
+"""""""""""""""""""""""""""""""""
+
+Using the ``-l/--lines`` CLI argument, for each input line gjson-py applies the query and filters the data according
+to it. Lines are read one by one so there is no memory overhead for the processing. It can be used while tailing log
+files in JSON format for example.
+
+
+.. code-block:: console
+
+    $ gjson --lines test.json 'age'
+    61
+    34
+    57
+    $ tail -f log.json | gjson --lines 'bytes_sent'  # Dummy example
+
+Encapsulate all lines in an array, then apply the query
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Using the special query prefix syntax ``..``, as described in GJSON's documentation for `JSON Lines`_, gjson-py will
+read all lines from the input and encapsulate them into an array. This approach has of course the memory overhead of
+loading the whole input to perform the query.
+
+.. code-block:: console
+
+    $ gjson test.json '..#.name'
+    ["Gilbert", "Alexa", "May"]
+
+Filter lines based on their values
+""""""""""""""""""""""""""""""""""
+
+Combining the ``-l/--lines`` CLI argument with the special query prefix ``..`` described above, it's possible to filter
+input lines based on their values. In this case gjson-py encapsulates each line in an array so that is possible to use
+the `Queries`_ GJSON syntax to filter them. As the ecapsulation is performed on each line, there is no memory overhead.
+Because technically when a line is filtered is because there was no match on the whole line query, the final exit code,
+if any line is filtered, will be ``1``.
+
+.. code-block:: console
+
+    $ gjson --lines test.json '..#(age>40).name'
+    "Gilbert"
+    "May"
+
+Filter lines and apply query to the result
+""""""""""""""""""""""""""""""""""""""""""
+
+Combining the methods above is possible for example to filter/extract data from the lines first and then apply a query
+to the aggregated result. The memory overhead in this case is based on the amount of data resulting from the first
+filtering/extraction.
+
+.. code-block:: console
+
+    $ gjson --lines test.json 'age' | gjson '..@sort'
+    [34, 57, 61]
+    $ gjson --lines test.json '..#(age>40).age' | gjson '..@sort'
+    [57, 61]
+
 Query syntax
 ------------
 
