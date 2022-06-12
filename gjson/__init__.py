@@ -243,7 +243,7 @@ DOT_DELIMITER = '.'
 PIPE_DELIMITER = '|'
 """str: One of the available delimiters in the query grammar."""
 # Single character operators goes last to avoid mis-detection.
-QUERIES_OPERATORS = ('==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
+QUERIES_OPERATORS = ('==~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
 """tuple: The list of supported operators inside queries."""
 
 
@@ -544,7 +544,21 @@ class GJSONObj:
             raise GJSONError('Query on mapping like objects require a key before the operator.')
 
         oper: Callable[[Any, Any], bool]
-        if op_str in ('==', '='):
+        if op_str == '==~':
+            if value not in (True, False):
+                if all_items:
+                    return []
+
+                raise GJSONError(f'Queries ==~ operator requires a boolean value, got {type(value)} instead: {value}.')
+
+            def truthy_op(obj_a: Any, obj_b: bool) -> bool:
+                truthy = operator.truth(obj_a)
+                if obj_b:
+                    return truthy
+                return not truthy
+
+            oper = truthy_op
+        elif op_str in ('==', '='):
             oper = operator.eq
         elif op_str == '!=':
             oper = operator.ne
@@ -574,7 +588,10 @@ class GJSONObj:
 
         try:
             if key:
-                ret = [i for i in obj if key in i and oper(i[key], value)]
+                if op_str == '==~':  # Consider missing keys as falsy according to GJSON docs.
+                    ret = [i for i in obj if oper(i.get(key), value)]
+                else:
+                    ret = [i for i in obj if key in i and oper(i[key], value)]
             else:  # Query on an array of non-objects, match them directly
                 ret = [i for i in obj if oper(i, value)]
         except TypeError:

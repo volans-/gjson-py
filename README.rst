@@ -172,7 +172,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Arrays`_              | YES                    |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Queries`_             | PARTIALLY              | Subqueries and the tilde operator are not supported |
+| `Queries`_             | PARTIALLY              | Subqueries are not supported [#]_                   |
 +------------------------+------------------------+-----------------------------------------------------+
 | `Dot vs Pipe`_         | YES                    |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
@@ -189,6 +189,8 @@ This is the list of GJSON features and how they are supported by gjson-py:
 | `JSON Lines`_          | YES                    | CLI support [#]_ [#]_                               |
 +------------------------+------------------------+-----------------------------------------------------+
 
+.. [#] The queries matching is based on Python's operator and as such the results might be different than the ones from
+   the Go GJSON package. In particular for the ``~`` operator that checks the truthy-ness of objects.
 .. [#] Both for applying the same query to each line using the ``-l/--lines`` argument and to automatically encapsulate
    the input lines in a list and apply the query to the list using the ``..`` special query prefix described in
    `JSON Lines`_.

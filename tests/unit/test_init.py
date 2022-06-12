@@ -98,6 +98,23 @@ INPUT_LINES_WITH_ERRORS = """
 {invalid
 {"name": "Deloise", "age": 44}
 """
+INPUT_TRUTHINESS = json.loads("""
+{
+  "vals": [
+    { "a": 1, "b": true },
+    { "a": 2, "b": true },
+    { "a": 3, "b": false },
+    { "a": 4, "b": "0" },
+    { "a": 5, "b": 0 },
+    { "a": 6, "b": "1" },
+    { "a": 7, "b": 1 },
+    { "a": 8, "b": "true" },
+    { "a": 9, "b": false },
+    { "a": 10, "b": null },
+    { "a": 11 }
+  ]
+}
+""")
 
 
 def compare_values(result, expected):
@@ -336,6 +353,33 @@ class TestFlatten:
     def test_get(self, query, expected):
         """It should correctly flatten the given object."""
         assert self.list.get(query, quiet=True) == expected
+
+
+class TestTruthiness:
+    """Testing gjson with an input object with truthy/falsy objects."""
+
+    def setup_method(self):
+        """Initialize the test instance."""
+        self.object = gjson.GJSON(INPUT_TRUTHINESS)
+
+    @pytest.mark.parametrize('query, expected', (
+        ('vals.#(b==~true).a', 1),
+        ('vals.#(b==~true)#.a', [1, 2, 4, 6, 7, 8]),
+        ('vals.#(b==~false).a', 3),
+        ('vals.#(b==~false)#.a', [3, 5, 9, 10, 11]),
+        ('vals.#(b==~"invalid")#', []),
+    ))
+    def test_get_ok(self, query, expected):
+        """It should query the JSON object and return the expected result."""
+        compare_values(self.object.get(query), expected)
+
+    @pytest.mark.parametrize('query, error', (
+        ('vals.#(b==~"invalid")', "Queries ==~ operator requires a boolean value, got <class 'str'> instead: invalid"),
+    ))
+    def test_get_raise(self, query, error):
+        """It should raise a GJSONError error with the expected message."""
+        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+            self.object.get(query)
 
 
 @pytest.mark.parametrize('modifier', ('@valid', '@this'))
