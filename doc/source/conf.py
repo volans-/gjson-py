@@ -63,6 +63,13 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+# -- Options for manual page output ---------------------------------------
+
+# One entry per manual page. List of tuples
+# (source start file, name, description, authors, manual section).
+man_pages = [
+    ('cli', 'gjson', 'filter and extract data from JSON-like files', [author], 1),
+]
 
 # -- Options for HTML output -------------------------------------------------
 
