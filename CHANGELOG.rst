@@ -1,6 +1,23 @@
 Release Notes
 =============
 
+`v0.0.5`_ (2022-08-05)
+^^^^^^^^^^^^^^^^^^^^^^
+
+New features
+""""""""""""
+
+* Queries: add support for the tilde operator:
+
+  * When performing queries on arrays, add support for the Go GJSON tilde operator to perform truthy-ness comparison.
+  * The comparison is based on Python's definition of truthy-ness, hence the actual results might differ from the ones
+    in the Go package.
+
+Minor improvements
+""""""""""""""""""
+
+* documentation: add man page for the gjson binary.
+
 `v0.0.4`_ (2022-06-11)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -115,3 +132,4 @@ Miscellanea
 .. _`v0.0.2`: https://github.com/volans-/gjson-py/releases/tag/v0.0.2
 .. _`v0.0.3`: https://github.com/volans-/gjson-py/releases/tag/v0.0.3
 .. _`v0.0.4`: https://github.com/volans-/gjson-py/releases/tag/v0.0.4
+.. _`v0.0.5`: https://github.com/volans-/gjson-py/releases/tag/v0.0.5
