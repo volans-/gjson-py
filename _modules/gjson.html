@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson &mdash; gjson-py 0.0.4 documentation</title>
+  <title>gjson &mdash; gjson-py 0.0.5 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -28,7 +28,7 @@
             <a href="../index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.4
+                0.0.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -315,7 +315,7 @@
 <span class="n">PIPE_DELIMITER</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span>
 <span class="sd">&quot;&quot;&quot;str: One of the available delimiters in the query grammar.&quot;&quot;&quot;</span>
 <span class="c1"># Single character operators goes last to avoid mis-detection.</span>
-<span class="n">QUERIES_OPERATORS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;!=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;!%&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span>
+<span class="n">QUERIES_OPERATORS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;==~&#39;</span><span class="p">,</span> <span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;!=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;!%&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;tuple: The list of supported operators inside queries.&quot;&quot;&quot;</span>
 
 
@@ -616,7 +616,21 @@
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;Query on mapping like objects require a key before the operator.&#39;</span><span class="p">)</span>
 
         <span class="n">oper</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">op_str</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">op_str</span> <span class="o">==</span> <span class="s1">&#39;==~&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">all_items</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">[]</span>
+
+                <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Queries ==~ operator requires a boolean value, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1"> instead: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">truthy_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="n">truthy</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span><span class="n">obj_a</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">obj_b</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">truthy</span>
+                <span class="k">return</span> <span class="ow">not</span> <span class="n">truthy</span>
+
+            <span class="n">oper</span> <span class="o">=</span> <span class="n">truthy_op</span>
+        <span class="k">elif</span> <span class="n">op_str</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">):</span>
             <span class="n">oper</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span>
         <span class="k">elif</span> <span class="n">op_str</span> <span class="o">==</span> <span class="s1">&#39;!=&#39;</span><span class="p">:</span>
             <span class="n">oper</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span>
@@ -646,7 +660,10 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
-                <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="n">op_str</span> <span class="o">==</span> <span class="s1">&#39;==~&#39;</span><span class="p">:</span>  <span class="c1"># Consider missing keys as falsy according to GJSON docs.</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">value</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># Query on an array of non-objects, match them directly</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">)]</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>

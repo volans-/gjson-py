@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; gjson-py 0.0.4 documentation</title>
+  <title>Introduction &mdash; gjson-py 0.0.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CLI" href="cli.html" />
-    <link rel="prev" title="gjson-py 0.0.4 documentation" href="index.html" /> 
+    <link rel="prev" title="gjson-py 0.0.5 documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,7 +31,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.4
+                0.0.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -261,7 +261,7 @@ filtering/extraction.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#queries">Queries</a></p></td>
 <td><p>PARTIALLY</p></td>
-<td><p>Subqueries and the tilde operator are not supported</p></td>
+<td><p>Subqueries are not supported <a class="footnote-reference brackets" href="#id4" id="id1">1</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#dot-vs-pipe">Dot vs Pipe</a></p></td>
 <td><p>YES</p></td>
@@ -289,17 +289,21 @@ filtering/extraction.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a></p></td>
 <td><p>YES</p></td>
-<td><p>CLI support <a class="footnote-reference brackets" href="#id3" id="id1">1</a> <a class="footnote-reference brackets" href="#id4" id="id2">2</a></p></td>
+<td><p>CLI support <a class="footnote-reference brackets" href="#id5" id="id2">2</a> <a class="footnote-reference brackets" href="#id6" id="id3">3</a></p></td>
 </tr>
 </tbody>
 </table>
 <dl class="footnote brackets">
-<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>The queries matching is based on Python’s operator and as such the results might be different than the ones from
+the Go GJSON package. In particular for the <code class="docutils literal notranslate"><span class="pre">~</span></code> operator that checks the truthy-ness of objects.</p>
+</dd>
+<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p>Both for applying the same query to each line using the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> argument and to automatically encapsulate
 the input lines in a list and apply the query to the list using the <code class="docutils literal notranslate"><span class="pre">..</span></code> special query prefix described in
 <a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a>.</p>
 </dd>
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
 <dd><p>Library support is not currently present because gjson-py accepts only Python objects, making it impossible to
 pass JSON Lines directly. The client is free to choose if calling gjson-py for each line or to encapsulate them in
 a list before calling gjson-py.</p>
@@ -379,7 +383,7 @@ a list before calling gjson-py.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.0.4 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.0.5 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cli.html" class="btn btn-neutral float-right" title="CLI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
