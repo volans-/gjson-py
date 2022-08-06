@@ -25,6 +25,10 @@ gjson-py is available on the `Python Package Index`_ (PyPI) and can be easily in
 
     pip install gjson
 
+A ``debian`` branch is also present with all the configuration to build the package for Debian-based systems.
+A ``.deb`` package for the current stable and unstable Debian versions is also available for download on the
+`releases page on GitHub`_.
+
 How to use the library
 ----------------------
 
@@ -234,6 +238,7 @@ This is the list of modifiers and how they are supported by gjson-py:
 .. _`Python Package Index`: https://pypi.org/project/gjson/
 .. _`GJSON Path Syntax`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md
 .. _`gjson-py documentation`: https://volans-.github.io/gjson-py/index.html
+.. _`releases page on GitHub`: https://github.com/volans-/gjson-py/releases
 
 .. _`Path Structure`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#path-structure
 .. _`Basic`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#basic
