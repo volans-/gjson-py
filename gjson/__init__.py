@@ -890,7 +890,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     # Use argparse.FileType here instead of putting it as type in the --file argument parsing, to allow to handle the
     # verbosity in case of error and make sure the file is always closed in case other arguments fail the validation.
     try:
-        args.file = argparse.FileType(encoding='utf-8')(args.file)
+        args.file = argparse.FileType(encoding='utf-8', errors='surrogateescape')(args.file)
     except (OSError, argparse.ArgumentTypeError) as ex:
         if args.verbose == 1:
             print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
@@ -898,6 +898,12 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
             raise
 
         return 1
+
+    # Reconfigure __stdin__ and __stdout__ instead of stdin and stdout because the latters are TextIO and could not
+    # have the reconfigure() method if re-assigned, while reconfigure() is part of TextIOWrapper.
+    # See also: https://github.com/python/typeshed/pull/8171
+    sys.__stdin__.reconfigure(errors='surrogateescape')
+    sys.__stdout__.reconfigure(errors='surrogateescape')
 
     def _execute(line: str, file_obj: Optional[IO[Any]]) -> int:
         try:
