@@ -34,6 +34,7 @@ pylint:
     - pointless-string-statement  # used as documentation for class attributes
   options:
     max-line-length: 120
+    max-module-lines: 2000
     include-naming-hint: true
 
 pyroma:

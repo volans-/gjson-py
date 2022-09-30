@@ -4,6 +4,7 @@ import json
 import operator
 import re
 import sys
+from collections import Counter
 from collections.abc import Mapping, Sequence
 from typing import Any, Callable, Dict, IO, Optional, Protocol, runtime_checkable
 
@@ -783,7 +784,7 @@ class GJSONObj:
         if isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
             return sorted(obj)
 
-        raise GJSONError(f'Sort modifier not supported for object of type {type(obj)}. '
+        raise GJSONError(f'@sort modifier not supported for object of type {type(obj)}. '
                          'Expected a mapping or sequence like object.')
 
     def _parse_modifier_valid(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
@@ -823,6 +824,29 @@ class GJSONObj:
         """
         del last  # for pylint, unused argument
         return obj
+
+    def _parse_modifier_top_n(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @top_n modifier to find the most common values of a given field.
+
+        Arguments:
+            options: the eventual modifier options. If not specified all items are returned. If specified it must
+                contain a 'n' key with the number of top N to return.
+            obj: the current object to extract the N most common items.
+            last: whether this is the final part of the query.
+
+        Raises:
+            gjson.GJSONError: if the current object is not a sequence.
+
+        Returns:
+            dict: a dictionary of unique items as keys and the count as value.
+
+        """
+        del last  # for pylint, unused argument
+        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+            raise GJSONError(f'@top_n modifier not supported for object of type {type(obj)}. '
+                             'Expected a sequence like object.')
+
+        return dict(Counter(obj).most_common(options.get('n')))
 
     def _parse_modifier_flatten(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @flatten modifier.

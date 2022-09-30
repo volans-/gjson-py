@@ -425,6 +425,30 @@ def test_gjson_get_gjson():
     assert str(ret) == '["Sara", "Alex", "Jack"]'
 
 
+@pytest.mark.parametrize('data, num, expected', (
+    # Valid data
+    ('[1, 2, 3, 4, 5]', None, {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}),
+    ('[1, 2, 3, 4, 5]', 0, {}),
+    ('[1, 2, 3, 4, 5]', 2, {1: 1, 2: 1}),
+    ('[1, 1, 1, 1, 1]', None, {1: 5}),
+    ('[1, 1, 1, 1, 1]', 1, {1: 5}),
+    ('[1, 1, 1, 2, 2, 3]', None, {1: 3, 2: 2, 3: 1}),
+    ('[1, 1, 1, 2, 2, 3, 3, 3, 3]', None, {3: 4, 1: 3, 2: 2}),
+    ('[1, 1, 1, 2, 2, 3, 3, 3, 3]', 2, {3: 4, 1: 3}),
+    # Invalid data
+    ('{"key": "value"}', None, None),
+    ('1', None, None),
+    ('"value"', None, None),
+))
+def test_get_modifier_top_n(data, num, expected):
+    """It should return the top N common items."""
+    obj = gjson.GJSON(json.loads(data))
+    if num is not None:
+        compare_values(obj.get(f'@top_n:{{"n": {num}}}', quiet=True), expected)
+    else:
+        compare_values(obj.get('@top_n', quiet=True), expected)
+
+
 class TestJSONOutput:
     """Test class for all JSON output functionalities."""
 
@@ -548,7 +572,8 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'this', 'valid', 'values', 'ugly'}
+        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'this', 'top_n', 'valid', 'values',
+                    'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
 
 
