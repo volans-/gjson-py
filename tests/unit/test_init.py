@@ -430,7 +430,7 @@ class TestJSONOutput:
 
     def setup_method(self):
         """Initialize the test instance."""
-        self.obj = {'key': 'value'}
+        self.obj = {'key': 'value', 'hello world': '\u3053\u3093\u306b\u3061\u306f\u4e16\u754c'}
         self.query = 'key'
         self.value = '"value"'
         self.gjson = gjson.GJSON(self.obj)
@@ -456,9 +456,11 @@ class TestJSONOutput:
             self.gjson.getj('')
 
     @pytest.mark.parametrize('query, expected', (
-        ('@pretty', '{\n  "key": "value"\n}'),
-        ('@pretty:{"indent": 4}', '{\n    "key": "value"\n}'),
-        ('@pretty:{"indent": "\t"}', '{\n\t"key": "value"\n}'),
+        ('@pretty', '{\n  "key": "value",\n  "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
+        ('@pretty:{"indent": 4}',
+         '{\n    "key": "value",\n    "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
+        ('@pretty:{"indent": "\t"}',
+         '{\n\t"key": "value",\n\t"hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
     ))
     def test_modifier_pretty(self, query, expected):
         """It should prettyfy the JSON string based on the parameters."""
@@ -471,7 +473,17 @@ class TestJSONOutput:
 
     def test_modifier_ugly(self):
         """It should uglyfy the JSON string."""
-        assert gjson.get(self.obj, '@ugly', as_str=True) == '{"key":"value"}'
+        assert gjson.get(self.obj, '@ugly', as_str=True) == (
+            '{"key":"value","hello world":"\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"}')
+
+    def test_output_unicode(self):
+        """It should return unicode characters as-is."""
+        assert gjson.get(self.obj, 'hello world', as_str=True) == '"\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"'
+
+    def test_modifier_ascii(self):
+        """It should escape all non-ASCII characters."""
+        assert gjson.get(self.obj, 'hello world.@ascii', as_str=True) == (
+            '"\\u3053\\u3093\\u306b\\u3061\\u306f\\u4e16\\u754c"')
 
 
 def custom_sum(options, obj, *, last):
@@ -536,7 +548,7 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'flatten', 'keys', 'pretty', 'reverse', 'sort', 'this', 'valid', 'values', 'ugly'}
+        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'this', 'valid', 'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
 
 

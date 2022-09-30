@@ -213,6 +213,8 @@ This is the list of modifiers and how they are supported by gjson-py:
 +----------------+-----------------------+-----------------------------------------+
 | ``@pretty``    | PARTIALLY             | The ``width`` argument is not supported |
 +----------------+-----------------------+-----------------------------------------+
+| ``@ascii``     | Not present in GJSON  | Escapes all non-ASCII characters        |
++----------------+-----------------------+-----------------------------------------+
 | ``@this``      | YES                   |                                         |
 +----------------+-----------------------+-----------------------------------------+
 | ``@valid``     | YES                   |                                         |
@@ -231,7 +233,7 @@ This is the list of modifiers and how they are supported by gjson-py:
 +----------------+-----------------------+-----------------------------------------+
 | ``@group``     | NO                    |                                         |
 +----------------+-----------------------+-----------------------------------------+
-| ``@sort``      | YES                   | Not present in GJSON                    |
+| ``@sort``      | Not present in GJSON  | Sorts a mapping or sequence object      |
 +----------------+-----------------------+-----------------------------------------+
 
 .. _`GJSON`: https://github.com/tidwall/gjson

@@ -75,7 +75,7 @@ class GJSON:
             the JSON-encoded string representing the instantiated object.
 
         """
-        return json.dumps(self._obj)
+        return json.dumps(self._obj, ensure_ascii=False)
 
     def get(self, query: str, *, quiet: bool = False) -> Any:
         """Perform a query on the instantiated object and return the resulting object.
@@ -287,7 +287,7 @@ class GJSONObj:
                                      'to the gjson.ModifierProtocol')
 
         self._custom_modifiers = custom_modifiers if custom_modifiers else {}
-        self._dump_params: Dict[str, Any] = {}
+        self._dump_params: Dict[str, Any] = {'ensure_ascii': False}
         self._after_hash = False
         self._after_query_all = False
         self._previous_part: Optional[str] = None
@@ -309,7 +309,7 @@ class GJSONObj:
 
         """
         # Reset internal parameters
-        self._dump_params = {}
+        self._dump_params = {'ensure_ascii': False}
         self._after_hash = False
         self._after_query_all = False
         self._previous_part = None
@@ -712,7 +712,7 @@ class GJSONObj:
             raise GJSONError('The current object does not have a values() method.') from ex
 
     def _parse_modifier_ugly(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
-        """Apply the @ugly modifier.
+        """Apply the @ugly modifier to condense the output.
 
         Arguments:
             options: the eventual options for the modifier, currently unused.
@@ -724,17 +724,33 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        self._dump_params = {
-            'separators': (',', ':'),
-            'indent': None,
-        }
+        self._dump_params['separators'] = (',', ':')
+        self._dump_params['indent'] = None
         return obj
 
     def _parse_modifier_pretty(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
-        """Apply the @pretty modifier.
+        """Apply the @pretty modifier to pretty-print the output.
 
         Arguments:
             options: the eventual options for the modifier.
+            obj: the current object to prettyfy.
+            last: whether this is the final part of the query.
+
+        Returns:
+            the current object, unmodified.
+
+        """
+        del last  # for pylint, unused argument
+        self._dump_params['indent'] = options.get('indent', 2)
+        self._dump_params['sort_keys'] = options.get('sortKeys', False)
+        self._dump_params['prefix'] = options.get('prefix', '')
+        return obj
+
+    def _parse_modifier_ascii(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @ascii modifier to have all non-ASCII characters escaped when dumping the object.
+
+        Arguments:
+            options: the eventual options for the modifier, currently unused.
             obj: the current object to sort.
             last: whether this is the final part of the query.
 
@@ -743,15 +759,11 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        self._dump_params = {
-            'indent': options.get('indent', 2),
-            'sort_keys': options.get('sortKeys', False),
-            'prefix': options.get('prefix', ''),
-        }
+        self._dump_params['ensure_ascii'] = True
         return obj
 
     def _parse_modifier_sort(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
-        """Apply the @sort modifier.
+        """Apply the @sort modifier, sorts mapping and sequences.
 
         Arguments:
             options: the eventual options for the modifier, currently unused.
@@ -791,7 +803,7 @@ class GJSONObj:
         """
         del last  # for pylint, unused argument
         try:
-            json.dumps(obj)
+            json.dumps(obj, **self._dump_params)
         except Exception as ex:
             raise GJSONError('The current object cannot be converted to JSON.') from ex
 
