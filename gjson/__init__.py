@@ -5,8 +5,8 @@ import operator
 import re
 import sys
 from collections import Counter
-from collections.abc import Mapping, Sequence
-from typing import Any, Callable, Dict, IO, Optional, Protocol, runtime_checkable
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, IO, Optional, Protocol, runtime_checkable
 
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -61,7 +61,7 @@ class GJSON:
 
         """
         self._obj = obj
-        self._custom_modifiers: Dict[str, 'ModifierProtocol'] = {}
+        self._custom_modifiers: dict[str, 'ModifierProtocol'] = {}
 
     def __str__(self) -> str:
         """Return the current object as a JSON-encoded string.
@@ -205,7 +205,7 @@ class GJSONError(Exception):
 class ModifierProtocol(Protocol):
     """Callback protocol for the custom modifiers."""
 
-    def __call__(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def __call__(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """To register a custom modifier a callable that adhere to this protocol must be provided.
 
         Examples:
@@ -258,7 +258,7 @@ except DistributionNotFound:  # pragma: no cover - this should never happen duri
 class GJSONObj:
     """A low-level class to perform the GJSON query on a JSON-like object."""
 
-    def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[Dict[str, 'ModifierProtocol']] = None):
+    def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[dict[str, 'ModifierProtocol']] = None):
         """Initialize the instance with the starting object and query.
 
         Examples:
@@ -288,7 +288,7 @@ class GJSONObj:
                                      'to the gjson.ModifierProtocol')
 
         self._custom_modifiers = custom_modifiers if custom_modifiers else {}
-        self._dump_params: Dict[str, Any] = {'ensure_ascii': False}
+        self._dump_params: dict[str, Any] = {'ensure_ascii': False}
         self._after_hash = False
         self._after_query_all = False
         self._previous_part: Optional[str] = None
@@ -650,7 +650,7 @@ class GJSONObj:
         except Exception as ex:
             raise GJSONError(f'Modifier @{modifier} raised an exception') from ex
 
-    def _parse_modifier_reverse(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_reverse(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @reverse modifier.
 
         Arguments:
@@ -670,7 +670,7 @@ class GJSONObj:
 
         return obj
 
-    def _parse_modifier_keys(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_keys(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @keys modifier.
 
         Arguments:
@@ -691,7 +691,7 @@ class GJSONObj:
         except AttributeError as ex:
             raise GJSONError('The current object does not have a keys() method.') from ex
 
-    def _parse_modifier_values(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_values(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @values modifier.
 
         Arguments:
@@ -712,7 +712,7 @@ class GJSONObj:
         except AttributeError as ex:
             raise GJSONError('The current object does not have a values() method.') from ex
 
-    def _parse_modifier_ugly(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_ugly(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @ugly modifier to condense the output.
 
         Arguments:
@@ -729,7 +729,7 @@ class GJSONObj:
         self._dump_params['indent'] = None
         return obj
 
-    def _parse_modifier_pretty(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_pretty(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @pretty modifier to pretty-print the output.
 
         Arguments:
@@ -747,7 +747,7 @@ class GJSONObj:
         self._dump_params['prefix'] = options.get('prefix', '')
         return obj
 
-    def _parse_modifier_ascii(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_ascii(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @ascii modifier to have all non-ASCII characters escaped when dumping the object.
 
         Arguments:
@@ -763,7 +763,7 @@ class GJSONObj:
         self._dump_params['ensure_ascii'] = True
         return obj
 
-    def _parse_modifier_sort(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_sort(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @sort modifier, sorts mapping and sequences.
 
         Arguments:
@@ -787,7 +787,7 @@ class GJSONObj:
         raise GJSONError(f'@sort modifier not supported for object of type {type(obj)}. '
                          'Expected a mapping or sequence like object.')
 
-    def _parse_modifier_valid(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_valid(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @valid modifier, checking that the current object can be converted to JSON.
 
         Arguments:
@@ -810,7 +810,7 @@ class GJSONObj:
 
         return obj
 
-    def _parse_modifier_this(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_this(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @this modifier, that returns the current object.
 
         Arguments:
@@ -825,7 +825,7 @@ class GJSONObj:
         del last  # for pylint, unused argument
         return obj
 
-    def _parse_modifier_top_n(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_top_n(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @top_n modifier to find the most common values of a given field.
 
         Arguments:
@@ -848,7 +848,7 @@ class GJSONObj:
 
         return dict(Counter(obj).most_common(options.get('n')))
 
-    def _parse_modifier_sum_n(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_sum_n(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @sum_n modifier that groups the values of a given key while summing the values of another key.
 
         The key used to sum must have numeric values.
@@ -878,7 +878,7 @@ class GJSONObj:
             results[item[options['group']]] += item[options['sum']]
         return dict(results.most_common(options.get('n')))
 
-    def _parse_modifier_flatten(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_flatten(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @flatten modifier.
 
         Arguments:

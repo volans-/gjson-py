@@ -5,7 +5,7 @@ import io
 import json
 import re
 
-from typing import Mapping
+from collections.abc import Mapping
 
 import pytest
 
