@@ -115,6 +115,17 @@ INPUT_TRUTHINESS = json.loads("""
   ]
 }
 """)
+INPUT_SUM_N = json.loads("""
+[
+    {"key": "a", "value": 1, "other": "value"},
+    {"key": "b", "value": 2},
+    {"key": "c", "value": 3, "other": "value"},
+    {"key": "a", "value": 7},
+    {"key": "b", "value": 1.5},
+    {"key": "d", "value": 4},
+    {"key": "c", "value": 9}
+]
+""")
 
 
 def compare_values(result, expected):
@@ -449,6 +460,50 @@ def test_get_modifier_top_n(data, num, expected):
         compare_values(obj.get('@top_n', quiet=True), expected)
 
 
+@pytest.mark.parametrize('num, expected', (
+    (0, {}),
+    (1, {"c": 12}),
+    (2, {"c": 12, "a": 8}),
+    (3, {"c": 12, "a": 8, "d": 4}),
+    (4, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
+    (None, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
+))
+def test_get_modifier_sum_n_valid(num, expected):
+    """It should group and sum and return the top N items."""
+    obj = gjson.GJSON(INPUT_SUM_N)
+    if num is not None:
+        compare_values(obj.get(f'@sum_n:{{"group": "key", "sum": "value", "n": {num}}}', quiet=True), expected)
+    else:
+        compare_values(obj.get('@sum_n:{"group": "key", "sum": "value"}', quiet=True), expected)
+
+
+@pytest.mark.parametrize('data', (
+    '{"an": "object"}',
+    '"a string"',
+    '1',
+))
+def test_get_modifier_sum_n_invalid_data(data):
+    """It should raise a GJSONError if the input is invalid."""
+    obj = gjson.GJSON(json.loads(data))
+    with pytest.raises(gjson.GJSONError, match="@sum_n modifier not supported for object of type"):
+        obj.get('@sum_n:{"group": "key", "sum": "value"}')
+
+
+@pytest.mark.parametrize('options', (
+    '',
+    ':{}',
+    ':{"group": "invalid", "sum": "value"}',
+    ':{"group": "key", "sum": "invalid"}',
+    ':{"group": "key", "sum": "other"}',
+    ':{"group": "other", "sum": "value"}',
+))
+def test_get_modifier_sum_n_invalid_options(options):
+    """It should raise a GJSONError if the options are invalid."""
+    obj = gjson.GJSON(INPUT_SUM_N)
+    with pytest.raises(gjson.GJSONError, match="Modifier @sum_n raised an exception"):
+        obj.get(f'@sum_n{options}')
+
+
 class TestJSONOutput:
     """Test class for all JSON output functionalities."""
 
@@ -572,8 +627,8 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'this', 'top_n', 'valid', 'values',
-                    'ugly'}
+        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n', 'valid',
+                    'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
 
 

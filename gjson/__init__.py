@@ -848,6 +848,36 @@ class GJSONObj:
 
         return dict(Counter(obj).most_common(options.get('n')))
 
+    def _parse_modifier_sum_n(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @sum_n modifier that groups the values of a given key while summing the values of another key.
+
+        The key used to sum must have numeric values.
+
+        Arguments:
+            options: the modifier options. It must contain a 'group' key with the name of the field to use to group the
+                items as value and a 'sum' key with the name of the field to use to sum the values for each unique
+                grouped identifier. If a 'n' key is also provided, only the top N results are returned. If not
+                specified all items are returned.
+            obj: the current object to group and sum the top N values.
+            last: whether this is the final part of the query.
+
+        Raises:
+            gjson.GJSONError: if the current object is not a sequence.
+
+        Returns:
+            dict: a dictionary of unique items as keys and the sum as value.
+
+        """
+        del last  # for pylint, unused argument
+        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+            raise GJSONError(f'@sum_n modifier not supported for object of type {type(obj)}. '
+                             'Expected a sequence like object.')
+
+        results: Counter[Any] = Counter()
+        for item in obj:
+            results[item[options['group']]] += item[options['sum']]
+        return dict(results.most_common(options.get('n')))
+
     def _parse_modifier_flatten(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @flatten modifier.
 
