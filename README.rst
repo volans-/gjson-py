@@ -25,6 +25,10 @@ gjson-py is available on the `Python Package Index`_ (PyPI) and can be easily in
 
     pip install gjson
 
+A ``debian`` branch is also present with all the configuration to build the package for Debian-based systems.
+A ``.deb`` package for the current stable and unstable Debian versions is also available for download on the
+`releases page on GitHub`_.
+
 How to use the library
 ----------------------
 
@@ -198,42 +202,81 @@ This is the list of GJSON features and how they are supported by gjson-py:
    pass JSON Lines directly. The client is free to choose if calling gjson-py for each line or to encapsulate them in
    a list before calling gjson-py.
 
-This is the list of modifiers and how they are supported by gjson-py:
+This is the list of modifiers present in GJSON and how they are supported by gjson-py:
 
-+----------------+-----------------------+-----------------------------------------+
-| GJSON Modifier | Supported by gjson-py | Notes                                   |
-+----------------+-----------------------+-----------------------------------------+
-| ``@reverse``   | YES                   |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@ugly``      | YES                   |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@pretty``    | PARTIALLY             | The ``width`` argument is not supported |
-+----------------+-----------------------+-----------------------------------------+
-| ``@this``      | YES                   |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@valid``     | YES                   |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@flatten``   | YES                   |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@join``      | NO                    |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@keys``      | YES                   |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@values``    | YES                   |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@tostr``     | NO                    |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@fromstr``   | NO                    |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@group``     | NO                    |                                         |
-+----------------+-----------------------+-----------------------------------------+
-| ``@sort``      | YES                   | Not present in GJSON                    |
-+----------------+-----------------------+-----------------------------------------+
++----------------+-----------------------+------------------------------------------+
+| GJSON Modifier | Supported by gjson-py | Notes                                    |
++----------------+-----------------------+------------------------------------------+
+| ``@reverse``   | YES                   |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@ugly``      | YES                   |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@pretty``    | PARTIALLY             | The ``width`` argument is not supported  |
++----------------+-----------------------+------------------------------------------+
+| ``@this``      | YES                   |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@valid``     | YES                   |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@flatten``   | YES                   |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@join``      | NO                    |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@keys``      | YES                   |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@values``    | YES                   |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@tostr``     | NO                    |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@fromstr``   | NO                    |                                          |
++----------------+-----------------------+------------------------------------------+
+| ``@group``     | NO                    |                                          |
++----------------+-----------------------+------------------------------------------+
+
+
+Additional features
+^^^^^^^^^^^^^^^^^^^
+
+This is the list of additional modifiers specific to gjson-py:
+
+* ``@ascii``: escapes all non-ASCII characters when printing/returning the string representation of the object,
+  ensuring that the output is made only of ASCII characters. It's implemented using the ``ensure_ascii`` arguments in
+  the Python's ``json`` module. This modifier doesn't accept any arguments.
+* ``@sort``: sorts a mapping object by its keys or a sequence object by its values. This modifier doesn't accept any
+  arguments.
+* ``top_n``: given a sequence object groups the items in the sequence counting how many occurrences of each value are
+  present. It returns a mapping object where the keys are the distinct values of the list and the values are the number
+  of times the key was present in the list, ordered from the most common to the least common item. The items in the
+  original sequence object must be Python hashable. This modifier accepts an optional argument ``n`` to return just the
+  N items with the higher counts. When the ``n`` argument is not provided all items are returned. Example usage:
+
+  .. code-block:: console
+
+    $ echo '["a", "b", "c", "b", "c", "c"]' | gjson '@top_n'
+    {"c": 3, "b": 2, "a": 1}
+    $ echo '["a", "b", "c", "b", "c", "c"]' | gjson '@top_n:{"n":2}'
+    {"c": 3, "b": 2}
+
+* ``sum_n``: given a sequence of objects, groups the items in the sequence using a grouping key and sum the values of a
+  sum key provided. It returns a mapping object where the keys are the distinct values of the grouping key and the
+  values are the sums of all the values of the sum key for each distinct grouped key, ordered from the highest sum to
+  the lowest. The values of the grouping key must be Python hashable. The values of the sum key must be integers or
+  floats. This modifier required two mandatory arguments, ``group`` and ``sum`` that have as values the respective keys
+  in the objects of the sequence. An optional ``n`` argument is also accepted to return just the top N items with the
+  highest sum. Example usage:
+
+  .. code-block:: console
+
+    $ echo '[{"key": "a", "time": 1}, {"key": "b", "time": 2}, {"key": "c", "time": 3}, {"key": "a", "time": 4}]' > test.json
+    $ gjson test.json '@sum_n:{"group": "key", "sum": "time"}'
+    {"a": 5, "c": 3, "b": 2}
+    $ gjson test.json '@sum_n:{"group": "key", "sum": "time", "n": 2}'
+    {"a": 5, "c": 3}
 
 .. _`GJSON`: https://github.com/tidwall/gjson
 .. _`Python Package Index`: https://pypi.org/project/gjson/
 .. _`GJSON Path Syntax`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md
 .. _`gjson-py documentation`: https://volans-.github.io/gjson-py/index.html
+.. _`releases page on GitHub`: https://github.com/volans-/gjson-py/releases
 
 .. _`Path Structure`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#path-structure
 .. _`Basic`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#basic

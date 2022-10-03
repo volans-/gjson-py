@@ -4,8 +4,9 @@ import json
 import operator
 import re
 import sys
-from collections.abc import Mapping, Sequence
-from typing import Any, Callable, Dict, IO, Optional, Protocol, runtime_checkable
+from collections import Counter
+from collections.abc import Callable, Mapping, Sequence
+from typing import Any, IO, Optional, Protocol, runtime_checkable
 
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -60,7 +61,7 @@ class GJSON:
 
         """
         self._obj = obj
-        self._custom_modifiers: Dict[str, 'ModifierProtocol'] = {}
+        self._custom_modifiers: dict[str, 'ModifierProtocol'] = {}
 
     def __str__(self) -> str:
         """Return the current object as a JSON-encoded string.
@@ -75,7 +76,7 @@ class GJSON:
             the JSON-encoded string representing the instantiated object.
 
         """
-        return json.dumps(self._obj)
+        return json.dumps(self._obj, ensure_ascii=False)
 
     def get(self, query: str, *, quiet: bool = False) -> Any:
         """Perform a query on the instantiated object and return the resulting object.
@@ -204,7 +205,7 @@ class GJSONError(Exception):
 class ModifierProtocol(Protocol):
     """Callback protocol for the custom modifiers."""
 
-    def __call__(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def __call__(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """To register a custom modifier a callable that adhere to this protocol must be provided.
 
         Examples:
@@ -257,7 +258,7 @@ except DistributionNotFound:  # pragma: no cover - this should never happen duri
 class GJSONObj:
     """A low-level class to perform the GJSON query on a JSON-like object."""
 
-    def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[Dict[str, 'ModifierProtocol']] = None):
+    def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[dict[str, 'ModifierProtocol']] = None):
         """Initialize the instance with the starting object and query.
 
         Examples:
@@ -287,7 +288,7 @@ class GJSONObj:
                                      'to the gjson.ModifierProtocol')
 
         self._custom_modifiers = custom_modifiers if custom_modifiers else {}
-        self._dump_params: Dict[str, Any] = {}
+        self._dump_params: dict[str, Any] = {'ensure_ascii': False}
         self._after_hash = False
         self._after_query_all = False
         self._previous_part: Optional[str] = None
@@ -309,7 +310,7 @@ class GJSONObj:
 
         """
         # Reset internal parameters
-        self._dump_params = {}
+        self._dump_params = {'ensure_ascii': False}
         self._after_hash = False
         self._after_query_all = False
         self._previous_part = None
@@ -649,7 +650,7 @@ class GJSONObj:
         except Exception as ex:
             raise GJSONError(f'Modifier @{modifier} raised an exception') from ex
 
-    def _parse_modifier_reverse(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_reverse(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @reverse modifier.
 
         Arguments:
@@ -669,7 +670,7 @@ class GJSONObj:
 
         return obj
 
-    def _parse_modifier_keys(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_keys(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @keys modifier.
 
         Arguments:
@@ -690,7 +691,7 @@ class GJSONObj:
         except AttributeError as ex:
             raise GJSONError('The current object does not have a keys() method.') from ex
 
-    def _parse_modifier_values(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_values(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @values modifier.
 
         Arguments:
@@ -711,8 +712,8 @@ class GJSONObj:
         except AttributeError as ex:
             raise GJSONError('The current object does not have a values() method.') from ex
 
-    def _parse_modifier_ugly(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
-        """Apply the @ugly modifier.
+    def _parse_modifier_ugly(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @ugly modifier to condense the output.
 
         Arguments:
             options: the eventual options for the modifier, currently unused.
@@ -724,17 +725,33 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        self._dump_params = {
-            'separators': (',', ':'),
-            'indent': None,
-        }
+        self._dump_params['separators'] = (',', ':')
+        self._dump_params['indent'] = None
         return obj
 
-    def _parse_modifier_pretty(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
-        """Apply the @pretty modifier.
+    def _parse_modifier_pretty(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @pretty modifier to pretty-print the output.
 
         Arguments:
             options: the eventual options for the modifier.
+            obj: the current object to prettyfy.
+            last: whether this is the final part of the query.
+
+        Returns:
+            the current object, unmodified.
+
+        """
+        del last  # for pylint, unused argument
+        self._dump_params['indent'] = options.get('indent', 2)
+        self._dump_params['sort_keys'] = options.get('sortKeys', False)
+        self._dump_params['prefix'] = options.get('prefix', '')
+        return obj
+
+    def _parse_modifier_ascii(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @ascii modifier to have all non-ASCII characters escaped when dumping the object.
+
+        Arguments:
+            options: the eventual options for the modifier, currently unused.
             obj: the current object to sort.
             last: whether this is the final part of the query.
 
@@ -743,15 +760,11 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        self._dump_params = {
-            'indent': options.get('indent', 2),
-            'sort_keys': options.get('sortKeys', False),
-            'prefix': options.get('prefix', ''),
-        }
+        self._dump_params['ensure_ascii'] = True
         return obj
 
-    def _parse_modifier_sort(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
-        """Apply the @sort modifier.
+    def _parse_modifier_sort(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @sort modifier, sorts mapping and sequences.
 
         Arguments:
             options: the eventual options for the modifier, currently unused.
@@ -771,10 +784,10 @@ class GJSONObj:
         if isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
             return sorted(obj)
 
-        raise GJSONError(f'Sort modifier not supported for object of type {type(obj)}. '
+        raise GJSONError(f'@sort modifier not supported for object of type {type(obj)}. '
                          'Expected a mapping or sequence like object.')
 
-    def _parse_modifier_valid(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_valid(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @valid modifier, checking that the current object can be converted to JSON.
 
         Arguments:
@@ -791,13 +804,13 @@ class GJSONObj:
         """
         del last  # for pylint, unused argument
         try:
-            json.dumps(obj)
+            json.dumps(obj, **self._dump_params)
         except Exception as ex:
             raise GJSONError('The current object cannot be converted to JSON.') from ex
 
         return obj
 
-    def _parse_modifier_this(self, _options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_this(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @this modifier, that returns the current object.
 
         Arguments:
@@ -812,7 +825,60 @@ class GJSONObj:
         del last  # for pylint, unused argument
         return obj
 
-    def _parse_modifier_flatten(self, options: Dict[str, Any], obj: Any, *, last: bool) -> Any:
+    def _parse_modifier_top_n(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @top_n modifier to find the most common values of a given field.
+
+        Arguments:
+            options: the eventual modifier options. If not specified all items are returned. If specified it must
+                contain a 'n' key with the number of top N to return.
+            obj: the current object to extract the N most common items.
+            last: whether this is the final part of the query.
+
+        Raises:
+            gjson.GJSONError: if the current object is not a sequence.
+
+        Returns:
+            dict: a dictionary of unique items as keys and the count as value.
+
+        """
+        del last  # for pylint, unused argument
+        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+            raise GJSONError(f'@top_n modifier not supported for object of type {type(obj)}. '
+                             'Expected a sequence like object.')
+
+        return dict(Counter(obj).most_common(options.get('n')))
+
+    def _parse_modifier_sum_n(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @sum_n modifier that groups the values of a given key while summing the values of another key.
+
+        The key used to sum must have numeric values.
+
+        Arguments:
+            options: the modifier options. It must contain a 'group' key with the name of the field to use to group the
+                items as value and a 'sum' key with the name of the field to use to sum the values for each unique
+                grouped identifier. If a 'n' key is also provided, only the top N results are returned. If not
+                specified all items are returned.
+            obj: the current object to group and sum the top N values.
+            last: whether this is the final part of the query.
+
+        Raises:
+            gjson.GJSONError: if the current object is not a sequence.
+
+        Returns:
+            dict: a dictionary of unique items as keys and the sum as value.
+
+        """
+        del last  # for pylint, unused argument
+        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+            raise GJSONError(f'@sum_n modifier not supported for object of type {type(obj)}. '
+                             'Expected a sequence like object.')
+
+        results: Counter[Any] = Counter()
+        for item in obj:
+            results[item[options['group']]] += item[options['sum']]
+        return dict(results.most_common(options.get('n')))
+
+    def _parse_modifier_flatten(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @flatten modifier.
 
         Arguments:
@@ -878,7 +944,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     # Use argparse.FileType here instead of putting it as type in the --file argument parsing, to allow to handle the
     # verbosity in case of error and make sure the file is always closed in case other arguments fail the validation.
     try:
-        args.file = argparse.FileType(encoding='utf-8')(args.file)
+        args.file = argparse.FileType(encoding='utf-8', errors='surrogateescape')(args.file)
     except (OSError, argparse.ArgumentTypeError) as ex:
         if args.verbose == 1:
             print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
@@ -886,6 +952,12 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
             raise
 
         return 1
+
+    # Reconfigure __stdin__ and __stdout__ instead of stdin and stdout because the latters are TextIO and could not
+    # have the reconfigure() method if re-assigned, while reconfigure() is part of TextIOWrapper.
+    # See also: https://github.com/python/typeshed/pull/8171
+    sys.__stdin__.reconfigure(errors='surrogateescape')
+    sys.__stdout__.reconfigure(errors='surrogateescape')
 
     def _execute(line: str, file_obj: Optional[IO[Any]]) -> int:
         try:

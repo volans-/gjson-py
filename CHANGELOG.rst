@@ -1,6 +1,54 @@
 Release Notes
 =============
 
+`v0.1.0`_ (2022-10-03)
+^^^^^^^^^^^^^^^^^^^^^^
+
+Minor improvements
+""""""""""""""""""
+
+*  Modifiers: add ``@top_n`` modifier (not present in GJSON):
+
+  * Add a ``@top_n`` modifier that optionally accepts as options the number of top common items to return:
+    ``@top_n:{"n": 5}``
+  * If no options are provided all items are returned.
+  * It requires a list of items as input and returns a dictionary with unique items as keys and the count of them as
+    values.
+
+*  Modifiers: add ``@sum_n`` modifier (not present in GJSON):
+
+  * Add a ``@sum_n`` modifier that will work on a sequence of objects, grouping the items with the same value for a
+    given grouping key and sum the values of a sum key for each of them.
+  * The options are mandatory and must specify the key to use for grouping and the key to use for summing:
+    ``{"group": "somekey", "sum": "anotherkey"}``. Optionally specifying the ``n`` parameter to just return the top N
+    results based on the summed value: ``{"group": "somekey", "sum": "anotherkey", "n": 5}``
+  * It requires a list of objects as input and returns a dictionary with unique items as keys and the sum of their
+    values as values.
+
+Bug fixes
+"""""""""
+
+* Output: fix unicode handling:
+
+  * Fix the default behaviour ensuring non-ASCII characters are returned as-is.
+  * Add a new modifier ``@ascii``, that when set will escape all non-ASCII characters.
+
+* CLI: fix encoding handling:
+
+  * Use the ``surrogateescape`` Python mode when reading the input and back when printing the output to prevent
+    failures when parsing the input and reducing the loss of data.
+
+Miscellanea
+"""""""""""
+
+* documentation: add mention to Debian packaging and the availability of Debian packages for the project.
+* Type hints: use native types when possible. Instead of importing from ``typing`` use directly the native types when
+  they support the ``[]`` syntax added in Python 3.9.
+* documentation: refactor the modifiers documentation to clearly split the GJSON modifiers supported by gjson-py and
+  the additional modifiers specific to gjson-py with more detailed explanation and example usage for the additional
+  ones.
+* setup.py: mark project as Beta for this ``v0.1.0`` release and add an additional keyword for PyPI indexing.
+
 `v0.0.5`_ (2022-08-05)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -133,3 +181,4 @@ Miscellanea
 .. _`v0.0.3`: https://github.com/volans-/gjson-py/releases/tag/v0.0.3
 .. _`v0.0.4`: https://github.com/volans-/gjson-py/releases/tag/v0.0.4
 .. _`v0.0.5`: https://github.com/volans-/gjson-py/releases/tag/v0.0.5
+.. _`v0.1.0`: https://github.com/volans-/gjson-py/releases/tag/v0.1.0

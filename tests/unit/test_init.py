@@ -5,7 +5,7 @@ import io
 import json
 import re
 
-from typing import Mapping
+from collections.abc import Mapping
 
 import pytest
 
@@ -114,6 +114,17 @@ INPUT_TRUTHINESS = json.loads("""
     { "a": 11 }
   ]
 }
+""")
+INPUT_SUM_N = json.loads("""
+[
+    {"key": "a", "value": 1, "other": "value"},
+    {"key": "b", "value": 2},
+    {"key": "c", "value": 3, "other": "value"},
+    {"key": "a", "value": 7},
+    {"key": "b", "value": 1.5},
+    {"key": "d", "value": 4},
+    {"key": "c", "value": 9}
+]
 """)
 
 
@@ -425,12 +436,80 @@ def test_gjson_get_gjson():
     assert str(ret) == '["Sara", "Alex", "Jack"]'
 
 
+@pytest.mark.parametrize('data, num, expected', (
+    # Valid data
+    ('[1, 2, 3, 4, 5]', None, {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}),
+    ('[1, 2, 3, 4, 5]', 0, {}),
+    ('[1, 2, 3, 4, 5]', 2, {1: 1, 2: 1}),
+    ('[1, 1, 1, 1, 1]', None, {1: 5}),
+    ('[1, 1, 1, 1, 1]', 1, {1: 5}),
+    ('[1, 1, 1, 2, 2, 3]', None, {1: 3, 2: 2, 3: 1}),
+    ('[1, 1, 1, 2, 2, 3, 3, 3, 3]', None, {3: 4, 1: 3, 2: 2}),
+    ('[1, 1, 1, 2, 2, 3, 3, 3, 3]', 2, {3: 4, 1: 3}),
+    # Invalid data
+    ('{"key": "value"}', None, None),
+    ('1', None, None),
+    ('"value"', None, None),
+))
+def test_get_modifier_top_n(data, num, expected):
+    """It should return the top N common items."""
+    obj = gjson.GJSON(json.loads(data))
+    if num is not None:
+        compare_values(obj.get(f'@top_n:{{"n": {num}}}', quiet=True), expected)
+    else:
+        compare_values(obj.get('@top_n', quiet=True), expected)
+
+
+@pytest.mark.parametrize('num, expected', (
+    (0, {}),
+    (1, {"c": 12}),
+    (2, {"c": 12, "a": 8}),
+    (3, {"c": 12, "a": 8, "d": 4}),
+    (4, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
+    (None, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
+))
+def test_get_modifier_sum_n_valid(num, expected):
+    """It should group and sum and return the top N items."""
+    obj = gjson.GJSON(INPUT_SUM_N)
+    if num is not None:
+        compare_values(obj.get(f'@sum_n:{{"group": "key", "sum": "value", "n": {num}}}', quiet=True), expected)
+    else:
+        compare_values(obj.get('@sum_n:{"group": "key", "sum": "value"}', quiet=True), expected)
+
+
+@pytest.mark.parametrize('data', (
+    '{"an": "object"}',
+    '"a string"',
+    '1',
+))
+def test_get_modifier_sum_n_invalid_data(data):
+    """It should raise a GJSONError if the input is invalid."""
+    obj = gjson.GJSON(json.loads(data))
+    with pytest.raises(gjson.GJSONError, match="@sum_n modifier not supported for object of type"):
+        obj.get('@sum_n:{"group": "key", "sum": "value"}')
+
+
+@pytest.mark.parametrize('options', (
+    '',
+    ':{}',
+    ':{"group": "invalid", "sum": "value"}',
+    ':{"group": "key", "sum": "invalid"}',
+    ':{"group": "key", "sum": "other"}',
+    ':{"group": "other", "sum": "value"}',
+))
+def test_get_modifier_sum_n_invalid_options(options):
+    """It should raise a GJSONError if the options are invalid."""
+    obj = gjson.GJSON(INPUT_SUM_N)
+    with pytest.raises(gjson.GJSONError, match="Modifier @sum_n raised an exception"):
+        obj.get(f'@sum_n{options}')
+
+
 class TestJSONOutput:
     """Test class for all JSON output functionalities."""
 
     def setup_method(self):
         """Initialize the test instance."""
-        self.obj = {'key': 'value'}
+        self.obj = {'key': 'value', 'hello world': '\u3053\u3093\u306b\u3061\u306f\u4e16\u754c'}
         self.query = 'key'
         self.value = '"value"'
         self.gjson = gjson.GJSON(self.obj)
@@ -456,9 +535,11 @@ class TestJSONOutput:
             self.gjson.getj('')
 
     @pytest.mark.parametrize('query, expected', (
-        ('@pretty', '{\n  "key": "value"\n}'),
-        ('@pretty:{"indent": 4}', '{\n    "key": "value"\n}'),
-        ('@pretty:{"indent": "\t"}', '{\n\t"key": "value"\n}'),
+        ('@pretty', '{\n  "key": "value",\n  "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
+        ('@pretty:{"indent": 4}',
+         '{\n    "key": "value",\n    "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
+        ('@pretty:{"indent": "\t"}',
+         '{\n\t"key": "value",\n\t"hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
     ))
     def test_modifier_pretty(self, query, expected):
         """It should prettyfy the JSON string based on the parameters."""
@@ -471,7 +552,17 @@ class TestJSONOutput:
 
     def test_modifier_ugly(self):
         """It should uglyfy the JSON string."""
-        assert gjson.get(self.obj, '@ugly', as_str=True) == '{"key":"value"}'
+        assert gjson.get(self.obj, '@ugly', as_str=True) == (
+            '{"key":"value","hello world":"\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"}')
+
+    def test_output_unicode(self):
+        """It should return unicode characters as-is."""
+        assert gjson.get(self.obj, 'hello world', as_str=True) == '"\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"'
+
+    def test_modifier_ascii(self):
+        """It should escape all non-ASCII characters."""
+        assert gjson.get(self.obj, 'hello world.@ascii', as_str=True) == (
+            '"\\u3053\\u3093\\u306b\\u3061\\u306f\\u4e16\\u754c"')
 
 
 def custom_sum(options, obj, *, last):
@@ -536,7 +627,8 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'flatten', 'keys', 'pretty', 'reverse', 'sort', 'this', 'valid', 'values', 'ugly'}
+        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n', 'valid',
+                    'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
 
 

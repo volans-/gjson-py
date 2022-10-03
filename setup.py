@@ -38,7 +38,7 @@ setup(
     author='Riccardo Coccioli',
     author_email='volans-@users.noreply.github.com',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
@@ -60,7 +60,7 @@ setup(
     },
     extras_require=extras_require,
     install_requires=[],
-    keywords=['gjson'],
+    keywords=['gjson', 'json'],
     license='GPLv3+',
     long_description=long_description,
     long_description_content_type='text/x-rst',
