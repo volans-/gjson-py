@@ -1,3 +1,9 @@
+python-gjson (0.1.0-1) unstable; urgency=medium
+
+  * v0.1.0 upstream release.
+
+ -- Riccardo Coccioli <volans-@users.noreply.github.com>  Mon, 03 Oct 2022 07:18:03 -0000
+
 python-gjson (0.0.5-1) unstable; urgency=medium
 
   * Initial Debian packaging.
