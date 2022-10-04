@@ -1,4 +1,13 @@
 version=4
-opts=filenamemangle=s/.+\/v(\d\S+\.tar\.gz)/gjson-$1/,\
-pgpsigurlmangle=s/archive\/.+\/v(\d\S+)\.tar\.gz/releases\/download\/v$1\/gjson-py-$1\.tar\.gz\.asc/ \
-  https://github.com/volans-/gjson-py/releases/latest .*/v(\d\S+)\.tar\.gz
+# searchmode: use searchmode plain to search in the JSON returned by the API
+# filenamemangle: extract from the URL the GitHub project name (the last path part before /tarball/) and the version,
+#                 to generate a resulting tarball named: ${PROJECT_NAME}-${VERSION}.tar.gz
+# pgpsigurlmangle: retrieve also the tarball PGP signature assuming it was uploaded with name ${PROJECT_NAME}-v${VERSION}
+#                  extracting from the tarball download URL the GitHub username/organization, the GitHub project name and
+#                  the version generating the signature URL as required by GitHub
+# URL: use the project API URL to get the release information, looking for the tarball URL and extracting the version from
+#      the last part of the URL path.
+opts=searchmode=plain,\
+filenamemangle=s~.+/([^/]+)/tarball/v(@ANY_VERSION@)~$1-$2.tar.gz~,\
+pgpsigurlmangle=s~api.github.com/repos/([^/]+)/([^/]+)/tarball/v(@ANY_VERSION@)~github.com/$1/$2/releases/download/v$3/$2-v$3.tar.gz.asc~ \
+  https://api.github.com/repos/volans-/gjson-py/releases https://api\.github\.com/repos/[^/]+/[^/]+/tarball/v([^"]+)
