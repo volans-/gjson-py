@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; gjson-py 0.0.5 documentation</title>
+  <title>API &mdash; gjson-py 0.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.5
+                0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -44,7 +45,35 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">CLI</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.get"><code class="docutils literal notranslate"><span class="pre">get()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.GJSON"><code class="docutils literal notranslate"><span class="pre">GJSON</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSON.__str__"><code class="docutils literal notranslate"><span class="pre">GJSON.__str__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSON.get"><code class="docutils literal notranslate"><span class="pre">GJSON.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSON.getj"><code class="docutils literal notranslate"><span class="pre">GJSON.getj()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSON.get_gjson"><code class="docutils literal notranslate"><span class="pre">GJSON.get_gjson()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSON.register_modifier"><code class="docutils literal notranslate"><span class="pre">GJSON.register_modifier()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.GJSONError"><code class="docutils literal notranslate"><span class="pre">GJSONError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.ModifierProtocol"><code class="docutils literal notranslate"><span class="pre">ModifierProtocol</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.ModifierProtocol.__call__"><code class="docutils literal notranslate"><span class="pre">ModifierProtocol.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.DOT_DELIMITER"><code class="docutils literal notranslate"><span class="pre">DOT_DELIMITER</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.PIPE_DELIMITER"><code class="docutils literal notranslate"><span class="pre">PIPE_DELIMITER</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.QUERIES_OPERATORS"><code class="docutils literal notranslate"><span class="pre">QUERIES_OPERATORS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.__version__"><code class="docutils literal notranslate"><span class="pre">__version__</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.GJSONObj"><code class="docutils literal notranslate"><span class="pre">GJSONObj</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSONObj.get"><code class="docutils literal notranslate"><span class="pre">GJSONObj.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSONObj.__str__"><code class="docutils literal notranslate"><span class="pre">GJSONObj.__str__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSONObj.builtin_modifiers"><code class="docutils literal notranslate"><span class="pre">GJSONObj.builtin_modifiers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.cli"><code class="docutils literal notranslate"><span class="pre">cli()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.get_parser"><code class="docutils literal notranslate"><span class="pre">get_parser()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Notes</a></li>
 </ul>
 
@@ -310,7 +339,7 @@ are registered with the same name the last one will be used.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – a dictionary of options. If no options are present in the query the callable will be called with
+<li><p><strong>options</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – a dictionary of options. If no options are present in the query the callable will be called with
 an empty dictionary as options. The modifier can supports any number of options, or none.</p></li>
 <li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – the current object already modifier by any previous parts of the query.</p></li>
 <li><p><strong>last</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code></a> if the modifier is the last element in the query or <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.10)"><code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code></a> otherwise.</p></li>
@@ -367,7 +396,7 @@ an empty dictionary as options. The modifier can supports any number of options,
 
 <dl class="py data">
 <dt class="sig sig-object py" id="gjson.__version__">
-<span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">__version__</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.0.5'</span></em><a class="headerlink" href="#gjson.__version__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">__version__</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1.0'</span></em><a class="headerlink" href="#gjson.__version__" title="Permalink to this definition">¶</a></dt>
 <dd><p>the version of the current gjson module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>

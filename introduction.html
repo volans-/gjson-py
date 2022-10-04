@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; gjson-py 0.0.5 documentation</title>
+  <title>Introduction &mdash; gjson-py 0.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,11 +16,12 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CLI" href="cli.html" />
-    <link rel="prev" title="gjson-py 0.0.5 documentation" href="index.html" /> 
+    <link rel="prev" title="gjson-py 0.1.0 documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.5
+                0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -61,6 +62,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#query-syntax">Query syntax</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#supported-gjson-features">Supported GJSON features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-features">Additional features</a></li>
 </ul>
 </li>
 </ul>
@@ -312,12 +314,12 @@ pass JSON Lines directly. The client is free to choose if calling gjson-py for e
 a list before calling gjson-py.</p>
 </dd>
 </dl>
-<p>This is the list of modifiers and how they are supported by gjson-py:</p>
+<p>This is the list of modifiers present in GJSON and how they are supported by gjson-py:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20%" />
-<col style="width: 29%" />
-<col style="width: 51%" />
+<col style="width: 28%" />
+<col style="width: 52%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p>GJSON Modifier</p></td>
@@ -372,12 +374,46 @@ a list before calling gjson-py.</p>
 <td><p>NO</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;sort</span></code></p></td>
-<td><p>YES</p></td>
-<td><p>Not present in GJSON</p></td>
-</tr>
 </tbody>
 </table>
+</section>
+<section id="additional-features">
+<h3>Additional features<a class="headerlink" href="#additional-features" title="Permalink to this heading">¶</a></h3>
+<p>This is the list of additional modifiers specific to gjson-py:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;ascii</span></code>: escapes all non-ASCII characters when printing/returning the string representation of the object,
+ensuring that the output is made only of ASCII characters. It’s implemented using the <code class="docutils literal notranslate"><span class="pre">ensure_ascii</span></code> arguments in
+the Python’s <code class="docutils literal notranslate"><span class="pre">json</span></code> module. This modifier doesn’t accept any arguments.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;sort</span></code>: sorts a mapping object by its keys or a sequence object by its values. This modifier doesn’t accept any
+arguments.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">top_n</span></code>: given a sequence object groups the items in the sequence counting how many occurrences of each value are
+present. It returns a mapping object where the keys are the distinct values of the list and the values are the number
+of times the key was present in the list, ordered from the most common to the least common item. The items in the
+original sequence object must be Python hashable. This modifier accepts an optional argument <code class="docutils literal notranslate"><span class="pre">n</span></code> to return just the
+N items with the higher counts. When the <code class="docutils literal notranslate"><span class="pre">n</span></code> argument is not provided all items are returned. Example usage:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;]&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;@top_n&#39;</span>
+<span class="go">{&quot;c&quot;: 3, &quot;b&quot;: 2, &quot;a&quot;: 1}</span>
+<span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;]&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;@top_n:{&quot;n&quot;:2}&#39;</span>
+<span class="go">{&quot;c&quot;: 3, &quot;b&quot;: 2}</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sum_n</span></code>: given a sequence of objects, groups the items in the sequence using a grouping key and sum the values of a
+sum key provided. It returns a mapping object where the keys are the distinct values of the grouping key and the
+values are the sums of all the values of the sum key for each distinct grouped key, ordered from the highest sum to
+the lowest. The values of the grouping key must be Python hashable. The values of the sum key must be integers or
+floats. This modifier required two mandatory arguments, <code class="docutils literal notranslate"><span class="pre">group</span></code> and <code class="docutils literal notranslate"><span class="pre">sum</span></code> that have as values the respective keys
+in the objects of the sequence. An optional <code class="docutils literal notranslate"><span class="pre">n</span></code> argument is also accepted to return just the top N items with the
+highest sum. Example usage:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;[{&quot;key&quot;: &quot;a&quot;, &quot;time&quot;: 1}, {&quot;key&quot;: &quot;b&quot;, &quot;time&quot;: 2}, {&quot;key&quot;: &quot;c&quot;, &quot;time&quot;: 3}, {&quot;key&quot;: &quot;a&quot;, &quot;time&quot;: 4}]&#39;</span> &gt; test.json
+<span class="gp">$ </span>gjson test.json <span class="s1">&#39;@sum_n:{&quot;group&quot;: &quot;key&quot;, &quot;sum&quot;: &quot;time&quot;}&#39;</span>
+<span class="go">{&quot;a&quot;: 5, &quot;c&quot;: 3, &quot;b&quot;: 2}</span>
+<span class="gp">$ </span>gjson test.json <span class="s1">&#39;@sum_n:{&quot;group&quot;: &quot;key&quot;, &quot;sum&quot;: &quot;time&quot;, &quot;n&quot;: 2}&#39;</span>
+<span class="go">{&quot;a&quot;: 5, &quot;c&quot;: 3}</span>
+</pre></div>
+</div>
+</li>
+</ul>
 </section>
 </section>
 </section>
@@ -386,7 +422,7 @@ a list before calling gjson-py.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.0.5 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.1.0 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cli.html" class="btn btn-neutral float-right" title="CLI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

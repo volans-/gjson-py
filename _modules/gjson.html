@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson &mdash; gjson-py 0.0.5 documentation</title>
+  <title>gjson &mdash; gjson-py 0.1.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -15,6 +15,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -28,7 +29,7 @@
             <a href="../index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.0.5
+                0.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -76,8 +77,9 @@
 <span class="kn">import</span> <span class="nn">operator</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
 
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">DistributionNotFound</span><span class="p">,</span> <span class="n">get_distribution</span>
 
@@ -132,7 +134,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">obj</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;ModifierProtocol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;ModifierProtocol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="GJSON.__str__"><a class="viewcode-back" href="../api.html#gjson.GJSON.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the current object as a JSON-encoded string.</span>
@@ -147,7 +149,7 @@
 <span class="sd">            the JSON-encoded string representing the instantiated object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GJSON.get"><a class="viewcode-back" href="../api.html#gjson.GJSON.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Perform a query on the instantiated object and return the resulting object.</span>
@@ -276,7 +278,7 @@
 <span class="k">class</span> <span class="nc">ModifierProtocol</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Callback protocol for the custom modifiers.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ModifierProtocol.__call__"><a class="viewcode-back" href="../api.html#gjson.ModifierProtocol.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<div class="viewcode-block" id="ModifierProtocol.__call__"><a class="viewcode-back" href="../api.html#gjson.ModifierProtocol.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;To register a custom modifier a callable that adhere to this protocol must be provided.</span>
 
 <span class="sd">        Examples:</span>
@@ -329,7 +331,7 @@
 <div class="viewcode-block" id="GJSONObj"><a class="viewcode-back" href="../api.html#gjson.GJSONObj">[docs]</a><span class="k">class</span> <span class="nc">GJSONObj</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A low-level class to perform the GJSON query on a JSON-like object.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;ModifierProtocol&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;ModifierProtocol&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize the instance with the starting object and query.</span>
 
 <span class="sd">        Examples:</span>
@@ -359,7 +361,7 @@
                                      <span class="s1">&#39;to the gjson.ModifierProtocol&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span> <span class="o">=</span> <span class="n">custom_modifiers</span> <span class="k">if</span> <span class="n">custom_modifiers</span> <span class="k">else</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ensure_ascii&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_previous_part</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -381,7 +383,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Reset internal parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ensure_ascii&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_previous_part</span> <span class="o">=</span> <span class="kc">None</span>
@@ -721,7 +723,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="si">}</span><span class="s1"> raised an exception&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @reverse modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -741,7 +743,7 @@
 
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @keys modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -762,7 +764,7 @@
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object does not have a keys() method.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @values modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -783,8 +785,8 @@
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object does not have a values() method.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_ugly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Apply the @ugly modifier.</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_ugly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply the @ugly modifier to condense the output.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            options: the eventual options for the modifier, currently unused.</span>
@@ -796,17 +798,33 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">),</span>
-            <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;separators&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_pretty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Apply the @pretty modifier.</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_pretty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply the @pretty modifier to pretty-print the output.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            options: the eventual options for the modifier.</span>
+<span class="sd">            obj: the current object to prettyfy.</span>
+<span class="sd">            last: whether this is the final part of the query.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the current object, unmodified.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;sort_keys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sortKeys&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">_parse_modifier_ascii</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply the @ascii modifier to have all non-ASCII characters escaped when dumping the object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            options: the eventual options for the modifier, currently unused.</span>
 <span class="sd">            obj: the current object to sort.</span>
 <span class="sd">            last: whether this is the final part of the query.</span>
 
@@ -815,15 +833,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-            <span class="s1">&#39;sort_keys&#39;</span><span class="p">:</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sortKeys&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-            <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;ensure_ascii&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Apply the @sort modifier.</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply the @sort modifier, sorts mapping and sequences.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            options: the eventual options for the modifier, currently unused.</span>
@@ -843,10 +857,10 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
             <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
-        <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sort modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
+        <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;@sort modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
                          <span class="s1">&#39;Expected a mapping or sequence like object.&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @valid modifier, checking that the current object can be converted to JSON.</span>
 
 <span class="sd">        Arguments:</span>
@@ -863,13 +877,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object cannot be converted to JSON.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
 
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_this</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_this</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @this modifier, that returns the current object.</span>
 
 <span class="sd">        Arguments:</span>
@@ -884,7 +898,60 @@
         <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_parse_modifier_top_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply the @top_n modifier to find the most common values of a given field.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            options: the eventual modifier options. If not specified all items are returned. If specified it must</span>
+<span class="sd">                contain a &#39;n&#39; key with the number of top N to return.</span>
+<span class="sd">            obj: the current object to extract the N most common items.</span>
+<span class="sd">            last: whether this is the final part of the query.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONError: if the current object is not a sequence.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: a dictionary of unique items as keys and the count as value.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;@top_n modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
+                             <span class="s1">&#39;Expected a sequence like object.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">_parse_modifier_sum_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Apply the @sum_n modifier that groups the values of a given key while summing the values of another key.</span>
+
+<span class="sd">        The key used to sum must have numeric values.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            options: the modifier options. It must contain a &#39;group&#39; key with the name of the field to use to group the</span>
+<span class="sd">                items as value and a &#39;sum&#39; key with the name of the field to use to sum the values for each unique</span>
+<span class="sd">                grouped identifier. If a &#39;n&#39; key is also provided, only the top N results are returned. If not</span>
+<span class="sd">                specified all items are returned.</span>
+<span class="sd">            obj: the current object to group and sum the top N values.</span>
+<span class="sd">            last: whether this is the final part of the query.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONError: if the current object is not a sequence.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: a dictionary of unique items as keys and the sum as value.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;@sum_n modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
+                             <span class="s1">&#39;Expected a sequence like object.&#39;</span><span class="p">)</span>
+
+        <span class="n">results</span><span class="p">:</span> <span class="n">Counter</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]]]</span> <span class="o">+=</span> <span class="n">item</span><span class="p">[</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">_parse_modifier_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply the @flatten modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -950,7 +1017,7 @@
     <span class="c1"># Use argparse.FileType here instead of putting it as type in the --file argument parsing, to allow to handle the</span>
     <span class="c1"># verbosity in case of error and make sure the file is always closed in case other arguments fail the validation.</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">args</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;surrogateescape&#39;</span><span class="p">)(</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ex</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
@@ -958,6 +1025,12 @@
             <span class="k">raise</span>
 
         <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="c1"># Reconfigure __stdin__ and __stdout__ instead of stdin and stdout because the latters are TextIO and could not</span>
+    <span class="c1"># have the reconfigure() method if re-assigned, while reconfigure() is part of TextIOWrapper.</span>
+    <span class="c1"># See also: https://github.com/python/typeshed/pull/8171</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">__stdin__</span><span class="o">.</span><span class="n">reconfigure</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s1">&#39;surrogateescape&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">__stdout__</span><span class="o">.</span><span class="n">reconfigure</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s1">&#39;surrogateescape&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_obj</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">IO</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
