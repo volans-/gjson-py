@@ -220,31 +220,32 @@ class TestObject:
         # Basic
         ('', 'Empty query'),
         ('age.0', "Integer query part on unsupported object type <class 'int'>"),
-        ('friends.99', 'Index 99 out of range for sequence object with 3 items in query friends.99'),
-        ('name.nonexistent', 'Mapping object does not have key nonexistent for query name.nonexistent'),
-        ('name.1', 'Mapping object does not have key 1 for query name.1'),
-        ('children.invalid', 'Invalid or unsupported query part "invalid" for query children.invalid.'),
+        ('friends.99', 'Index `99` out of range for sequence object with 3 items in query `friends.99`'),
+        ('name.nonexistent', 'Mapping object does not have key `nonexistent` for query `name.nonexistent`'),
+        ('name.1', 'Mapping object does not have key `1` for query `name.1`'),
+        ('children.invalid', 'Invalid or unsupported query part `invalid` for query `children.invalid`'),
         # Wildcards
-        ('x*', 'No key matching pattern with wildcard x*'),
-        ('??????????', 'No key matching pattern with wildcard ??????????'),
-        ('children.x*', "Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>"),
-        ('(-?', 'No key matching pattern with wildcard (-?.'),
+        ('x*', 'No key matching pattern with wildcard `x*`'),
+        ('??????????', 'No key matching pattern with wildcard `??????????`'),
+        ('children.x*',
+         "Wildcard matching key `x*` in query `children.x*` requires a mapping object, got <class 'list'>"),
+        ('(-?', 'No key matching pattern with wildcard `(-?`'),
         # Queries
         ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
-        ('#.invalid', 'Invalid or unsupported query part "invalid" for query #.invalid.'),
+        ('#.invalid', 'Invalid or unsupported query part `invalid` for query `#.invalid`'),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
-        ('friends.#(last=={1: 2})', 'Invalid value "{1: 2}" for the query key "last".'),
-        ('friends.#(invalid', 'Invalid query part #(invalid. Expected in the format'),
+        ('friends.#(last=={1: 2})', 'Invalid value `{1: 2}` for the query key `last`'),
+        ('friends.#(invalid', 'Invalid query part `#(invalid`. Expected in the format'),
         ('#(first)', 'Queries are supported only for sequence like objects'),
-        ('friends.#(last=="invalid")', 'Query part last=="invalid" for first element does not match anything.'),
-        ('friends.#(first%"D?")', 'Query part first%"D?" for first element does not match anything.'),
+        ('friends.#(last=="invalid")', 'Query part `last=="invalid"` for first element does not match anything.'),
+        ('friends.#(first%"D?")', 'Query part `first%"D?"` for first element does not match anything.'),
         # Dot vs Pipe
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers
         ('@pretty:', 'Unable to load options for modifier @pretty'),
         ('@pretty:{invalid', 'Unable to load options for modifier @pretty'),
         ('@pretty:["invalid"]',
-         "Invalid options for modifier @pretty, expected mapping got <class 'list'>: ['invalid']"),
+         "Invalid options for modifier @pretty, expected mapping got <class 'list'>: `['invalid']`"),
         ('@invalid', 'Unknown modifier @invalid'),
         ('children.@keys', 'The current object does not have a keys() method.'),
         ('children.@values', 'The current object does not have a values() method.'),
@@ -340,7 +341,7 @@ class TestList:
 
     @pytest.mark.parametrize('query, error', (
         # Dot vs Pipe
-        ('#|first', 'Invalid or unsupported query part "first" for query #|first.'),
+        ('#|first', 'Invalid or unsupported query part `first` for query `#|first`'),
         ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
         ('#|#', 'The pipe delimiter cannot immediately follow the # element.'),
     ))
@@ -385,7 +386,8 @@ class TestTruthiness:
         compare_values(self.object.get(query), expected)
 
     @pytest.mark.parametrize('query, error', (
-        ('vals.#(b==~"invalid")', "Queries ==~ operator requires a boolean value, got <class 'str'> instead: invalid"),
+        ('vals.#(b==~"invalid")',
+         "Queries ==~ operator requires a boolean value, got <class 'str'> instead: `invalid`"),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
@@ -686,14 +688,14 @@ def test_cli_stdin_query_verbosity_1(monkeypatch, capsys):
     assert ret == 1
     captured = capsys.readouterr()
     assert not captured.out
-    assert captured.err == 'GJSONError: Mapping object does not have key nonexistent for query nonexistent\n'
+    assert captured.err == 'GJSONError: Mapping object does not have key `nonexistent` for query `nonexistent`.\n'
 
 
 def test_cli_stdin_query_verbosity_2(monkeypatch):
     """It should exit with a failure exit code and print the full traceback."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
     with pytest.raises(
-            gjson.GJSONError, match=r'Mapping object does not have key nonexistent for query nonexistent'):
+            gjson.GJSONError, match=r'Mapping object does not have key `nonexistent` for query `nonexistent`'):
         gjson.cli(['-vv', '-', 'nonexistent'])
 
 

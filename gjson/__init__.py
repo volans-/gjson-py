@@ -188,7 +188,7 @@ class GJSON:
 
         """
         if name in GJSONObj.builtin_modifiers():
-            raise GJSONError(f'Unable to register a modifier with the same name of the built-in modifier: @{name}')
+            raise GJSONError(f'Unable to register a modifier with the same name of the built-in modifier: @{name}.')
 
         if not isinstance(func, ModifierProtocol):
             raise GJSONError(f'The given func "{func}" for the custom modifier @{name} does not adhere '
@@ -280,12 +280,12 @@ class GJSONObj:
         self._query = query
         if custom_modifiers is not None:
             if (intersection := self.builtin_modifiers().intersection(set(custom_modifiers.keys()))):
-                raise GJSONError(f'Some provided custom_modifiers have the same name of built-in ones: {intersection}')
+                raise GJSONError(f'Some provided custom_modifiers have the same name of built-in ones: {intersection}.')
 
             for name, modifier in custom_modifiers.items():
                 if not isinstance(modifier, ModifierProtocol):
                     raise GJSONError(f'The given func "{modifier}" for the custom modifier @{name} does not adhere '
-                                     'to the gjson.ModifierProtocol')
+                                     'to the gjson.ModifierProtocol.')
 
         self._custom_modifiers = custom_modifiers if custom_modifiers else {}
         self._dump_params: dict[str, Any] = {'ensure_ascii': False}
@@ -390,7 +390,7 @@ class GJSONObj:
         in_query_all = False
         ret: Any
         if not part:
-            raise GJSONError(f'Empty query part between two delimiters. Query is: {self._query}')
+            raise GJSONError(f'Empty query part between two delimiters. Query is `{self._query}`.')
 
         if part == '#':  # Hash
             in_hash = True
@@ -419,7 +419,7 @@ class GJSONObj:
                 suff_len = 2
                 in_query_all = True
             else:
-                raise GJSONError(f'Invalid query part {part}. Expected in the format #(...) or #(...)#.')
+                raise GJSONError(f'Invalid query part `{part}`. Expected in the format #(...) or #(...)#.')
 
             ret = self._parse_query(part[2:-suff_len], obj, all_items)
 
@@ -429,7 +429,7 @@ class GJSONObj:
         elif re.match(r'^([1-9][0-9]*|0)$', part):  # Integer index
             if isinstance(obj, Mapping):  # Integer object keys not supported by JSON
                 if part not in obj:
-                    raise GJSONError(f'Mapping object does not have key {part} for query {self._query}')
+                    raise GJSONError(f'Mapping object does not have key `{part}` for query `{self._query}`.')
                 ret = obj[part]
             elif isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
                 if self._after_hash:
@@ -442,8 +442,8 @@ class GJSONObj:
                     index = int(part)
                     num = len(obj)
                     if index >= num:
-                        raise GJSONError(
-                            f'Index {part} out of range for sequence object with {num} items in query {self._query}')
+                        raise GJSONError(f'Index `{part}` out of range for sequence object with {num} items in query '
+                                         f'`{self._query}`.')
                     ret = obj[index]
             else:
                 raise GJSONError(f'Integer query part on unsupported object type {type(obj)}, expected a mapping '
@@ -451,7 +451,7 @@ class GJSONObj:
 
         elif '*' in part or '?' in part:  # Wildcards
             if not isinstance(obj, Mapping):
-                raise GJSONError(f'Wildcard matching key {part} in query {self._query} requires a mapping object, '
+                raise GJSONError(f'Wildcard matching key `{part}` in query `{self._query}` requires a mapping object, '
                                  f'got {type(obj)} instead.')
 
             input_parts = re.split(r'(?<!\\)(\?|\*)', part)
@@ -474,12 +474,12 @@ class GJSONObj:
                     ret = obj[key]
                     break
             else:
-                raise GJSONError(f'No key matching pattern with wildcard {part}.')
+                raise GJSONError(f'No key matching pattern with wildcard `{part}`.')
 
         else:
             if not self._after_hash and isinstance(obj, Mapping):
                 if part not in obj:
-                    raise GJSONError(f'Mapping object does not have key {part} for query {self._query}')
+                    raise GJSONError(f'Mapping object does not have key `{part}` for query `{self._query}`.')
                 ret = obj[part]
             else:
                 if ((self._after_hash or self._after_query_all) and delimiter and delimiter == DOT_DELIMITER
@@ -487,7 +487,7 @@ class GJSONObj:
                     # Skip non mapping items and items without the given key
                     ret = [i[part] for i in obj if isinstance(i, Mapping) and part in i]
                 else:
-                    raise GJSONError(f'Invalid or unsupported query part "{part}" for query {self._query}.')
+                    raise GJSONError(f'Invalid or unsupported query part `{part}` for query `{self._query}`.')
 
         if in_hash:
             self._after_hash = True
@@ -539,7 +539,7 @@ class GJSONObj:
             string_value = query[position + len(op_str):].strip()
             value = json.loads(string_value)
         except json.JSONDecodeError as ex:
-            raise GJSONError(f'Invalid value "{string_value}" for the query key "{key}".') from ex
+            raise GJSONError(f'Invalid value `{string_value}` for the query key `{key}`.') from ex
 
         if not key and not all_items and obj and isinstance(obj[0], Mapping):
             raise GJSONError('Query on mapping like objects require a key before the operator.')
@@ -550,7 +550,8 @@ class GJSONObj:
                 if all_items:
                     return []
 
-                raise GJSONError(f'Queries ==~ operator requires a boolean value, got {type(value)} instead: {value}.')
+                raise GJSONError(
+                    f'Queries ==~ operator requires a boolean value, got {type(value)} instead: `{value}`.')
 
             def truthy_op(obj_a: Any, obj_b: bool) -> bool:
                 truthy = operator.truth(obj_a)
@@ -604,7 +605,7 @@ class GJSONObj:
         if ret:
             return ret[0]
 
-        raise GJSONError(f'Query part {query} for first element does not match anything.')
+        raise GJSONError(f'Query part `{query}` for first element does not match anything.')
 
     def _parse_modifier(self, part: str, obj: Any, *, last: bool) -> Any:  # noqa: MC0001
         """Parse a modifier.
@@ -627,11 +628,11 @@ class GJSONObj:
             try:
                 options = json.loads(options_string, strict=False)
             except json.JSONDecodeError as ex:
-                raise GJSONError(f'Unable to load options for modifier @{modifier}') from ex
+                raise GJSONError(f'Unable to load options for modifier @{modifier}.') from ex
 
             if not isinstance(options, Mapping):
                 raise GJSONError(
-                    f'Invalid options for modifier @{modifier}, expected mapping got {type(options)}: {options}')
+                    f'Invalid options for modifier @{modifier}, expected mapping got {type(options)}: `{options}`.')
         else:
             modifier = part
             options = {}
@@ -648,7 +649,7 @@ class GJSONObj:
         except GJSONError:
             raise
         except Exception as ex:
-            raise GJSONError(f'Modifier @{modifier} raised an exception') from ex
+            raise GJSONError(f'Modifier @{modifier} raised an exception.') from ex
 
     def _parse_modifier_reverse(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @reverse modifier.
