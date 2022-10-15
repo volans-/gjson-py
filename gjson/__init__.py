@@ -187,6 +187,13 @@ class GJSON:
             gjson.GJSONError: if the provided callable doesn't adhere to the :py:class:`gjson.ModifierProtocol`.
 
         """
+        # Escape the ] as they are inside a [...] block
+        not_allowed_regex = ''.join(MODIFIER_NAME_RESERVED_CHARS).replace(']', '\]')
+        if re.search(fr'[{not_allowed_regex}]', name):
+            not_allowed_string = ', '.join(f'`{i}`' for i in MODIFIER_NAME_RESERVED_CHARS)
+            raise GJSONError(f'Unable to register modifier `{name}`, contains at least one not allowed character: '
+                             f'{not_allowed_string}')
+
         if name in GJSONObj.builtin_modifiers():
             raise GJSONError(f'Unable to register a modifier with the same name of the built-in modifier: @{name}.')
 
@@ -246,6 +253,8 @@ PIPE_DELIMITER = '|'
 # Single character operators goes last to avoid mis-detection.
 QUERIES_OPERATORS = ('==~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
 """tuple: The list of supported operators inside queries."""
+MODIFIER_NAME_RESERVED_CHARS = ('"', ',', '.', '|', ':', '@', '{', '}', '[', ']', '(', ')')
+"""tuple: The list of reserver characters not usable in a modifier's name."""
 
 
 try:

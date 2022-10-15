@@ -592,6 +592,16 @@ class TestCustomModifiers:
         obj.register_modifier('sum', custom_sum)
         assert obj.get(self.query) == 15
 
+    @pytest.mark.parametrize('char', gjson.MODIFIER_NAME_RESERVED_CHARS)
+    def test_gjson_register_modifier_invalid_name(self, char):
+        """It should raise a GJSONError if trying to register a modifier with a name with not allowed characters."""
+        obj = gjson.GJSON(self.valid_obj)
+        name = fr'a{char}b'
+        with pytest.raises(
+                gjson.GJSONError,
+                match=fr'Unable to register modifier `{re.escape(name)}`, contains at least one not allowed'):
+            obj.register_modifier(name, custom_sum)
+
     def test_gjson_register_modifier_override_builtin(self):
         """It should raise a GJSONError if trying to register a modifier with the same name of a built-in one."""
         obj = gjson.GJSON(self.valid_obj)

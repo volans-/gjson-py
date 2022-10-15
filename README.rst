@@ -184,7 +184,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Modifier arguments`_  | YES                    | Only a JSON object is accepted as argument          |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Custom modifiers`_    | YES                    | Only a JSON object is accepted as argument          |
+| `Custom modifiers`_    | YES                    | Only a JSON object is accepted as argument [#]_     |
 +------------------------+------------------------+-----------------------------------------------------+
 | `Multipaths`_          | NO                     |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
@@ -195,6 +195,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 
 .. [#] The queries matching is based on Python's operator and as such the results might be different than the ones from
    the Go GJSON package. In particular for the ``~`` operator that checks the truthy-ness of objects.
+.. [#] Custom modifiers names cannot contain reserved characters used by the GJSON grammar.
 .. [#] Both for applying the same query to each line using the ``-l/--lines`` argument and to automatically encapsulate
    the input lines in a list and apply the query to the list using the ``..`` special query prefix described in
    `JSON Lines`_.
