@@ -242,8 +242,8 @@ class TestObject:
         # Dot vs Pipe
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers
-        ('@pretty:', 'Unable to load options for modifier @pretty'),
-        ('@pretty:{invalid', 'Unable to load options for modifier @pretty'),
+        ('@pretty:', 'Unable to load options for modifier @pretty from ``'),
+        ('@pretty:{invalid', 'Unable to load options for modifier @pretty from `{invalid`'),
         ('@pretty:["invalid"]',
          "Invalid options for modifier @pretty, expected mapping got <class 'list'>: `['invalid']`"),
         ('@invalid', 'Unknown modifier @invalid'),

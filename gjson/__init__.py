@@ -637,7 +637,7 @@ class GJSONObj:
             try:
                 options = json.loads(options_string, strict=False)
             except json.JSONDecodeError as ex:
-                raise GJSONError(f'Unable to load options for modifier @{modifier}.') from ex
+                raise GJSONError(f'Unable to load options for modifier @{modifier} from `{options_string}`.') from ex
 
             if not isinstance(options, Mapping):
                 raise GJSONError(
