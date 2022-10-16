@@ -1,7 +1,5 @@
 """GJSON test module."""
 # pylint: disable=attribute-defined-outside-init
-import argparse
-import io
 import json
 import re
 
@@ -10,6 +8,7 @@ from collections.abc import Mapping
 import pytest
 
 import gjson
+from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS
 
 
 INPUT_JSON = """
@@ -592,7 +591,7 @@ class TestCustomModifiers:
         obj.register_modifier('sum', custom_sum)
         assert obj.get(self.query) == 15
 
-    @pytest.mark.parametrize('char', gjson.MODIFIER_NAME_RESERVED_CHARS)
+    @pytest.mark.parametrize('char', MODIFIER_NAME_RESERVED_CHARS)
     def test_gjson_register_modifier_invalid_name(self, char):
         """It should raise a GJSONError if trying to register a modifier with a name with not allowed characters."""
         obj = gjson.GJSON(self.valid_obj)
@@ -642,153 +641,3 @@ class TestCustomModifiers:
         expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n', 'valid',
                     'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
-
-
-def test_cli_stdin(monkeypatch, capsys):
-    """It should read the data from stdin and query it."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
-    ret = gjson.cli(['-', 'name.first'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '"Tom"\n'
-    assert not captured.err
-
-
-def test_cli_file(tmp_path, capsys):
-    """It should read the data from the provided file and query it."""
-    data_file = tmp_path / 'input.json'
-    data_file.write_text(INPUT_JSON)
-    ret = gjson.cli([str(data_file), 'name.first'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '"Tom"\n'
-    assert not captured.err
-
-
-def test_cli_nonexistent_file(tmp_path, capsys):
-    """It should exit with a failure exit code and no output."""
-    ret = gjson.cli([str(tmp_path / 'nonexistent.json'), 'name.first'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert not captured.err
-
-
-def test_cli_nonexistent_file_verbosity_1(tmp_path, capsys):
-    """It should exit with a failure exit code and print the error message."""
-    ret = gjson.cli(['-v', str(tmp_path / 'nonexistent.json'), 'name.first'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert captured.err.startswith("ArgumentTypeError: can't open")
-    assert 'nonexistent.json' in captured.err
-
-
-def test_cli_nonexistent_file_verbosity_2(tmp_path):
-    """It should raise the exception and print the full traceback."""
-    with pytest.raises(
-            argparse.ArgumentTypeError, match=r"can't open .*/nonexistent.json.* No such file or directory"):
-        gjson.cli(['-vv', str(tmp_path / 'nonexistent.json'), 'name.first'])
-
-
-def test_cli_stdin_query_verbosity_1(monkeypatch, capsys):
-    """It should exit with a failure exit code and print the error message."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
-    ret = gjson.cli(['-v', '-', 'nonexistent'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert captured.err == 'GJSONError: Mapping object does not have key `nonexistent` for query `nonexistent`.\n'
-
-
-def test_cli_stdin_query_verbosity_2(monkeypatch):
-    """It should exit with a failure exit code and print the full traceback."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
-    with pytest.raises(
-            gjson.GJSONError, match=r'Mapping object does not have key `nonexistent` for query `nonexistent`'):
-        gjson.cli(['-vv', '-', 'nonexistent'])
-
-
-def test_cli_lines_ok(monkeypatch, capsys):
-    """It should apply the same query to each line."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    ret = gjson.cli(['--lines', '-', 'name'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"Alexa"\n"May"\n"Deloise"\n'
-    assert not captured.err
-
-
-def test_cli_lines_failed_lines_verbosity_0(monkeypatch, capsys):
-    """It should keep going with the other lines and just skip the failed line."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['--lines', '-', 'name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"Deloise"\n'
-    assert not captured.err
-
-
-def test_cli_lines_failed_lines_verbosity_1(monkeypatch, capsys):
-    """It should keep going with the other lines printing an error for the failed lines."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['-v', '--lines', '-', 'name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"Deloise"\n'
-    assert captured.err.count('JSONDecodeError') == 2
-
-
-def test_cli_lines_failed_lines_verbosity_2(monkeypatch):
-    """It should interrupt the processing and print the full traceback."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    with pytest.raises(
-            json.decoder.JSONDecodeError, match=r'Expecting property name enclosed in double quotes'):
-        gjson.cli(['-vv', '--lines', '-', 'name'])
-
-
-def test_cli_lines_double_dot_query(monkeypatch, capsys):
-    """It should encapsulate each line in an array to allow queries."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    ret = gjson.cli(['--lines', '..#(age>45).name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"May"\n'
-    assert not captured.err
-
-
-def test_cli_double_dot_query_ok(monkeypatch, capsys):
-    """It should encapsulate the input in an array and apply the query to the array."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    ret = gjson.cli(['-', '..#.name'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '["Gilbert", "Alexa", "May", "Deloise"]\n'
-    assert not captured.err
-
-
-def test_cli_double_dot_query_failed_lines_verbosity_0(monkeypatch, capsys):
-    """It should encapsulate the input in an array skipping failing lines."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['-', '..#.name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert not captured.err
-
-
-def test_cli_double_dot_query_failed_lines_verbosity_1(monkeypatch, capsys):
-    """It should encapsulate the input in an array skipping failing lines and printing an error for each failure."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['-v', '-', '..#.name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert captured.err.startswith('JSONDecodeError: Expecting property name enclosed in double quotes')
-
-
-def test_cli_double_dot_query_failed_lines_verbosity_2(monkeypatch):
-    """It should interrupt the execution at the first invalid line and exit printing the traceback."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    with pytest.raises(json.decoder.JSONDecodeError, match=r'Expecting property name enclosed in double quotes'):
-        gjson.cli(['-vv', '-', '..#.name'])

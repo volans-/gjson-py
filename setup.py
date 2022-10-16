@@ -55,7 +55,7 @@ setup(
                  'objects or JSON files, using the GJSON syntax.'),
     entry_points={
         'console_scripts': [
-            'gjson = gjson:cli',
+            'gjson = gjson._cli:cli',
         ],
     },
     extras_require=extras_require,
