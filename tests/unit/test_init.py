@@ -43,7 +43,8 @@ INPUT_ESCAPE = json.loads("""
         "key?v":"val4",
         "keyv.":"val5",
         "key.v":"val6",
-        "keyk*":{"key?":"val7"}
+        "keyk*":{"key?":"val7"},
+        "1key":"val8"
     }
 }
 """)
@@ -163,13 +164,11 @@ class TestObject:
         ('friends.#.age', [44, 68, 47]),
         ('friends.#.first', ['Dale', 'Roger', 'Jane']),
         # Queries
-        ('children.#()', "Sara"),
-        ('children.#()#', ["Sara", "Alex", "Jack"]),
-        ('friends.#.invalid.#()', []),
-        ('friends.#.invalid.#()#', []),
         ('friends.#(last=="Murphy").first', 'Dale'),
         ('friends.#(last=="Murphy")#.first', ['Dale', 'Jane']),
         ('friends.#(=="Murphy")#', []),
+        ('friends.#(=="Mu)(phy")#', []),
+        ('friends.#(age\\===44)#', []),
         ('friends.#(age>47)#.last', ['Craig']),
         ('friends.#(age>=47)#.last', ['Craig', 'Murphy']),
         ('friends.#(age<47)#.last', ['Murphy']),
@@ -217,39 +216,55 @@ class TestObject:
 
     @pytest.mark.parametrize('query, error', (
         # Basic
-        ('', 'Empty query'),
         ('age.0', "Integer query part on unsupported object type <class 'int'>"),
-        ('friends.99', 'Index `99` out of range for sequence object with 3 items in query `friends.99`'),
-        ('name.nonexistent', 'Mapping object does not have key `nonexistent` for query `name.nonexistent`'),
-        ('name.1', 'Mapping object does not have key `1` for query `name.1`'),
-        ('children.invalid', 'Invalid or unsupported query part `invalid` for query `children.invalid`'),
+        ('friends.99', 'Index `99` out of range for sequence object with 3 items in query.'),
+        ('name.nonexistent', 'Mapping object does not have key `nonexistent`.'),
+        ('name.1', 'Mapping object does not have key `1`.'),
+        ('children.invalid', 'Invalid or unsupported query part `invalid`.'),
+        ('children.', 'Delimiter at the end of the query.'),
+        ('children\\', 'Escape character at the end of the query.'),
         # Wildcards
         ('x*', 'No key matching pattern with wildcard `x*`'),
         ('??????????', 'No key matching pattern with wildcard `??????????`'),
-        ('children.x*',
-         "Wildcard matching key `x*` in query `children.x*` requires a mapping object, got <class 'list'>"),
+        ('children.x*', "Wildcard matching key `x*` requires a mapping object, got <class 'list'> instead."),
         ('(-?', 'No key matching pattern with wildcard `(-?`'),
         # Queries
         ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
-        ('#.invalid', 'Invalid or unsupported query part `invalid` for query `#.invalid`'),
+        ('#.invalid', 'Invalid or unsupported query part `invalid`.'),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
         ('friends.#(last=={1: 2})', 'Invalid value `{1: 2}` for the query key `last`'),
-        ('friends.#(invalid', 'Invalid query part `#(invalid`. Expected in the format'),
+        ('friends.#(invalid', "Unbalanced parentheses, opened ['('] vs closed []"),
         ('#(first)', 'Queries are supported only for sequence like objects'),
-        ('friends.#(last=="invalid")', 'Query part `last=="invalid"` for first element does not match anything.'),
-        ('friends.#(first%"D?")', 'Query part `first%"D?"` for first element does not match anything.'),
+        ('friends.#(last=="invalid")', 'Query for first element does not match anything.'),
+        ('friends.#(first%"D?")', 'Query for first element does not match anything.'),
+        ('friends.#(last=="Murphy")invalid', 'Expected delimiter or end of query after closing parenthesis.'),
+        ('children.#()', 'Empty or invalid query.'),
+        ('children.#()#', 'Empty or invalid query.'),
+        ('friends.#.invalid.#()', 'Empty or invalid query.'),
+        ('friends.#.invalid.#()#', 'Empty or invalid query.'),
         # Dot vs Pipe
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers
-        ('@pretty:', 'Unable to load options for modifier @pretty from ``'),
-        ('@pretty:{invalid', 'Unable to load options for modifier @pretty from `{invalid`'),
-        ('@pretty:["invalid"]',
-         "Invalid options for modifier @pretty, expected mapping got <class 'list'>: `['invalid']`"),
-        ('@invalid', 'Unknown modifier @invalid'),
+        ('@', 'Got empty modifier name.'),
+        ('@pretty:', 'Modifier with options separator `:` without any option.'),
+        ('@pretty:{invalid', 'Unable to load modifier options.'),
+        ('@pretty:["invalid"]', "Expected JSON object `{...}` as modifier options."),
+        ('@invalid', 'Unknown modifier @invalid.'),
+        ('@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
+        # JSON Lines
+        ('..name', 'Invalid query with two consecutive path delimiters.'),
+    ))
+    def test_get_parser_raise(self, query, error):
+        """It should raise a GJSONParseError error with the expected message."""
+        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
+            self.object.get(query)
+
+    @pytest.mark.parametrize('query, error', (
+        # Basic
+        ('', 'Empty query.'),
+        # Modifiers
         ('children.@keys', 'The current object does not have a keys() method.'),
         ('children.@values', 'The current object does not have a values() method.'),
-        # JSON Lines
-        ('..name', 'Empty query part between two delimiters'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
@@ -274,6 +289,7 @@ class TestEscape:
         (r'test.keyv\.', 'val5'),
         (r'test.key\.v', 'val6'),
         (r'test.keyk\*.key\?', 'val7'),
+        ('test.1key', 'val8'),
     ))
     def test_get_ok(self, query, expected):
         """It should query the escape test JSON and return the expected result."""
@@ -340,13 +356,13 @@ class TestList:
 
     @pytest.mark.parametrize('query, error', (
         # Dot vs Pipe
-        ('#|first', 'Invalid or unsupported query part `first` for query `#|first`'),
+        ('#|first', 'Invalid or unsupported query part `first`.'),
         ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
         ('#|#', 'The pipe delimiter cannot immediately follow the # element.'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
             self.list.get(query)
 
 
@@ -590,6 +606,12 @@ class TestCustomModifiers:
         obj = gjson.GJSON(self.valid_obj)
         obj.register_modifier('sum', custom_sum)
         assert obj.get(self.query) == 15
+
+    def test_gjson_register_modifier_with_escape_ok(self):
+        """It should register a valid modifier with escaped characters in the name."""
+        obj = gjson.GJSON(self.valid_obj)
+        obj.register_modifier('sum\\=', custom_sum)
+        assert obj.get('@sum\\=') == 15
 
     @pytest.mark.parametrize('char', MODIFIER_NAME_RESERVED_CHARS)
     def test_gjson_register_modifier_invalid_name(self, char):

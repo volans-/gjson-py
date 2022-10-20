@@ -7,11 +7,11 @@ from pkg_resources import DistributionNotFound, get_distribution
 
 from gjson._gjson import GJSONObj, MODIFIER_NAME_RESERVED_CHARS
 from gjson._protocols import ModifierProtocol
-from gjson.exceptions import GJSONError
+from gjson.exceptions import GJSONError, GJSONParseError
 
 
-# Explicit export of modules for the import * syntax
-__all__ = ['__version__', 'get', 'GJSON', 'GJSONError', 'GJSONObj', 'ModifierProtocol']
+# Explicit export of modules for the import * syntax, custom order to force the documentation order
+__all__ = ['get', 'GJSON', 'GJSONError', 'GJSONParseError', 'ModifierProtocol', 'GJSONObj', '__version__']
 
 
 # TODO: use a proper type hint for obj once https://github.com/python/typing/issues/182 will be fixed

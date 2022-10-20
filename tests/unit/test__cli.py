@@ -6,7 +6,7 @@ import json
 import pytest
 
 from gjson._cli import cli
-from gjson.exceptions import GJSONError
+from gjson.exceptions import GJSONParseError
 
 from .test_init import INPUT_JSON, INPUT_LINES, INPUT_LINES_WITH_ERRORS
 
@@ -65,14 +65,14 @@ def test_cli_stdin_query_verbosity_1(monkeypatch, capsys):
     assert ret == 1
     captured = capsys.readouterr()
     assert not captured.out
-    assert captured.err == 'GJSONError: Mapping object does not have key `nonexistent` for query `nonexistent`.\n'
+    assert captured.err == ('GJSONParseError: Mapping object does not have key `nonexistent`.\n'
+                            'Query: nonexistent\n-------^\n')
 
 
 def test_cli_stdin_query_verbosity_2(monkeypatch):
     """It should exit with a failure exit code and print the full traceback."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
-    with pytest.raises(
-            GJSONError, match=r'Mapping object does not have key `nonexistent` for query `nonexistent`'):
+    with pytest.raises(GJSONParseError, match=r'Mapping object does not have key `nonexistent`.'):
         cli(['-vv', '-', 'nonexistent'])
 
 
