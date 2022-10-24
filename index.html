@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson-py 0.1.0 documentation &mdash; gjson-py 0.1.0 documentation</title>
+  <title>gjson-py 0.2.0 documentation &mdash; gjson-py 0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
             <a href="#" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -62,7 +62,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>gjson-py 0.1.0 documentation</li>
+      <li>gjson-py 0.2.0 documentation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -73,7 +73,7 @@
            <div itemprop="articleBody">
              
   <section id="gjson-py-release-documentation">
-<h1>gjson-py 0.1.0 documentation<a class="headerlink" href="#gjson-py-release-documentation" title="Permalink to this heading">¶</a></h1>
+<h1>gjson-py 0.2.0 documentation<a class="headerlink" href="#gjson-py-release-documentation" title="Permalink to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
@@ -110,51 +110,56 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#gjson.GJSONError"><code class="docutils literal notranslate"><span class="pre">GJSONError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.GJSONParseError"><code class="docutils literal notranslate"><span class="pre">GJSONParseError</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#gjson.GJSONParseError.__str__"><code class="docutils literal notranslate"><span class="pre">GJSONParseError.__str__()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#gjson.ModifierProtocol"><code class="docutils literal notranslate"><span class="pre">ModifierProtocol</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api.html#gjson.ModifierProtocol.__call__"><code class="docutils literal notranslate"><span class="pre">ModifierProtocol.__call__()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.DOT_DELIMITER"><code class="docutils literal notranslate"><span class="pre">DOT_DELIMITER</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.PIPE_DELIMITER"><code class="docutils literal notranslate"><span class="pre">PIPE_DELIMITER</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.QUERIES_OPERATORS"><code class="docutils literal notranslate"><span class="pre">QUERIES_OPERATORS</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.__version__"><code class="docutils literal notranslate"><span class="pre">__version__</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#gjson.GJSONObj"><code class="docutils literal notranslate"><span class="pre">GJSONObj</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#gjson.GJSONObj.builtin_modifiers"><code class="docutils literal notranslate"><span class="pre">GJSONObj.builtin_modifiers()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#gjson.GJSONObj.get"><code class="docutils literal notranslate"><span class="pre">GJSONObj.get()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#gjson.GJSONObj.__str__"><code class="docutils literal notranslate"><span class="pre">GJSONObj.__str__()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#gjson.GJSONObj.builtin_modifiers"><code class="docutils literal notranslate"><span class="pre">GJSONObj.builtin_modifiers()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.cli"><code class="docutils literal notranslate"><span class="pre">cli()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.get_parser"><code class="docutils literal notranslate"><span class="pre">get_parser()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#gjson.__version__"><code class="docutils literal notranslate"><span class="pre">__version__</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="release.html#v0-1-0-2022-10-03">v0.1.0 (2022-10-03)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="release.html#v0-2-0-2022-10-24">v0.2.0 (2022-10-24)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release.html#new-features">New features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="release.html#minor-improvements">Minor improvements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="release.html#bug-fixes">Bug fixes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="release.html#miscellanea">Miscellanea</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="release.html#v0-0-5-2022-08-05">v0.0.5 (2022-08-05)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="release.html#new-features">New features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release.html#v0-1-0-2022-10-03">v0.1.0 (2022-10-03)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="release.html#id1">Minor improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#bug-fixes">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id2">Miscellanea</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="release.html#v0-0-5-2022-08-05">v0.0.5 (2022-08-05)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id3">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id4">Minor improvements</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="release.html#v0-0-4-2022-06-11">v0.0.4 (2022-06-11)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="release.html#id2">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="release.html#id3">Minor improvements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="release.html#id4">Miscellanea</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="release.html#v0-0-3-2022-06-11">v0.0.3 (2022-06-11)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="release.html#id5">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="release.html#id6">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id6">Minor improvements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="release.html#id7">Miscellanea</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="release.html#v0-0-3-2022-06-11">v0.0.3 (2022-06-11)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id8">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id9">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id10">Miscellanea</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="release.html#v0-0-2-2022-05-31">v0.0.2 (2022-05-31)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="release.html#id8">Bug fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="release.html#id9">Miscellanea</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id11">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="release.html#id12">Miscellanea</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="release.html#v0-0-1-2022-05-22">v0.0.1 (2022-05-22)</a></li>

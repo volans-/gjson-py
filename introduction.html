@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; gjson-py 0.1.0 documentation</title>
+  <title>Introduction &mdash; gjson-py 0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CLI" href="cli.html" />
-    <link rel="prev" title="gjson-py 0.1.0 documentation" href="index.html" /> 
+    <link rel="prev" title="gjson-py 0.2.0 documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.1.0
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -62,7 +62,10 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#query-syntax">Query syntax</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#supported-gjson-features">Supported GJSON features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#additional-features">Additional features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-features">Additional features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#additional-modifiers">Additional modifiers</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -266,7 +269,7 @@ filtering/extraction.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#queries">Queries</a></p></td>
 <td><p>PARTIALLY</p></td>
-<td><p>Subqueries are not supported <a class="footnote-reference brackets" href="#id4" id="id1">1</a></p></td>
+<td><p>Nested queries are not yet supported <a class="footnote-reference brackets" href="#id5" id="id1">1</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#dot-vs-pipe">Dot vs Pipe</a></p></td>
 <td><p>YES</p></td>
@@ -282,7 +285,7 @@ filtering/extraction.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#custom-modifiers">Custom modifiers</a></p></td>
 <td><p>YES</p></td>
-<td><p>Only a JSON object is accepted as argument</p></td>
+<td><p>Only a JSON object is accepted as argument <a class="footnote-reference brackets" href="#id6" id="id2">2</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipaths">Multipaths</a></p></td>
 <td><p>NO</p></td>
@@ -294,21 +297,24 @@ filtering/extraction.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a></p></td>
 <td><p>YES</p></td>
-<td><p>CLI support <a class="footnote-reference brackets" href="#id5" id="id2">2</a> <a class="footnote-reference brackets" href="#id6" id="id3">3</a></p></td>
+<td><p>CLI support <a class="footnote-reference brackets" href="#id7" id="id3">3</a> <a class="footnote-reference brackets" href="#id8" id="id4">4</a></p></td>
 </tr>
 </tbody>
 </table>
 <dl class="footnote brackets">
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>The queries matching is based on Python’s operator and as such the results might be different than the ones from
 the Go GJSON package. In particular for the <code class="docutils literal notranslate"><span class="pre">~</span></code> operator that checks the truthy-ness of objects.</p>
 </dd>
-<dt class="label" id="id5"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Custom modifiers names cannot contain reserved characters used by the GJSON grammar.</p>
+</dd>
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
 <dd><p>Both for applying the same query to each line using the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> argument and to automatically encapsulate
 the input lines in a list and apply the query to the list using the <code class="docutils literal notranslate"><span class="pre">..</span></code> special query prefix described in
 <a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a>.</p>
 </dd>
-<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
 <dd><p>Library support is not currently present because gjson-py accepts only Python objects, making it impossible to
 pass JSON Lines directly. The client is free to choose if calling gjson-py for each line or to encapsulate them in
 a list before calling gjson-py.</p>
@@ -379,14 +385,16 @@ a list before calling gjson-py.</p>
 </section>
 <section id="additional-features">
 <h3>Additional features<a class="headerlink" href="#additional-features" title="Permalink to this heading">¶</a></h3>
-<p>This is the list of additional modifiers specific to gjson-py:</p>
+<section id="additional-modifiers">
+<h4>Additional modifiers<a class="headerlink" href="#additional-modifiers" title="Permalink to this heading">¶</a></h4>
+<p>This is the list of additional modifiers specific to gjson-py not present in GJSON:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">&#64;ascii</span></code>: escapes all non-ASCII characters when printing/returning the string representation of the object,
 ensuring that the output is made only of ASCII characters. It’s implemented using the <code class="docutils literal notranslate"><span class="pre">ensure_ascii</span></code> arguments in
 the Python’s <code class="docutils literal notranslate"><span class="pre">json</span></code> module. This modifier doesn’t accept any arguments.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&#64;sort</span></code>: sorts a mapping object by its keys or a sequence object by its values. This modifier doesn’t accept any
 arguments.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">top_n</span></code>: given a sequence object groups the items in the sequence counting how many occurrences of each value are
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;top_n</span></code>: given a sequence object groups the items in the sequence counting how many occurrences of each value are
 present. It returns a mapping object where the keys are the distinct values of the list and the values are the number
 of times the key was present in the list, ordered from the most common to the least common item. The items in the
 original sequence object must be Python hashable. This modifier accepts an optional argument <code class="docutils literal notranslate"><span class="pre">n</span></code> to return just the
@@ -398,7 +406,7 @@ N items with the higher counts. When the <code class="docutils literal notransla
 </pre></div>
 </div>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sum_n</span></code>: given a sequence of objects, groups the items in the sequence using a grouping key and sum the values of a
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;sum_n</span></code>: given a sequence of objects, groups the items in the sequence using a grouping key and sum the values of a
 sum key provided. It returns a mapping object where the keys are the distinct values of the grouping key and the
 values are the sums of all the values of the sum key for each distinct grouped key, ordered from the highest sum to
 the lowest. The values of the grouping key must be Python hashable. The values of the sum key must be integers or
@@ -417,12 +425,13 @@ highest sum. Example usage:</p>
 </section>
 </section>
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.1.0 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.2.0 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cli.html" class="btn btn-neutral float-right" title="CLI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

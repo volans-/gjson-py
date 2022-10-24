@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gjson._protocols &mdash; gjson-py 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> gjson-py
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gjson-py</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+          <li><a href="../gjson.html">gjson</a> &raquo;</li>
+      <li>gjson._protocols</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gjson._protocols</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Typing protocols used by the gjson package.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+
+
+<div class="viewcode-block" id="ModifierProtocol"><a class="viewcode-back" href="../../api.html#gjson.ModifierProtocol">[docs]</a><span class="nd">@runtime_checkable</span>
+<span class="k">class</span> <span class="nc">ModifierProtocol</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback protocol for the custom modifiers.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ModifierProtocol.__call__"><a class="viewcode-back" href="../../api.html#gjson.ModifierProtocol.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;To register a custom modifier a callable that adhere to this protocol must be provided.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            Register a custom modifier that sums all the numbers in a list:</span>
+
+<span class="sd">                &gt;&gt;&gt; import gjson</span>
+<span class="sd">                &gt;&gt;&gt; data = [1, 2, 3, 4, 5]</span>
+<span class="sd">                &gt;&gt;&gt; def custom_sum(options, obj, *, last):</span>
+<span class="sd">                ...     # insert sanity checks code here</span>
+<span class="sd">                ...     return sum(obj)</span>
+<span class="sd">                ...</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj = gjson.GJSON(data)</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj.register_modifier(&#39;sum&#39;, custom_sum)</span>
+<span class="sd">                &gt;&gt;&gt; gjson_obj.get(&#39;@sum&#39;)</span>
+<span class="sd">                15</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            options: a dictionary of options. If no options are present in the query the callable will be called with</span>
+<span class="sd">                an empty dictionary as options. The modifier can supports any number of options, or none.</span>
+<span class="sd">            obj: the current object already modifier by any previous parts of the query.</span>
+<span class="sd">            last: :py:data:`True` if the modifier is the last element in the query or :py:data:`False` otherwise.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: any exception that might be raised by the callable is catched by gjson and re-raised as a</span>
+<span class="sd">                :py:class:`gjson.GJSONError` exception to ensure that the normal gjson behaviour is respected according</span>
+<span class="sd">                to the selected verbosity (CLI) or ``quiet`` parameter (Python library).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the resulting object after applying the modifier.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Riccardo Coccioli.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
