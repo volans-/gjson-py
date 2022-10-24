@@ -176,7 +176,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Arrays`_              | YES                    |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Queries`_             | PARTIALLY              | Subqueries are not supported [#]_                   |
+| `Queries`_             | PARTIALLY              | Nested queries are not yet supported [#]_           |
 +------------------------+------------------------+-----------------------------------------------------+
 | `Dot vs Pipe`_         | YES                    |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
@@ -184,7 +184,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Modifier arguments`_  | YES                    | Only a JSON object is accepted as argument          |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Custom modifiers`_    | YES                    | Only a JSON object is accepted as argument          |
+| `Custom modifiers`_    | YES                    | Only a JSON object is accepted as argument [#]_     |
 +------------------------+------------------------+-----------------------------------------------------+
 | `Multipaths`_          | NO                     |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
@@ -195,6 +195,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 
 .. [#] The queries matching is based on Python's operator and as such the results might be different than the ones from
    the Go GJSON package. In particular for the ``~`` operator that checks the truthy-ness of objects.
+.. [#] Custom modifiers names cannot contain reserved characters used by the GJSON grammar.
 .. [#] Both for applying the same query to each line using the ``-l/--lines`` argument and to automatically encapsulate
    the input lines in a list and apply the query to the list using the ``..`` special query prefix described in
    `JSON Lines`_.
@@ -236,14 +237,18 @@ This is the list of modifiers present in GJSON and how they are supported by gjs
 Additional features
 ^^^^^^^^^^^^^^^^^^^
 
-This is the list of additional modifiers specific to gjson-py:
+
+Additional modifiers
+""""""""""""""""""""
+
+This is the list of additional modifiers specific to gjson-py not present in GJSON:
 
 * ``@ascii``: escapes all non-ASCII characters when printing/returning the string representation of the object,
   ensuring that the output is made only of ASCII characters. It's implemented using the ``ensure_ascii`` arguments in
   the Python's ``json`` module. This modifier doesn't accept any arguments.
 * ``@sort``: sorts a mapping object by its keys or a sequence object by its values. This modifier doesn't accept any
   arguments.
-* ``top_n``: given a sequence object groups the items in the sequence counting how many occurrences of each value are
+* ``@top_n``: given a sequence object groups the items in the sequence counting how many occurrences of each value are
   present. It returns a mapping object where the keys are the distinct values of the list and the values are the number
   of times the key was present in the list, ordered from the most common to the least common item. The items in the
   original sequence object must be Python hashable. This modifier accepts an optional argument ``n`` to return just the
@@ -256,7 +261,7 @@ This is the list of additional modifiers specific to gjson-py:
     $ echo '["a", "b", "c", "b", "c", "c"]' | gjson '@top_n:{"n":2}'
     {"c": 3, "b": 2}
 
-* ``sum_n``: given a sequence of objects, groups the items in the sequence using a grouping key and sum the values of a
+* ``@sum_n``: given a sequence of objects, groups the items in the sequence using a grouping key and sum the values of a
   sum key provided. It returns a mapping object where the keys are the distinct values of the grouping key and the
   values are the sums of all the values of the sum key for each distinct grouped key, ordered from the highest sum to
   the lowest. The values of the grouping key must be Python hashable. The values of the sum key must be integers or

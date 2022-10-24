@@ -1,7 +1,5 @@
 """GJSON test module."""
 # pylint: disable=attribute-defined-outside-init
-import argparse
-import io
 import json
 import re
 
@@ -10,6 +8,7 @@ from collections.abc import Mapping
 import pytest
 
 import gjson
+from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS
 
 
 INPUT_JSON = """
@@ -44,7 +43,8 @@ INPUT_ESCAPE = json.loads("""
         "key?v":"val4",
         "keyv.":"val5",
         "key.v":"val6",
-        "keyk*":{"key?":"val7"}
+        "keyk*":{"key?":"val7"},
+        "1key":"val8"
     }
 }
 """)
@@ -164,13 +164,11 @@ class TestObject:
         ('friends.#.age', [44, 68, 47]),
         ('friends.#.first', ['Dale', 'Roger', 'Jane']),
         # Queries
-        ('children.#()', "Sara"),
-        ('children.#()#', ["Sara", "Alex", "Jack"]),
-        ('friends.#.invalid.#()', []),
-        ('friends.#.invalid.#()#', []),
         ('friends.#(last=="Murphy").first', 'Dale'),
         ('friends.#(last=="Murphy")#.first', ['Dale', 'Jane']),
         ('friends.#(=="Murphy")#', []),
+        ('friends.#(=="Mu)(phy")#', []),
+        ('friends.#(age\\===44)#', []),
         ('friends.#(age>47)#.last', ['Craig']),
         ('friends.#(age>=47)#.last', ['Craig', 'Murphy']),
         ('friends.#(age<47)#.last', ['Murphy']),
@@ -218,38 +216,55 @@ class TestObject:
 
     @pytest.mark.parametrize('query, error', (
         # Basic
-        ('', 'Empty query'),
         ('age.0', "Integer query part on unsupported object type <class 'int'>"),
-        ('friends.99', 'Index 99 out of range for sequence object with 3 items in query friends.99'),
-        ('name.nonexistent', 'Mapping object does not have key nonexistent for query name.nonexistent'),
-        ('name.1', 'Mapping object does not have key 1 for query name.1'),
-        ('children.invalid', 'Invalid or unsupported query part "invalid" for query children.invalid.'),
+        ('friends.99', 'Index `99` out of range for sequence object with 3 items in query.'),
+        ('name.nonexistent', 'Mapping object does not have key `nonexistent`.'),
+        ('name.1', 'Mapping object does not have key `1`.'),
+        ('children.invalid', 'Invalid or unsupported query part `invalid`.'),
+        ('children.', 'Delimiter at the end of the query.'),
+        ('children\\', 'Escape character at the end of the query.'),
         # Wildcards
-        ('x*', 'No key matching pattern with wildcard x*'),
-        ('??????????', 'No key matching pattern with wildcard ??????????'),
-        ('children.x*', "Wildcard matching key x* in query children.x* requires a mapping object, got <class 'list'>"),
-        ('(-?', 'No key matching pattern with wildcard (-?.'),
+        ('x*', 'No key matching pattern with wildcard `x*`'),
+        ('??????????', 'No key matching pattern with wildcard `??????????`'),
+        ('children.x*', "Wildcard matching key `x*` requires a mapping object, got <class 'list'> instead."),
+        ('(-?', 'No key matching pattern with wildcard `(-?`'),
         # Queries
         ('#', "Expected a sequence like object for query part # at the end of the query, got <class 'dict'>."),
-        ('#.invalid', 'Invalid or unsupported query part "invalid" for query #.invalid.'),
+        ('#.invalid', 'Invalid or unsupported query part `invalid`.'),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
-        ('friends.#(last=={1: 2})', 'Invalid value "{1: 2}" for the query key "last".'),
-        ('friends.#(invalid', 'Invalid query part #(invalid. Expected in the format'),
+        ('friends.#(last=={1: 2})', 'Invalid value `{1: 2}` for the query key `last`'),
+        ('friends.#(invalid', "Unbalanced parentheses, opened ['('] vs closed []"),
         ('#(first)', 'Queries are supported only for sequence like objects'),
-        ('friends.#(last=="invalid")', 'Query part last=="invalid" for first element does not match anything.'),
-        ('friends.#(first%"D?")', 'Query part first%"D?" for first element does not match anything.'),
+        ('friends.#(last=="invalid")', 'Query for first element does not match anything.'),
+        ('friends.#(first%"D?")', 'Query for first element does not match anything.'),
+        ('friends.#(last=="Murphy")invalid', 'Expected delimiter or end of query after closing parenthesis.'),
+        ('children.#()', 'Empty or invalid query.'),
+        ('children.#()#', 'Empty or invalid query.'),
+        ('friends.#.invalid.#()', 'Empty or invalid query.'),
+        ('friends.#.invalid.#()#', 'Empty or invalid query.'),
         # Dot vs Pipe
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers
-        ('@pretty:', 'Unable to load options for modifier @pretty'),
-        ('@pretty:{invalid', 'Unable to load options for modifier @pretty'),
-        ('@pretty:["invalid"]',
-         "Invalid options for modifier @pretty, expected mapping got <class 'list'>: ['invalid']"),
-        ('@invalid', 'Unknown modifier @invalid'),
+        ('@', 'Got empty modifier name.'),
+        ('@pretty:', 'Modifier with options separator `:` without any option.'),
+        ('@pretty:{invalid', 'Unable to load modifier options.'),
+        ('@pretty:["invalid"]', "Expected JSON object `{...}` as modifier options."),
+        ('@invalid', 'Unknown modifier @invalid.'),
+        ('@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
+        # JSON Lines
+        ('..name', 'Invalid query with two consecutive path delimiters.'),
+    ))
+    def test_get_parser_raise(self, query, error):
+        """It should raise a GJSONParseError error with the expected message."""
+        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
+            self.object.get(query)
+
+    @pytest.mark.parametrize('query, error', (
+        # Basic
+        ('', 'Empty query.'),
+        # Modifiers
         ('children.@keys', 'The current object does not have a keys() method.'),
         ('children.@values', 'The current object does not have a values() method.'),
-        # JSON Lines
-        ('..name', 'Empty query part between two delimiters'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
@@ -274,6 +289,7 @@ class TestEscape:
         (r'test.keyv\.', 'val5'),
         (r'test.key\.v', 'val6'),
         (r'test.keyk\*.key\?', 'val7'),
+        ('test.1key', 'val8'),
     ))
     def test_get_ok(self, query, expected):
         """It should query the escape test JSON and return the expected result."""
@@ -340,13 +356,13 @@ class TestList:
 
     @pytest.mark.parametrize('query, error', (
         # Dot vs Pipe
-        ('#|first', 'Invalid or unsupported query part "first" for query #|first.'),
+        ('#|first', 'Invalid or unsupported query part `first`.'),
         ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
         ('#|#', 'The pipe delimiter cannot immediately follow the # element.'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
             self.list.get(query)
 
 
@@ -385,7 +401,8 @@ class TestTruthiness:
         compare_values(self.object.get(query), expected)
 
     @pytest.mark.parametrize('query, error', (
-        ('vals.#(b==~"invalid")', "Queries ==~ operator requires a boolean value, got <class 'str'> instead: invalid"),
+        ('vals.#(b==~"invalid")',
+         "Queries ==~ operator requires a boolean value, got <class 'str'> instead: `invalid`"),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
@@ -590,6 +607,22 @@ class TestCustomModifiers:
         obj.register_modifier('sum', custom_sum)
         assert obj.get(self.query) == 15
 
+    def test_gjson_register_modifier_with_escape_ok(self):
+        """It should register a valid modifier with escaped characters in the name."""
+        obj = gjson.GJSON(self.valid_obj)
+        obj.register_modifier('sum\\=', custom_sum)
+        assert obj.get('@sum\\=') == 15
+
+    @pytest.mark.parametrize('char', MODIFIER_NAME_RESERVED_CHARS)
+    def test_gjson_register_modifier_invalid_name(self, char):
+        """It should raise a GJSONError if trying to register a modifier with a name with not allowed characters."""
+        obj = gjson.GJSON(self.valid_obj)
+        name = fr'a{char}b'
+        with pytest.raises(
+                gjson.GJSONError,
+                match=fr'Unable to register modifier `{re.escape(name)}`, contains at least one not allowed'):
+            obj.register_modifier(name, custom_sum)
+
     def test_gjson_register_modifier_override_builtin(self):
         """It should raise a GJSONError if trying to register a modifier with the same name of a built-in one."""
         obj = gjson.GJSON(self.valid_obj)
@@ -630,153 +663,3 @@ class TestCustomModifiers:
         expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n', 'valid',
                     'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
-
-
-def test_cli_stdin(monkeypatch, capsys):
-    """It should read the data from stdin and query it."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
-    ret = gjson.cli(['-', 'name.first'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '"Tom"\n'
-    assert not captured.err
-
-
-def test_cli_file(tmp_path, capsys):
-    """It should read the data from the provided file and query it."""
-    data_file = tmp_path / 'input.json'
-    data_file.write_text(INPUT_JSON)
-    ret = gjson.cli([str(data_file), 'name.first'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '"Tom"\n'
-    assert not captured.err
-
-
-def test_cli_nonexistent_file(tmp_path, capsys):
-    """It should exit with a failure exit code and no output."""
-    ret = gjson.cli([str(tmp_path / 'nonexistent.json'), 'name.first'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert not captured.err
-
-
-def test_cli_nonexistent_file_verbosity_1(tmp_path, capsys):
-    """It should exit with a failure exit code and print the error message."""
-    ret = gjson.cli(['-v', str(tmp_path / 'nonexistent.json'), 'name.first'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert captured.err.startswith("ArgumentTypeError: can't open")
-    assert 'nonexistent.json' in captured.err
-
-
-def test_cli_nonexistent_file_verbosity_2(tmp_path):
-    """It should raise the exception and print the full traceback."""
-    with pytest.raises(
-            argparse.ArgumentTypeError, match=r"can't open .*/nonexistent.json.* No such file or directory"):
-        gjson.cli(['-vv', str(tmp_path / 'nonexistent.json'), 'name.first'])
-
-
-def test_cli_stdin_query_verbosity_1(monkeypatch, capsys):
-    """It should exit with a failure exit code and print the error message."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
-    ret = gjson.cli(['-v', '-', 'nonexistent'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert captured.err == 'GJSONError: Mapping object does not have key nonexistent for query nonexistent\n'
-
-
-def test_cli_stdin_query_verbosity_2(monkeypatch):
-    """It should exit with a failure exit code and print the full traceback."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
-    with pytest.raises(
-            gjson.GJSONError, match=r'Mapping object does not have key nonexistent for query nonexistent'):
-        gjson.cli(['-vv', '-', 'nonexistent'])
-
-
-def test_cli_lines_ok(monkeypatch, capsys):
-    """It should apply the same query to each line."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    ret = gjson.cli(['--lines', '-', 'name'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"Alexa"\n"May"\n"Deloise"\n'
-    assert not captured.err
-
-
-def test_cli_lines_failed_lines_verbosity_0(monkeypatch, capsys):
-    """It should keep going with the other lines and just skip the failed line."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['--lines', '-', 'name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"Deloise"\n'
-    assert not captured.err
-
-
-def test_cli_lines_failed_lines_verbosity_1(monkeypatch, capsys):
-    """It should keep going with the other lines printing an error for the failed lines."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['-v', '--lines', '-', 'name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"Deloise"\n'
-    assert captured.err.count('JSONDecodeError') == 2
-
-
-def test_cli_lines_failed_lines_verbosity_2(monkeypatch):
-    """It should interrupt the processing and print the full traceback."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    with pytest.raises(
-            json.decoder.JSONDecodeError, match=r'Expecting property name enclosed in double quotes'):
-        gjson.cli(['-vv', '--lines', '-', 'name'])
-
-
-def test_cli_lines_double_dot_query(monkeypatch, capsys):
-    """It should encapsulate each line in an array to allow queries."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    ret = gjson.cli(['--lines', '..#(age>45).name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert captured.out == '"Gilbert"\n"May"\n'
-    assert not captured.err
-
-
-def test_cli_double_dot_query_ok(monkeypatch, capsys):
-    """It should encapsulate the input in an array and apply the query to the array."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES))
-    ret = gjson.cli(['-', '..#.name'])
-    assert ret == 0
-    captured = capsys.readouterr()
-    assert captured.out == '["Gilbert", "Alexa", "May", "Deloise"]\n'
-    assert not captured.err
-
-
-def test_cli_double_dot_query_failed_lines_verbosity_0(monkeypatch, capsys):
-    """It should encapsulate the input in an array skipping failing lines."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['-', '..#.name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert not captured.err
-
-
-def test_cli_double_dot_query_failed_lines_verbosity_1(monkeypatch, capsys):
-    """It should encapsulate the input in an array skipping failing lines and printing an error for each failure."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    ret = gjson.cli(['-v', '-', '..#.name'])
-    assert ret == 1
-    captured = capsys.readouterr()
-    assert not captured.out
-    assert captured.err.startswith('JSONDecodeError: Expecting property name enclosed in double quotes')
-
-
-def test_cli_double_dot_query_failed_lines_verbosity_2(monkeypatch):
-    """It should interrupt the execution at the first invalid line and exit printing the traceback."""
-    monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_LINES_WITH_ERRORS))
-    with pytest.raises(json.decoder.JSONDecodeError, match=r'Expecting property name enclosed in double quotes'):
-        gjson.cli(['-vv', '-', '..#.name'])

@@ -1,6 +1,50 @@
 Release Notes
 =============
 
+`v0.2.0`_ (2022-10-24)
+^^^^^^^^^^^^^^^^^^^^^^
+
+New features
+""""""""""""
+
+* Query parsing: fully rewrite of the query parser:
+
+  * Until now the parsing was mostly relying on a couple of regular expressions with lookbehind assertions to take
+    into account escaped characters. Although they were working fine and also allowed to sensibly speed up the first
+    development of gjson-py, they also had two major limitations:
+
+    * Could not work in all corner cases.
+    * Prevented the implementation of the GJSON features still missing in gjson-py.
+
+  * The parsing has been completely refactored using a more standard parser approach, that allows to fine-tune the
+    parsing much more to cover all corner cases and also enables the development of GJSON features still missing.
+  * There shouldn't be any difference for normal queries, but some corner cases might now return a proper error.
+  * Introduced a new ``GJSONParseError`` for parser-specific errors, that inherits from GJSONError and also provides
+    a graphic way to show where the parsing error occurred. Example output::
+
+      GJSONParseError: Invalid or unsupported query part `invalid`.
+      Query: name.last.invalid
+      -----------------^
+
+Minor improvements
+""""""""""""""""""
+
+* Refactor code splitting it into multiple files:
+
+  * Restructure the gjson code to split it into multiple files for ease of development and maintenance.
+  * Keep all the split modules as private except the exceptions one, and re-export everything from the gjson module
+    itself, both to keep backward compatibility and also for simplicity of use by the clients.
+
+* Custom modifiers:
+
+  * Prevent to register custom modifiers with names that contains characters that are used by the GJSON grammair,
+    raising a GJSONError exception.
+
+Miscellanea
+"""""""""""
+
+* README: clarify naming for nested queries, based on feedback from `issue #2`_. Also fix a typo.
+
 `v0.1.0`_ (2022-10-03)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -176,9 +220,12 @@ Miscellanea
 
 * Initial version.
 
+.. _`issue #2`: https://github.com/volans-/gjson-py/issues/2
+
 .. _`v0.0.1`: https://github.com/volans-/gjson-py/releases/tag/v0.0.1
 .. _`v0.0.2`: https://github.com/volans-/gjson-py/releases/tag/v0.0.2
 .. _`v0.0.3`: https://github.com/volans-/gjson-py/releases/tag/v0.0.3
 .. _`v0.0.4`: https://github.com/volans-/gjson-py/releases/tag/v0.0.4
 .. _`v0.0.5`: https://github.com/volans-/gjson-py/releases/tag/v0.0.5
 .. _`v0.1.0`: https://github.com/volans-/gjson-py/releases/tag/v0.1.0
+.. _`v0.2.0`: https://github.com/volans-/gjson-py/releases/tag/v0.2.0
