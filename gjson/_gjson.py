@@ -379,7 +379,7 @@ class GJSONObj:
                 continue
 
             if char == ':':
-                name = self._query[start + 1:i]
+                name = self._query[start + 1:start + i]
                 options_len, options = self._parse_modifier_options(start + i + 1)
                 end = start + i + options_len
                 break

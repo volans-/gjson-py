@@ -194,6 +194,8 @@ class TestObject:
         ('@keys', ['name', 'age', 'children', 'fav.movie', 'friends']),
         ('name.@values', ['Tom', 'Anderson']),
         ('age.@flatten', 37),
+        ('@pretty:{"indent": 4}', INPUT_OBJECT),
+        (r'fav\.movie.@pretty:{"indent": 4}', 'Deer Hunter'),
         # Dot vs Pipe
         ('friends.0.first', 'Dale'),
         ('friends|0.first', 'Dale'),
@@ -246,11 +248,12 @@ class TestObject:
         ('friends.#(last="Murphy")#|first', 'Invalid or unsupported query'),
         # Modifiers
         ('@', 'Got empty modifier name.'),
-        ('@pretty:', 'Modifier with options separator `:` without any option.'),
-        ('@pretty:{invalid', 'Unable to load modifier options.'),
-        ('@pretty:["invalid"]', "Expected JSON object `{...}` as modifier options."),
-        ('@invalid', 'Unknown modifier @invalid.'),
-        ('@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
+        ('friends.@', 'Got empty modifier name.'),
+        ('friends.@pretty:', 'Modifier with options separator `:` without any option.'),
+        ('friends.@pretty:{invalid', 'Unable to load modifier options.'),
+        ('friends.@pretty:["invalid"]', "Expected JSON object `{...}` as modifier options."),
+        ('friends.@invalid', 'Unknown modifier @invalid.'),
+        ('friends.@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
         # JSON Lines
         ('..name', 'Invalid query with two consecutive path delimiters.'),
     ))

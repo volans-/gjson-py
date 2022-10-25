@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+`v0.2.1`_ (2022-10-25)
+^^^^^^^^^^^^^^^^^^^^^^
+
+Bug fixes
+"""""""""
+
+* Query parsing: fix modifier options:
+
+  * Fix a bug that was failing to properly get the modifier name when there were options and the modifier was not the
+    first path in the query.
+
 `v0.2.0`_ (2022-10-24)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -229,3 +240,4 @@ Miscellanea
 .. _`v0.0.5`: https://github.com/volans-/gjson-py/releases/tag/v0.0.5
 .. _`v0.1.0`: https://github.com/volans-/gjson-py/releases/tag/v0.1.0
 .. _`v0.2.0`: https://github.com/volans-/gjson-py/releases/tag/v0.2.0
+.. _`v0.2.1`: https://github.com/volans-/gjson-py/releases/tag/v0.2.1
