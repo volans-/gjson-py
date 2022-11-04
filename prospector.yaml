@@ -42,3 +42,7 @@ pyroma:
 
 vulture:
   run: true
+
+mccabe:
+  disable:
+    - MC0001  # too complex method
