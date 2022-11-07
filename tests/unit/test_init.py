@@ -487,6 +487,35 @@ class TestTruthiness:
             self.object.get(query)
 
 
+@pytest.mark.parametrize('query, expected', (
+    ('0.0', 'zero'),
+    ('0|0', 'zero'),
+    ('#.0', ['zero']),
+    ('#.1', ['one', 'one']),
+    ('#.9', []),
+    ('#(0="zero")#|0', {'0': 'zero', '1': 'one'}),
+    ('#(0="zero")#.1', ['one']),
+    ('#(0="zero")#.9', []),
+    ('#(0="invalid")#.1', []),
+))
+def test_get_integer_mapping_keys_ok(query, expected):
+    """It should return the expected result."""
+    obj = gjson.GJSON([{'0': 'zero', '1': 'one'}, {'1': 'one'}])
+    assert obj.get(query, quiet=True) == expected
+
+
+@pytest.mark.parametrize('query, error', (
+    ('0.1', 'Mapping object does not have key `1`.'),
+    ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
+    ('#|9', 'Integer query part after a pipe delimiter on an sequence like object.'),
+    ('#(0="zero")#|1', 'Index `1` out of range for sequence object with 1 items in query.'),
+))
+def test_get_integer_mapping_keys_raise(query, error):
+    """It should return the expected result."""
+    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        gjson.GJSON([{'0': 'zero'}]).get(query)
+
+
 @pytest.mark.parametrize('modifier', ('@valid', '@this'))
 def test_get_modifier_unmodified_ok(modifier):
     """It should return the same object."""

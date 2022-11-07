@@ -768,13 +768,12 @@ class GJSONObj:
                                           query=self._query, position=part.start)
                 ret = obj.get(part.part, NoResult())
             elif isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
-                if self._after_hash:
-                    if part.delimiter == PIPE_DELIMITER:
-                        raise GJSONParseError('Integer query part after a pipe delimiter on an sequence like object.',
-                                              query=self._query, position=part.start)
-                    ret = []
-                elif self._after_query_all and part.delimiter == DOT_DELIMITER:
-                    ret = []
+                if (self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER:
+                    # Skip non mapping items and items without the given key
+                    ret = [i[part.part] for i in obj if isinstance(i, Mapping) and part.part in i]
+                elif self._after_hash and part.delimiter == PIPE_DELIMITER:
+                    raise GJSONParseError('Integer query part after a pipe delimiter on an sequence like object.',
+                                          query=self._query, position=part.start)
                 else:
                     num = len(obj)
                     if part.index >= num:
