@@ -211,6 +211,67 @@ class TestObject:
         ('friends.#(last="Murphy")#|0', {'first': 'Dale', 'last': 'Murphy', 'age': 44, 'nets': ['ig', 'fb', 'tw']}),
         ('friends.#(last="Murphy")#.#', []),
         ('friends.#(last="Murphy")#|#', 2),
+        # Multipaths objects
+        ('{}', {}),
+        ('{.}', {}),
+        ('{.invalid}', {}),
+        ('{.invalid,}', {}),
+        ('{age}', {'age': 37}),
+        (r'{a\ge}', {r'a\ge': 37}),
+        (r'{"a\\ge":age}', {r'a\ge': 37}),
+        ('{"key":age}', {'key': 37}),
+        ('{age,age}', {'age': 37}),
+        ('{age,"years":age}', {'age': 37, 'years': 37}),
+        ('{"years":age,age}', {'years': 37, 'age': 37}),
+        ('{age,name.first}', {'age': 37, 'first': 'Tom'}),
+        ('{invalid,invalid.invalid,age}', {'age': 37}),
+        ('{name.first,age,name.last}', {'first': 'Tom', 'age': 37, 'last': 'Anderson'}),
+        ('{{age}}', {'_': {'age': 37}}),
+        ('{{age},age}', {'_': {'age': 37}, 'age': 37}),
+        ('friends.0.{age,nets.#(="ig")}', {'age': 44, "_": 'ig'}),
+        ('friends.0.{age,nets.#(="ig"),invalid}', {'age': 44, "_": 'ig'}),
+        ('friends.0.{age,nets.#(="ig")#}', {'age': 44, "_": ['ig']}),
+        ('friends.#.{age,"key":first}',
+         [{'age': 44, 'key': 'Dale'}, {'age': 68, 'key': 'Roger'}, {'age': 47, 'key': 'Jane'}]),
+        ('friends.#(age>44)#.{age,"key":first}', [{'age': 68, 'key': 'Roger'}, {'age': 47, 'key': 'Jane'}]),
+        ('friends.#(age>44)#.{age,"key":first,invalid}', [{'age': 68, 'key': 'Roger'}, {'age': 47, 'key': 'Jane'}]),
+        (r'{age,name.first,fav\.movie}', {'age': 37, 'first': 'Tom', r'fav\.movie': 'Deer Hunter'}),
+        ('{age,name.{"name":first,"surname":last},children.@sort}',
+         {'age': 37, '_': {'name': 'Tom', 'surname': 'Anderson'}, '@sort': ['Alex', 'Jack', 'Sara']}),
+        ('friends.{0.first,1.last,2.age}.@values', ['Dale', 'Craig', 47]),
+        ('{friends.{"a":0.{nets.{0}}}}', {'_': {'a': {'_': {'0': 'ig'}}}}),
+        ('{friends.{"a":0.{nets.{0,1}}}}', {'_': {'a': {'_': {'0': 'ig', '1': 'fb'}}}}),
+        # Multipaths arrays
+        ('[]', []),
+        ('[.]', []),
+        ('[.invalid]', []),
+        ('[.invalid,]', []),
+        ('[age]', [37]),
+        (r'[a\ge]', [37]),
+        ('[age,age]', [37, 37]),
+        ('[age,name.first]', [37, 'Tom']),
+        ('[name.first,age,invalid,invalid.invalid,name.last]', ['Tom', 37, 'Anderson']),
+        ('[[age]]', [[37]]),
+        ('[[age],age]', [[37], 37]),
+        ('friends.0.[age,nets.#(="ig")]', [44, 'ig']),
+        ('friends.0.[age,nets.#(="ig"),invalid]', [44, 'ig']),
+        ('friends.0.[age,nets.#(="ig")#]', [44, ['ig']]),
+        ('friends.#.[age,first]', [[44, 'Dale'], [68, 'Roger'], [47, 'Jane']]),
+        ('friends.#(age>44)#.[age,first]', [[68, 'Roger'], [47, 'Jane']]),
+        ('friends.#(age>44)#.[age,invalid,invalid.invalid,first]', [[68, 'Roger'], [47, 'Jane']]),
+        (r'[age,name.first,fav\.movie]', [37, 'Tom', 'Deer Hunter']),
+        ('[age,name.[first,last],children.@sort]', [37, ['Tom', 'Anderson'], ['Alex', 'Jack', 'Sara']]),
+        ('friends.[0.first,1.last,2.age]', ['Dale', 'Craig', 47]),
+        ('[friends.[0.[nets.[0]]]]', [[[['ig']]]]),
+        ('[friends.[0.[nets.[0,1]]]]', [[[['ig', 'fb']]]]),
+        # Multipaths mixed
+        ('[{}]', [{}]),
+        ('{[]}', {'_': []}),
+        ('{"a":[]}', {'a': []}),
+        ('[{age},{name.first}]', [{'age': 37}, {'first': 'Tom'}]),
+        ('{friends.0.[age,nets.#(="ig")]}', {'_': [44, 'ig']}),
+        ('{friends.0.[age,nets.#(="ig")],age}', {'_': [44, 'ig'], 'age': 37}),
+        ('{friends.0.[invalid,nets.#(="ig")],age,invalid}', {'_': ['ig'], 'age': 37}),
     ))
     def test_get_ok(self, query, expected):
         """It should query the JSON object and return the expected result."""
@@ -218,6 +279,14 @@ class TestObject:
 
     @pytest.mark.parametrize('query, error', (
         # Basic
+        ('.', 'Invalid query starting with a path delimiter.'),
+        ('|', 'Invalid query starting with a path delimiter.'),
+        ('.name', 'Invalid query starting with a path delimiter.'),
+        ('|age', 'Invalid query starting with a path delimiter.'),
+        ('name..first', 'Invalid query with two consecutive path delimiters.'),
+        ('name||first', 'Invalid query with two consecutive path delimiters.'),
+        ('name.|first', 'Invalid query with two consecutive path delimiters.'),
+        ('name|.first', 'Invalid query with two consecutive path delimiters.'),
         ('age.0', "Integer query part on unsupported object type <class 'int'>"),
         ('friends.99', 'Index `99` out of range for sequence object with 3 items in query.'),
         ('name.nonexistent', 'Mapping object does not have key `nonexistent`.'),
@@ -255,7 +324,10 @@ class TestObject:
         ('friends.@invalid', 'Unknown modifier @invalid.'),
         ('friends.@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
         # JSON Lines
-        ('..name', 'Invalid query with two consecutive path delimiters.'),
+        ('..name', 'Invalid query starting with a path delimiter.'),
+        # Multipaths objects
+        (r'{"a\ge":age}', r'Failed to parse multipaths key "a\ge"'),
+        ('{"age",age}', 'Expected colon after multipaths item with key "age".'),
     ))
     def test_get_parser_raise(self, query, error):
         """It should raise a GJSONParseError error with the expected message."""
@@ -352,10 +424,12 @@ class TestList:
         ('#(first)', {'first': 'Dale'}),
         ('#(last)#', [{'last': 'Murphy'}]),
         ('#(last)', {'last': 'Murphy'}),
+        # Multipaths
+        ('#.{first.@reverse}', [{'@reverse': 'Dale'}, {'@reverse': 'Jane'}, {}]),
     ))
     def test_get_ok(self, query, expected):
         """It should query the list test JSON and return the expected result."""
-        assert self.list.get(query, quiet=True) == expected
+        assert self.list.get(query, quiet=False) == expected
 
     @pytest.mark.parametrize('query, error', (
         # Dot vs Pipe
@@ -411,6 +485,35 @@ class TestTruthiness:
         """It should raise a GJSONError error with the expected message."""
         with pytest.raises(gjson.GJSONError, match=re.escape(error)):
             self.object.get(query)
+
+
+@pytest.mark.parametrize('query, expected', (
+    ('0.0', 'zero'),
+    ('0|0', 'zero'),
+    ('#.0', ['zero']),
+    ('#.1', ['one', 'one']),
+    ('#.9', []),
+    ('#(0="zero")#|0', {'0': 'zero', '1': 'one'}),
+    ('#(0="zero")#.1', ['one']),
+    ('#(0="zero")#.9', []),
+    ('#(0="invalid")#.1', []),
+))
+def test_get_integer_mapping_keys_ok(query, expected):
+    """It should return the expected result."""
+    obj = gjson.GJSON([{'0': 'zero', '1': 'one'}, {'1': 'one'}])
+    assert obj.get(query, quiet=True) == expected
+
+
+@pytest.mark.parametrize('query, error', (
+    ('0.1', 'Mapping object does not have key `1`.'),
+    ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
+    ('#|9', 'Integer query part after a pipe delimiter on an sequence like object.'),
+    ('#(0="zero")#|1', 'Index `1` out of range for sequence object with 1 items in query.'),
+))
+def test_get_integer_mapping_keys_raise(query, error):
+    """It should return the expected result."""
+    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        gjson.GJSON([{'0': 'zero'}]).get(query)
 
 
 @pytest.mark.parametrize('modifier', ('@valid', '@this'))

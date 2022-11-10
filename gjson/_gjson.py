@@ -18,12 +18,18 @@ PIPE_DELIMITER = '|'
 """str: One of the available delimiters in the query grammar."""
 DELIMITERS = (DOT_DELIMITER, PIPE_DELIMITER)
 """tuple: All the available delimiters in the query grammar."""
+MULTIPATHS_DELIMITERS = DELIMITERS + (']', '}', ',')
+"""tuple: All the available delimiters in the query grammar."""
 # Single character operators goes last to avoid mis-detection.
 QUERIES_OPERATORS = ('==~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
 """tuple: The list of supported operators inside queries."""
 MODIFIER_NAME_RESERVED_CHARS = ('"', ',', '.', '|', ':', '@', '{', '}', '[', ']', '(', ')')
 """tuple: The list of reserver characters not usable in a modifier's name."""
 PARENTHESES_PAIRS = {'(': ')', ')': '(', '[': ']', ']': '[', '{': '}', '}': '{'}
+
+
+class NoResult:
+    """A no result type to be passed around and be checked."""
 
 
 @dataclass
@@ -87,8 +93,32 @@ class ModifierQueryPart(BaseQueryPart):
     options: dict[Any, Any]
 
 
+@dataclass
+class MultipathsItem:
+    """Single multipaths query item."""
+
+    key: str
+    values: list[BaseQueryPart]
+
+
+@dataclass
+class MultipathsObjectQueryPart(BaseQueryPart):
+    """JSON object multipaths query part."""
+
+    parts: list[MultipathsItem]
+
+
+@dataclass
+class MultipathsArrayQueryPart(BaseQueryPart):
+    """JSON object multipaths query part."""
+
+    parts: list[list[BaseQueryPart]]
+
+
 class GJSONObj:
     """A low-level class to perform the GJSON query on a JSON-like object."""
+
+    # pylint: disable=too-many-branches,too-many-statements,too-many-locals
 
     def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[dict[str, ModifierProtocol]] = None):
         """Initialize the instance with the starting object and query.
@@ -163,7 +193,7 @@ class GJSONObj:
             raise GJSONError('Empty query.')
 
         obj = self._obj
-        for part in self._parse():
+        for part in self._parse(start=0, end=len(self._query) - 1):
             obj = self._parse_part(part, obj)
 
         return obj
@@ -193,8 +223,16 @@ class GJSONObj:
 
         return json_string
 
-    def _parse(self) -> list[BaseQueryPart]:  # noqa: MC0001
+    def _parse(self, *, start: int, end: int, max_end: int = 0, delimiter: str = '',
+               in_multipaths: bool = False) -> list[BaseQueryPart]:
         """Main parser of the query that will delegate to more specific parsers for each different feature.
+
+        Arguments:
+            start: the start position in the query.
+            end: the end position in the query.
+            max_end: an optional last position up to where a closing parentheses can be searched.
+            delimiter: the optional delimiter before the query, if this is called on a multipaths.
+            in_multipaths: whether the part to be parsed is inside a multipaths.
 
         Raises:
             gjson.GJSONParseError: on error.
@@ -203,20 +241,18 @@ class GJSONObj:
             the resulting object.
 
         """
-        eol = len(self._query)
         current: list[str] = []
         current_start = -1
         parts: list[BaseQueryPart] = []
         previous: Optional[BaseQueryPart] = None
 
-        i = 0
-        delimiter = ''
+        i = start
         while True:
             part: Optional[BaseQueryPart] = None
             # Get current and next character in the query
-            if i == eol - 1:
+            if i == end:
                 next_char = None
-            elif i >= eol:
+            elif i >= end:
                 if parts and not current:
                     parts[-1].is_last = True
                 break
@@ -226,6 +262,10 @@ class GJSONObj:
             char = self._query[i]
 
             if char in DELIMITERS:
+                if i == start:
+                    raise GJSONParseError('Invalid query starting with a path delimiter.',
+                                          query=self._query, position=i)
+
                 if next_char in DELIMITERS:
                     raise GJSONParseError('Invalid query with two consecutive path delimiters.',
                                           query=self._query, position=i)
@@ -245,14 +285,21 @@ class GJSONObj:
                 continue
 
             if char == '@':
-                part = self._parse_modifier_query_part(i, delimiter)
+                part = self._parse_modifier_query_part(i, delimiter, max_end=max_end)
             elif char == '#' and (next_char in DELIMITERS or next_char is None):
                 part = ArrayLenghtQueryPart(start=i, end=i, part=char, delimiter=delimiter, is_last=next_char is None,
                                             previous=previous)
             elif char == '#' and next_char == '(':
-                part = self._parse_array_query_query_part(i, delimiter)
+                part = self._parse_array_query_query_part(i, delimiter, max_end=max_end)
             elif re.match(r'[0-9]', char) and not current:
-                part = self._parse_array_index_query_part(i, delimiter)
+                part = self._parse_array_index_query_part(i, delimiter, in_multipaths=in_multipaths)
+            elif char == '{':
+                part = self._parse_object_multipaths_query_part(i, delimiter, max_end=max_end)
+            elif char == '[':
+                part = self._parse_array_multipaths_query_part(i, delimiter, max_end=max_end)
+            elif in_multipaths and char == ',':
+                i -= 1
+                break
 
             if part:
                 part.previous = previous
@@ -283,7 +330,7 @@ class GJSONObj:
 
         return parts
 
-    def _find_closing_parentheses(self, start: int, opening: set[str], suffix: str = '') -> int:  # noqa: MC0001
+    def _find_closing_parentheses(self, start: int, opening: set[str], suffix: str = '', max_end: int = 0) -> int:
         """Find the matching parentheses that closes the opening one looking for unbalance of the given characters.
 
         Arguments:
@@ -291,6 +338,7 @@ class GJSONObj:
             opening: the list of parentheses openings to look for imbalances.
             suffix: an optional suffix that can be present after the closing parentheses before reaching a delimiter or
                 the end of the query.
+            max_end: an optional last position up to where the parentheses can be found.
 
         Raises:
             gjson.GJSONParseError: if unable to find the closing parentheses or the parentheses are not balanced.
@@ -306,7 +354,9 @@ class GJSONObj:
         end = -1
         escaped = False
         in_string = False
-        for i, char in enumerate(self._query[start:]):
+        query = self._query[start:max_end + 1] if max_end else self._query[start:]
+
+        for i, char in enumerate(query):
             if char == ESCAPE_CHARACTER:
                 escaped = True
                 continue
@@ -341,23 +391,24 @@ class GJSONObj:
             raise GJSONParseError(f'Unbalanced parentheses, opened {opened} vs closed {closed}.',
                                   query=self._query, position=start)
 
-        end = start + end
-
-        if suffix and end + len(suffix) < len(self._query) and self._query[end + 1:end + len(suffix) + 1] == suffix:
+        if suffix and end + len(suffix) < len(query) and query[end + 1:end + len(suffix) + 1] == suffix:
             end += len(suffix)
 
-        if end + 1 < len(self._query) and self._query[end + 1] not in DELIMITERS:
-            raise GJSONParseError('Expected delimiter or end of query after closing parenthesis.',
-                                  query=self._query, position=end)
+        if end + 1 < len(query):
+            if ((max_end and query[end + 1] not in MULTIPATHS_DELIMITERS)
+                    or (not max_end and query[end + 1] not in DELIMITERS)):
+                raise GJSONParseError('Expected delimiter or end of query after closing parenthesis.',
+                                      query=self._query, position=start + end)
 
-        return end
+        return start + end
 
-    def _parse_modifier_query_part(self, start: int, delimiter: str) -> ModifierQueryPart:
+    def _parse_modifier_query_part(self, start: int, delimiter: str, max_end: int = 0) -> ModifierQueryPart:
         """Find the modifier end position in the query starting from a given point.
 
         Arguments:
             start: the index of the ``@`` symbol that starts a modifier in the query.
             delimiter: the delimiter before the modifier.
+            max_end: an optional last position up to where the last character can be found.
 
         Raises:
             gjson.GJSONParseError: on invalid modifier.
@@ -369,7 +420,8 @@ class GJSONObj:
         end = start
         escaped = False
         options: dict[Any, Any] = {}
-        for i, char in enumerate(self._query[start:]):
+        query = self._query[start:max_end + 1] if max_end else self._query[start:]
+        for i, char in enumerate(query):
             if char == ESCAPE_CHARACTER and not escaped:
                 escaped = True
                 continue
@@ -391,7 +443,7 @@ class GJSONObj:
 
         else:  # End of query
             end = start + i
-            name = self._query[start + 1:]
+            name = self._query[start + 1:start + i + 1]
 
         name.replace(ESCAPE_CHARACTER, '')
         if not name:
@@ -441,12 +493,13 @@ class GJSONObj:
 
         return len(options_string), options
 
-    def _parse_array_query_query_part(self, start: int, delimiter: str) -> ArrayQueryQueryPart:
+    def _parse_array_query_query_part(self, start: int, delimiter: str, max_end: int = 0) -> ArrayQueryQueryPart:
         """Parse an array query part starting from the given point.
 
         Arguments:
             start: the index of the ``#`` symbol that starts a ``#(...)`` or ``#(...)#`` query.
             delimiter: the delimiter before the modifier.
+            max_end: an optional last position up to where the closing parentheses can be found.
 
         Raises:
             gjson.GJSONParseError: on invalid query.
@@ -455,7 +508,7 @@ class GJSONObj:
             the array query part object.
 
         """
-        end = self._find_closing_parentheses(start, set('('), '#')
+        end = self._find_closing_parentheses(start, set('('), '#', max_end=max_end)
         part = self._query[start:end + 1]
         if part[-1] == '#':
             content_end = -2
@@ -486,19 +539,23 @@ class GJSONObj:
         return ArrayQueryQueryPart(start=start, end=end, part=part, delimiter=delimiter, is_last=False, previous=None,
                                    field=key, operator=query_operator, value=value, first_only=first_only)
 
-    def _parse_array_index_query_part(self, start: int, delimiter: str) -> Optional[ArrayIndexQueryPart]:
+    def _parse_array_index_query_part(self, start: int, delimiter: str,
+                                      in_multipaths: bool = False) -> Optional[ArrayIndexQueryPart]:
         """Parse an array index query part.
 
         Arguments:
             start: the index of the start of the path in the query.
             delimiter: the delimiter before the query part.
+            in_multipaths: whether the part to be parsed is inside a multipaths.
 
         Returns:
             the array index query object if the integer path is found, :py:const:`None` otherwise.
 
         """
         subquery = self._query[start:]
-        match = re.search(r'^([1-9][0-9]*|0)(\.|\||$)', subquery)
+        delimiters = MULTIPATHS_DELIMITERS if in_multipaths else DELIMITERS
+        delimiters_match = '|'.join([re.escape(i) for i in delimiters])
+        match = re.search(fr'^([1-9][0-9]*|0)({delimiters_match}|$)', subquery)
         if not match:
             return None
 
@@ -507,12 +564,161 @@ class GJSONObj:
 
         return ArrayIndexQueryPart(start=start, end=end, part=part, delimiter=delimiter, is_last=False, previous=None)
 
-    def _parse_part(self, part: BaseQueryPart, obj: Any) -> Any:  # noqa: MC0001
+    def _parse_object_multipaths_query_part(
+            self, start: int, delimiter: str, max_end: int = 0) -> MultipathsObjectQueryPart:
+        """Parse a multipaths object query part.
+
+        Arguments:
+            start: the index of the start of the path in the query.
+            delimiter: the delimiter before the query part.
+            max_end: an optional last position up to where the multipaths can extend.
+
+        Returns:
+            the multipaths object query part.
+
+        Raises:
+            gjson.GJSONParseError: on invalid query.
+
+        """
+        end = self._find_closing_parentheses(start, set('{'), max_end=max_end)
+        part = self._query[start:end + 1]
+        parts = []
+
+        def _get_key(current_key: Optional[str], value: Optional[BaseQueryPart]) -> str:
+            """Return the current key or the default value if not set. Allow for empty key as valid key.
+
+            Arguments:
+                current_key: the current key to evaluate.
+                value: the current value from where to extract a key name if missing.
+
+            """
+            if current_key is not None:
+                return current_key
+
+            if value and isinstance(value, (FieldQueryPart, ArrayIndexQueryPart, ModifierQueryPart)):
+                return value.part
+
+            return '_'
+
+        new_item = True
+        escaped = False
+        key: Optional[str] = None
+        key_start = 0
+        value_start = 0
+        skip_until = 0
+
+        for i, char in enumerate(part[1:-1], start=1):
+            if skip_until and i <= skip_until:
+                if i == skip_until:
+                    skip_until = 0
+                    new_item = True
+
+                continue
+
+            if new_item:
+                value_start = 0
+                if char == '"':
+                    key_start = i
+                    new_item = False
+                    continue
+
+                if char != ',':
+                    value_start = i
+                    new_item = False
+
+            if key_start:
+                if char == ESCAPE_CHARACTER and not escaped:
+                    escaped = True
+                    continue
+
+                if escaped:
+                    escaped = False
+                    continue
+
+                if char == '"':
+                    try:
+                        key = json.loads(part[key_start:i + 1])
+                    except json.JSONDecodeError as ex:
+                        raise GJSONParseError(f'Failed to parse multipaths key {part[key_start:i + 1]}.',
+                                              query=self._query, position=key_start) from ex
+                    key_start = 0
+                    continue
+
+            if key is not None and not key_start and not value_start:
+                if char == ':':
+                    value_start = i + 1
+                    continue
+
+                raise GJSONParseError(f'Expected colon after multipaths item with key "{key}".',
+                                      query=self._query, position=i)
+
+            if value_start:
+                try:
+                    values = self._parse(
+                        start=start + value_start,
+                        end=end - 1,
+                        max_end=max_end - 1 if max_end else end - 1,
+                        delimiter=delimiter,
+                        in_multipaths=True)
+                except GJSONParseError:  # In multipaths, paths that fails are silently suppressed
+                    values = []
+
+                if values:
+                    parts.append(MultipathsItem(key=_get_key(key, values[-1]), values=values))
+                    skip_until = values[-1].end - start + 1
+                else:
+                    skip_until = end - start
+
+                new_item = True
+                key = None
+                key_start = 0
+                value_start = 0
+                continue
+
+        return MultipathsObjectQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None,
+                                         is_last=False, parts=parts)
+
+    def _parse_array_multipaths_query_part(
+            self, start: int, delimiter: str, max_end: int = 0) -> MultipathsArrayQueryPart:
+        """Todo."""
+        end = self._find_closing_parentheses(start, set('['), max_end=max_end)
+        part = self._query[start:end + 1]
+        parts = []
+        skip_until = 0
+
+        for i, _ in enumerate(part[1:-1], start=1):
+            if skip_until and i <= skip_until:
+                if i == skip_until:
+                    skip_until = 0
+
+                continue
+
+            try:
+                values = self._parse(
+                    start=start + i,
+                    end=end - 1,
+                    max_end=max_end - 1 if max_end else end - 1,
+                    delimiter=delimiter,
+                    in_multipaths=True)
+            except GJSONParseError:  # In multipaths, paths that fails are silently suppressed
+                values = []
+
+            if values:
+                parts.append(values)
+                skip_until = values[-1].end - start + 1
+            else:
+                skip_until = end - start
+
+        return MultipathsArrayQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None,
+                                        is_last=False, parts=parts)
+
+    def _parse_part(self, part: BaseQueryPart, obj: Any, in_multipaths: bool = False) -> Any:
         """Parse the given part of the full query.
 
         Arguments:
             part: the query part as already parsed.
             obj: the current object.
+            in_multipaths: whether the part to be parsed is inside a multipaths.
 
         Raises:
             gjson.GJSONParseError: on invalid query.
@@ -525,7 +731,10 @@ class GJSONObj:
         in_query_all = False
         ret: Any
 
-        if isinstance(part, ArrayLenghtQueryPart):  # Hash
+        if isinstance(obj, NoResult):
+            return obj
+
+        if isinstance(part, ArrayLenghtQueryPart):
             in_hash = True
             if part.is_last:
                 if part.delimiter == DOT_DELIMITER and (self._after_hash or self._after_query_all):
@@ -541,7 +750,7 @@ class GJSONObj:
             else:
                 ret = obj
 
-        elif isinstance(part, ArrayQueryQueryPart):  # Queries
+        elif isinstance(part, ArrayQueryQueryPart):
             if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
                 raise GJSONParseError(f'Queries are supported only for sequence like objects, got {type(obj)}.',
                                       query=self._query, position=part.start)
@@ -552,20 +761,19 @@ class GJSONObj:
         elif isinstance(part, ModifierQueryPart):
             ret = self._apply_modifier(part, obj)
 
-        elif isinstance(part, ArrayIndexQueryPart):  # Integer index
+        elif isinstance(part, ArrayIndexQueryPart):
             if isinstance(obj, Mapping):  # Integer object keys not supported by JSON
-                if part.part not in obj:
+                if not in_multipaths and part.part not in obj:
                     raise GJSONParseError(f'Mapping object does not have key `{part}`.',
                                           query=self._query, position=part.start)
-                ret = obj[part.part]
+                ret = obj.get(part.part, NoResult())
             elif isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
-                if self._after_hash:
-                    if part.delimiter == PIPE_DELIMITER:
-                        raise GJSONParseError('Integer query part after a pipe delimiter on an sequence like object.',
-                                              query=self._query, position=part.start)
-                    ret = []
-                elif self._after_query_all and part.delimiter == DOT_DELIMITER:
-                    ret = []
+                if (self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER:
+                    # Skip non mapping items and items without the given key
+                    ret = [i[part.part] for i in obj if isinstance(i, Mapping) and part.part in i]
+                elif self._after_hash and part.delimiter == PIPE_DELIMITER:
+                    raise GJSONParseError('Integer query part after a pipe delimiter on an sequence like object.',
+                                          query=self._query, position=part.start)
                 else:
                     num = len(obj)
                     if part.index >= num:
@@ -607,19 +815,76 @@ class GJSONObj:
 
             else:
                 key = part.part.replace(ESCAPE_CHARACTER, '')
+                failed = False
                 if not self._after_hash and isinstance(obj, Mapping):
-                    if key not in obj:
+                    if not in_multipaths and key not in obj:
                         raise GJSONParseError(f'Mapping object does not have key `{key}`.',
                                               query=self._query, position=part.start)
-                    ret = obj[key]
-                else:
-                    if ((self._after_hash or self._after_query_all) and part.delimiter
-                            and part.delimiter == DOT_DELIMITER and isinstance(obj, Sequence)):
+                    ret = obj.get(key, NoResult())
+                elif (self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER:
+                    if isinstance(obj, Sequence):
                         # Skip non mapping items and items without the given key
                         ret = [i[key] for i in obj if isinstance(i, Mapping) and key in i]
+                    elif in_multipaths and isinstance(obj, Mapping):
+                        ret = obj.get(key, NoResult())
                     else:
-                        raise GJSONParseError(f'Invalid or unsupported query part `{key}`.',
-                                              query=self._query, position=part.start)
+                        failed = True
+                else:
+                    failed = True
+
+                if failed:
+                    raise GJSONParseError(f'Invalid or unsupported query part `{key}`.',
+                                          query=self._query, position=part.start)
+
+        elif isinstance(part, MultipathsObjectQueryPart):
+            if ((self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER
+                    and isinstance(obj, Sequence)):
+                ret = []
+                for i in obj:
+                    obj_item = {}
+                    for obj_part in part.parts:
+                        obj_ret = i
+                        for obj_value in obj_part.values:
+                            obj_ret = self._parse_part(obj_value, obj_ret, in_multipaths=True)
+
+                        if not isinstance(obj_ret, NoResult):
+                            obj_item[obj_part.key] = obj_ret
+
+                    ret.append(obj_item)
+            else:
+                ret = {}
+                for obj_part in part.parts:
+                    obj_ret = obj
+                    for obj_value in obj_part.values:
+                        obj_ret = self._parse_part(obj_value, obj_ret, in_multipaths=True)
+
+                    if not isinstance(obj_ret, NoResult):
+                        ret[obj_part.key] = obj_ret
+
+        elif isinstance(part, MultipathsArrayQueryPart):
+            if ((self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER
+                    and isinstance(obj, Sequence)):
+                ret = []
+                for i in obj:
+                    array_item = []
+                    for array_part in part.parts:
+                        array_ret = i
+                        for array_value in array_part:
+                            array_ret = self._parse_part(array_value, array_ret, in_multipaths=True)
+
+                        if not isinstance(array_ret, NoResult):
+                            array_item.append(array_ret)
+
+                    ret.append(array_item)
+            else:
+                ret = []
+                for array_part in part.parts:
+                    array_ret = obj
+                    for array_value in array_part:
+                        array_ret = self._parse_part(array_value, array_ret, in_multipaths=True)
+
+                    if not isinstance(array_ret, NoResult):
+                        ret.append(array_ret)
 
         if in_hash:
             self._after_hash = True
@@ -628,7 +893,7 @@ class GJSONObj:
 
         return ret
 
-    def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:  # noqa: MC0001
+    def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:
         """Parse an inline query #(...) / #(...)#.
 
         Arguments:
