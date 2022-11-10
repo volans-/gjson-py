@@ -1,6 +1,23 @@
 Release Notes
 =============
 
+`v0.3.0`_ (2022-11-10)
+^^^^^^^^^^^^^^^^^^^^^^
+
+New features
+""""""""""""
+
+* Query parsing: add `GJSON multipaths`_ support.
+
+Bug fixes
+"""""""""
+
+* Query parsing: fix integer mapping keys
+
+  * When after a hash ``#`` or a query that returns all items ``#(...)#``, if there is an integer key, return any
+    matching key from the resulting items from the query if they match the integer key (as string, as per JSON
+    specifications).
+
 `v0.2.1`_ (2022-10-25)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -231,6 +248,8 @@ Miscellanea
 
 * Initial version.
 
+.. _`GJSON Multipaths`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipaths
+
 .. _`issue #2`: https://github.com/volans-/gjson-py/issues/2
 
 .. _`v0.0.1`: https://github.com/volans-/gjson-py/releases/tag/v0.0.1
@@ -241,3 +260,4 @@ Miscellanea
 .. _`v0.1.0`: https://github.com/volans-/gjson-py/releases/tag/v0.1.0
 .. _`v0.2.0`: https://github.com/volans-/gjson-py/releases/tag/v0.2.0
 .. _`v0.2.1`: https://github.com/volans-/gjson-py/releases/tag/v0.2.1
+.. _`v0.3.0`: https://github.com/volans-/gjson-py/releases/tag/v0.3.0
