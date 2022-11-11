@@ -680,7 +680,20 @@ class GJSONObj:
 
     def _parse_array_multipaths_query_part(
             self, start: int, delimiter: str, max_end: int = 0) -> MultipathsArrayQueryPart:
-        """Todo."""
+        """Parse a multipaths object query part.
+
+        Arguments:
+            start: the index of the start of the path in the query.
+            delimiter: the delimiter before the query part.
+            max_end: an optional last position up to where the multipaths can extend.
+
+        Returns:
+            the multipaths array query part.
+
+        Raises:
+            gjson.GJSONParseError: on invalid query.
+
+        """
         end = self._find_closing_parentheses(start, set('['), max_end=max_end)
         part = self._query[start:end + 1]
         parts = []
