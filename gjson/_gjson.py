@@ -336,12 +336,12 @@ class GJSONObj:
 
         return parts
 
-    def _find_closing_parentheses(self, start: int, opening: set[str], suffix: str = '', max_end: int = 0) -> int:
-        """Find the matching parentheses that closes the opening one looking for unbalance of the given characters.
+    def _find_closing_parentheses(self, *, start: int, opening: str, suffix: str = '', max_end: int = 0) -> int:
+        """Find the matching parentheses that closes the opening one looking for unbalance of the given character.
 
         Arguments:
             start: the index of the opening parentheses in the query.
-            opening: the list of parentheses openings to look for imbalances.
+            opening: the opening parentheses to look for imbalances.
             suffix: an optional suffix that can be present after the closing parentheses before reaching a delimiter or
                 the end of the query.
             max_end: an optional last position up to where the parentheses can be found.
@@ -354,9 +354,8 @@ class GJSONObj:
             suffix if present.
 
         """
-        closing = set(PARENTHESES_PAIRS[char] for char in opening)
-        opened = []
-        closed = []
+        closing = PARENTHESES_PAIRS[opening]
+        opened = 0
         end = -1
         escaped = False
         in_string = False
@@ -382,19 +381,17 @@ class GJSONObj:
             if in_string:
                 continue
 
-            if char in opening:
-                opened.append(char)
-            elif char in closing:
-                if opened and opened[-1] == PARENTHESES_PAIRS[char]:
-                    opened.pop()
+            if char == opening:
+                opened += 1
+            elif char == closing:
+                if opened:
+                    opened -= 1
                     if not opened:
                         end = i
                         break
-                else:
-                    closed.append(char)
 
-        if opened or closed or end < 0:
-            raise GJSONParseError(f'Unbalanced parentheses, opened {opened} vs closed {closed}.',
+        if opened or end < 0:
+            raise GJSONParseError(f'Unbalanced parentheses `{opening}`, {opened} still opened.',
                                   query=self._query, position=start)
 
         if suffix and end + len(suffix) < len(query) and query[end + 1:end + len(suffix) + 1] == suffix:
@@ -514,7 +511,7 @@ class GJSONObj:
             the array query part object.
 
         """
-        end = self._find_closing_parentheses(start, set('('), '#', max_end=max_end)
+        end = self._find_closing_parentheses(start=start, opening='(', suffix='#', max_end=max_end)
         part = self._query[start:end + 1]
         if part[-1] == '#':
             content_end = -2
@@ -586,7 +583,7 @@ class GJSONObj:
             gjson.GJSONParseError: on invalid query.
 
         """
-        end = self._find_closing_parentheses(start, set('{'), max_end=max_end)
+        end = self._find_closing_parentheses(start=start, opening='{', max_end=max_end)
         part = self._query[start:end + 1]
         parts = []
 
@@ -700,7 +697,7 @@ class GJSONObj:
             gjson.GJSONParseError: on invalid query.
 
         """
-        end = self._find_closing_parentheses(start, set('['), max_end=max_end)
+        end = self._find_closing_parentheses(start=start, opening='[', max_end=max_end)
         part = self._query[start:end + 1]
         parts = []
         skip_until = 0
@@ -751,7 +748,7 @@ class GJSONObj:
         end = -1
         begin = self._query[start + 1:start + 2]
         if begin in ('{', '['):
-            end = self._find_closing_parentheses(start + 1, set(begin), max_end=max_end)
+            end = self._find_closing_parentheses(start=start + 1, opening=begin, max_end=max_end)
 
         elif begin == '"':
             query = self._query[start + 2:max_end + 1] if max_end else self._query[start + 2:]
