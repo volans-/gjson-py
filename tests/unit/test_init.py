@@ -4,6 +4,7 @@ import json
 import re
 
 from collections.abc import Mapping
+from math import isnan
 
 import pytest
 
@@ -130,6 +131,11 @@ INPUT_SUM_N = json.loads("""
 
 def compare_values(result, expected):
     """Compare results with the expected values ensuring same-order of keys for dictionaries."""
+    if isinstance(expected, float):
+        if isnan(expected):
+            assert isnan(result)
+            return
+
     assert result == expected
     if isinstance(expected, Mapping):
         assert list(result.keys()) == list(expected.keys())
@@ -272,6 +278,37 @@ class TestObject:
         ('{friends.0.[age,nets.#(="ig")]}', {'_': [44, 'ig']}),
         ('{friends.0.[age,nets.#(="ig")],age}', {'_': [44, 'ig'], 'age': 37}),
         ('{friends.0.[invalid,nets.#(="ig")],age,invalid}', {'_': ['ig'], 'age': 37}),
+        # Literals
+        ('!true', True),
+        ('!false', False),
+        ('!null', None),
+        ('!NaN', float('nan')),
+        ('!Infinity', float('inf')),
+        ('!-Infinity', float('-inf')),
+        ('!"key"', 'key'),
+        ('!"line \\"quotes\\""', 'line "quotes"'),
+        ('!0', 0),
+        ('!12', 12),
+        ('!-12', -12),
+        ('!12.34', 12.34),
+        ('!12.34E2', 1234),
+        ('!12.34E+2', 1234),
+        ('!12.34e-2', 0.1234),
+        ('!-12.34e-2', -0.1234),
+        ('friends.#.!"value"', ['value', 'value', 'value']),
+        ('friends.#.!invalid', []),
+        ('friends.#|!"value"', 'value'),
+        ('friends.#(age>45)#.!"value"', ['value', 'value']),
+        ('name|!"value"', 'value'),
+        ('!{}', {}),
+        ('![]', []),
+        ('!{"name":{"first":"Tom"}}.{name.first}.first', 'Tom'),
+        ('{name.last,"key":!"value"}', {'last': 'Anderson', 'key': 'value'}),
+        ('{name.last,"key":!{"a":"b"},"invalid"}', {'last': 'Anderson', 'key': {'a': 'b'}}),
+        ('{name.last,"key":!{"c":"d"},!"valid"}', {'last': 'Anderson', 'key': {'c': 'd'}, '_': 'valid'}),
+        ('[!true,!false,!null,!Infinity,!invalid,{"name":!"andy",name.last},+Infinity,!["value1","value2"]]',
+         [True, False, None, float('inf'), {'name': 'andy', 'last': 'Anderson'}, ['value1', 'value2']]),
+        ('[!12.34,!-12.34e-2,!true]', [12.34, -0.1234, True]),
     ))
     def test_get_ok(self, query, expected):
         """It should query the JSON object and return the expected result."""
@@ -328,6 +365,22 @@ class TestObject:
         # Multipaths objects
         (r'{"a\ge":age}', r'Failed to parse multipaths key "a\ge"'),
         ('{"age",age}', 'Expected colon after multipaths item with key "age".'),
+        # Literals
+        ('!', 'Unable to load literal JSON'),
+        ('name.!', 'Unable to load literal JSON'),
+        ('!invalid', 'Unable to load literal JSON'),
+        (r'!in\valid', 'Unable to load literal JSON'),
+        ('!0.a', 'Invalid or unsupported query part `a`.'),
+        ('!0.1ea', 'Invalid or unsupported query part `ea`.'),
+        ('!-12.', 'Delimiter at the end of the query.'),
+        ('!-12.e', 'Invalid or unsupported query part `e`.'),
+        ('name.!invalid', 'Unable to load literal JSON'),
+        ('!"invalid', 'Unable to find end of literal string.'),
+        ('friends.#|!invalid', 'Unable to load literal JSON'),
+        ('!{true,', "Unbalanced parentheses, opened ['{'] vs closed []."),
+        ('![true,', "Unbalanced parentheses, opened ['['] vs closed []."),
+        ('!"value".invalid', 'Invalid or unsupported query part `invalid`.'),
+        ('name.!"value"', 'Unable to load literal JSON: literal afer a dot delimiter.'),
     ))
     def test_get_parser_raise(self, query, error):
         """It should raise a GJSONParseError error with the expected message."""

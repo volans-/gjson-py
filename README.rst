@@ -188,7 +188,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Multipaths`_          | YES                    |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Literals`_            | NO                     |                                                     |
+| `Literals`_            | YES                    | Including infinite and NaN values [#]_              |
 +------------------------+------------------------+-----------------------------------------------------+
 | `JSON Lines`_          | YES                    | CLI support [#]_ [#]_                               |
 +------------------------+------------------------+-----------------------------------------------------+
@@ -196,6 +196,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 .. [#] The queries matching is based on Python's operator and as such the results might be different than the ones from
    the Go GJSON package. In particular for the ``~`` operator that checks the truthy-ness of objects.
 .. [#] Custom modifiers names cannot contain reserved characters used by the GJSON grammar.
+.. [#] Those special cases are handled according to `Python's JSON documentation`_.
 .. [#] Both for applying the same query to each line using the ``-l/--lines`` argument and to automatically encapsulate
    the input lines in a list and apply the query to the list using the ``..`` special query prefix described in
    `JSON Lines`_.
@@ -282,6 +283,7 @@ This is the list of additional modifiers specific to gjson-py not present in GJS
 .. _`GJSON Path Syntax`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md
 .. _`gjson-py documentation`: https://volans-.github.io/gjson-py/index.html
 .. _`releases page on GitHub`: https://github.com/volans-/gjson-py/releases
+.. _`Python's JSON documentation`: https://docs.python.org/3/library/json.html#infinite-and-nan-number-values
 
 .. _`Path Structure`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#path-structure
 .. _`Basic`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#basic

@@ -115,6 +115,10 @@ class MultipathsArrayQueryPart(BaseQueryPart):
     parts: list[list[BaseQueryPart]]
 
 
+class LiteralQueryPart(BaseQueryPart):
+    """Literal query part."""
+
+
 class GJSONObj:
     """A low-level class to perform the GJSON query on a JSON-like object."""
 
@@ -297,6 +301,8 @@ class GJSONObj:
                 part = self._parse_object_multipaths_query_part(i, delimiter, max_end=max_end)
             elif char == '[':
                 part = self._parse_array_multipaths_query_part(i, delimiter, max_end=max_end)
+            elif char == '!':
+                part = self._parse_literal_query_part(i, delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif in_multipaths and char == ',':
                 i -= 1
                 break
@@ -725,6 +731,62 @@ class GJSONObj:
         return MultipathsArrayQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None,
                                         is_last=False, parts=parts)
 
+    def _parse_literal_query_part(self, start: int, delimiter: str, max_end: int = 0,
+                                  in_multipaths: bool = False) -> LiteralQueryPart:
+        """Parse a literal query part.
+
+        Arguments:
+            start: the index of the start of the path in the query.
+            delimiter: the delimiter before the query part.
+            max_end: an optional last position up to where the multipaths can extend.
+            in_multipaths: whether the part to be parsed is inside a multipaths.
+
+        Returns:
+            the literal query part.
+
+        Raises:
+            gjson.GJSONParseError: on invalid query.
+
+        """
+        end = -1
+        begin = self._query[start + 1:start + 2]
+        if begin in ('{', '['):
+            end = self._find_closing_parentheses(start + 1, set(begin), max_end=max_end)
+
+        elif begin == '"':
+            query = self._query[start + 2:max_end + 1] if max_end else self._query[start + 2:]
+            match = re.search(r'(?<!\\)(")', query)  # Negative lookbehind assertion
+            if match is None or match.end() == -1:
+                raise GJSONParseError('Unable to find end of literal string.',
+                                      query=self._query, position=start + 2)
+
+            # match.end() returns the next position after the last matched character
+            end = start + 1 + match.end()
+
+        else:
+            query = self._query[start + 1:max_end + 1] if max_end else self._query[start + 1:]
+            if match := re.match(r'(true|false|null|NaN|(-)?Infinity)', query):
+                # Includes also Infinite and NaN values:
+                # https://docs.python.org/3/library/json.html#infinite-and-nan-number-values
+                offset = 0
+            elif match := re.match(r'-?(0|[1-9][0-9]*)(.[0-9]+)?((e|E)(\+|-|)[0-9]+)?', query):
+                offset = 0  # JSON number
+            else:  # Catch until the first delimiter or end of string
+                delimiters = MULTIPATHS_DELIMITERS if in_multipaths else DELIMITERS
+                pattern = '|'.join(re.escape(delimiter) for delimiter in delimiters)
+                match = re.search(fr'(?<!\\)({pattern}|$)', query)  # Negative lookbehind assertion
+                offset = 1 if match and match.group() else 0
+
+                if match is None or match.end() == -1:  # pragma: nocover the above regex always matches
+                    raise GJSONParseError('Invalid JSON literal.', query=self._query, position=start + 1)
+
+            end = start + match.end() - offset  # match.end() gives the next position after the last matched character
+
+        # Allow for empty literals '!' at this point to be able to handle them differently while parsing the parts
+        # based if it's in a multipaths or after a query.
+        part = self._query[start:end + 1]
+        return LiteralQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None, is_last=False)
+
     def _parse_part(self, part: BaseQueryPart, obj: Any, in_multipaths: bool = False) -> Any:
         """Parse the given part of the full query.
 
@@ -898,6 +960,34 @@ class GJSONObj:
 
                     if not isinstance(array_ret, NoResult):
                         ret.append(array_ret)
+
+        elif isinstance(part, LiteralQueryPart):
+            try:
+                new_obj = json.loads(part.part[1:])
+                json_error = ''
+            except json.JSONDecodeError as ex:
+                json_error = str(ex)
+                new_obj = NoResult()
+
+            ret = new_obj
+            if (self._after_hash or self._after_query_all) and isinstance(obj, Sequence):
+                if part.delimiter == DOT_DELIMITER:
+                    if isinstance(new_obj, NoResult):
+                        ret = []
+                    else:
+                        ret = [new_obj for _ in obj]
+                elif part.delimiter == PIPE_DELIMITER:
+                    ret = new_obj
+            else:
+                if part.delimiter == DOT_DELIMITER and not isinstance(new_obj, NoResult):
+                    json_error = 'literal afer a dot delimiter.'
+                    ret = NoResult()
+                elif part.delimiter == PIPE_DELIMITER:
+                    ret = new_obj
+
+            if not in_multipaths and isinstance(ret, NoResult):
+                raise GJSONParseError(
+                    f'Unable to load literal JSON: {json_error}', query=self._query, position=part.start)
 
         if in_hash:
             self._after_hash = True
