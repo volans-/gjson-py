@@ -127,6 +127,23 @@ INPUT_SUM_N = json.loads("""
     {"key": "c", "value": 9}
 ]
 """)
+INPUT_NESTED_QUERIES = json.loads("""
+{
+    "key": [
+        {"level1": [{"level2": [{"level3": [1, 2]}]}]},
+        {"level1": [{"level2": [{"level3": [2, 3]}]}]},
+        [[{"level3": [1, 2]}], [{"level3": [2, 3]}]],
+        [[{"level3": [2, 3]}], [{"level3": [3, 4]}]],
+        {"another": [{"level2": [{"level3": [2, 3]}]}]},
+        {"level1": [{"another": [{"level3": [2, 3]}]}]},
+        {"level1": [{"level2": [{"another": [2, 3]}]}]},
+        [[{"another": [2, 3]}], [{"another": [3, 4]}]],
+        "spurious",
+        12.34,
+        {"mixed": [[{"level4": [1, 2]}]]}
+    ]
+}
+""")
 
 
 def compare_values(result, expected):
@@ -534,6 +551,52 @@ class TestTruthiness:
     @pytest.mark.parametrize('query, error', (
         ('vals.#(b==~"invalid")',
          "Queries ==~ operator requires a boolean value, got <class 'str'> instead: `invalid`"),
+    ))
+    def test_get_raise(self, query, error):
+        """It should raise a GJSONError error with the expected message."""
+        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+            self.object.get(query)
+
+
+class TestNestedQueries:
+    """Testing gjson nested queries."""
+
+    def setup_method(self):
+        """Initialize the test instance."""
+        self.object = gjson.GJSON(INPUT_NESTED_QUERIES)
+
+    @pytest.mark.parametrize('query, expected', (
+        # Arrays of objects
+        ('key.#(level1.#(level2.#(level3)))', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3)))#', INPUT_NESTED_QUERIES['key'][0:2]),
+        ('key.#(level1.#(level2.#(level3.#(==0))))#', []),
+        ('key.#(level1.#(level2.#(level3.#(=1))))', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3.#(=1)#)#)#)', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3.#(==1))))#', [INPUT_NESTED_QUERIES['key'][0]]),
+        ('key.#(level1.#(level2.#(level3.#(==2))))', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3.#(=2))))#', INPUT_NESTED_QUERIES['key'][0:2]),
+        # Arrays of arrays
+        ('key.#(#(#(level3)))', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3)))#', INPUT_NESTED_QUERIES['key'][2:4]),
+        ('key.#(#(#(level3.#(==0))))#', []),
+        ('key.#(#(#(level3.#(==1))))', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3.#(==1)#)#)#)', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3.#(==1))))#', [INPUT_NESTED_QUERIES['key'][2]]),
+        ('key.#(#(#(level3.#(==2))))', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3.#(==2))))#', INPUT_NESTED_QUERIES['key'][2:4]),
+        ('key.#(#(#(level3.#(>=4))))', INPUT_NESTED_QUERIES['key'][3]),
+        ('key.#(#(#(level3.#(>=4))))#', [INPUT_NESTED_QUERIES['key'][3]]),
+        # Mixed
+        ('key.#(mixed.#(#(level4)))', INPUT_NESTED_QUERIES['key'][-1]),
+        ('key.#(mixed.#(#(level4)))#', [INPUT_NESTED_QUERIES['key'][-1]]),
+    ))
+    def test_get_ok(self, query, expected):
+        """It should query the JSON object and return the expected result."""
+        compare_values(self.object.get(query), expected)
+
+    @pytest.mark.parametrize('query, error', (
+        ('key.#(level1.#(level2.#(level3.#(==0))))', 'Query for first element does not match anything.'),
+        ('key.#(#(#(level3.#(==0))))', 'Query for first element does not match anything.'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""

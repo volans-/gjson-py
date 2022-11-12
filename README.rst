@@ -176,7 +176,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+-----------------------------------------------------+
 | `Arrays`_              | YES                    |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
-| `Queries`_             | PARTIALLY              | Nested queries are not yet supported [#]_           |
+| `Queries`_             | YES                    | Using Python's operators [#]_ [#]_                  |
 +------------------------+------------------------+-----------------------------------------------------+
 | `Dot vs Pipe`_         | YES                    |                                                     |
 +------------------------+------------------------+-----------------------------------------------------+
@@ -195,6 +195,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 
 .. [#] The queries matching is based on Python's operator and as such the results might be different than the ones from
    the Go GJSON package. In particular for the ``~`` operator that checks the truthy-ness of objects.
+.. [#] When using nested queries, only the outermost one controls whether to return only the first item or all items.
 .. [#] Custom modifiers names cannot contain reserved characters used by the GJSON grammar.
 .. [#] Those special cases are handled according to `Python's JSON documentation`_.
 .. [#] Both for applying the same query to each line using the ``-l/--lines`` argument and to automatically encapsulate

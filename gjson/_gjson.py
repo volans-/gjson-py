@@ -5,7 +5,7 @@ import re
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from gjson._protocols import ModifierProtocol
 from gjson.exceptions import GJSONError, GJSONParseError
@@ -81,7 +81,7 @@ class ArrayQueryQueryPart(BaseQueryPart):
 
     field: str
     operator: str
-    value: str
+    value: Union[str, 'ArrayQueryQueryPart']
     first_only: bool
 
 
@@ -398,8 +398,11 @@ class GJSONObj:
             end += len(suffix)
 
         if end + 1 < len(query):
-            if ((max_end and query[end + 1] not in MULTIPATHS_DELIMITERS)
-                    or (not max_end and query[end + 1] not in DELIMITERS)):
+            delimiters = list(MULTIPATHS_DELIMITERS) if max_end else list(DELIMITERS)
+            if opening == '(' and suffix == '#':  # Nested queries
+                delimiters.append(')')
+
+            if (max_end and query[end + 1] not in delimiters) or (not max_end and query[end + 1] not in DELIMITERS):
                 raise GJSONParseError('Expected delimiter or end of query after closing parenthesis.',
                                       query=self._query, position=start + end)
 
@@ -523,20 +526,26 @@ class GJSONObj:
         content = part[2: content_end]
         query_operator = ''
         key = ''
-        value = ''
+        value: Union[str, ArrayQueryQueryPart] = ''
 
         pattern = '|'.join(re.escape(op) for op in QUERIES_OPERATORS)
-        match = re.search(fr'(?<!\\)({pattern})', content)  # Negative lookbehind assertion
+        match = re.search(fr'(?<!\\)({pattern}|\.?#\()', content)  # Negative lookbehind assertion
         if match:
             query_operator = match.group()
             key = content[:match.start()]
-            value = content[match.end():]
+            value = content[match.end():].strip()
         else:  # No operator, assume existence match of key
             key = content
 
         key = key.strip()
-        value = value.strip()
-        if not key and not (operator and value):
+        if match and '#(' in query_operator:  # Nested queries
+            offset = 1 if query_operator[0] == '.' else 0
+            query_operator = ''
+            nested_start = start + 2 + match.start() + offset
+            value = self._parse_array_query_query_part(nested_start, delimiter, max_end=end + content_end)
+            value.first_only = False  # Nested queries first_only is controlled by the most external query
+
+        if not key and not (query_operator and value) and not isinstance(value, ArrayQueryQueryPart):
             raise GJSONParseError('Empty or invalid query.', query=self._query, position=start)
 
         return ArrayQueryQueryPart(start=start, end=end, part=part, delimiter=delimiter, is_last=False, previous=None,
@@ -993,6 +1002,29 @@ class GJSONObj:
 
         return ret
 
+    def _evaluate_query_return_value(self, query: ArrayQueryQueryPart, obj: Any) -> Any:
+        """Evaluate the return value of an inline query #(...) / #(...)# depending on first match or all matches.
+
+        Arguments:
+            query: the query part.
+            obj: the current object.
+
+        Raises:
+            gjson.GJSONParseError: if the query is for the first element and there are no matching items.
+
+        Returns:
+            the result of the query.
+
+        """
+        if query.first_only:
+            if obj:
+                return obj[0]
+
+            raise GJSONParseError('Query for first element does not match anything.',
+                                  query=self._query, position=query.start)
+
+        return obj
+
     def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:
         """Parse an inline query #(...) / #(...)#.
 
@@ -1007,16 +1039,23 @@ class GJSONObj:
             the result of the query.
 
         """
+        if isinstance(query.value, ArrayQueryQueryPart):
+            ret = []
+            for i in obj:
+                nested_obj = None
+                if query.field:
+                    if isinstance(i, Mapping) and query.field in i:
+                        nested_obj = i[query.field]
+                elif isinstance(i, Sequence) and not isinstance(i, (str, bytes)):
+                    nested_obj = i
+
+                if nested_obj is not None and self._parse_query(query.value, nested_obj):
+                    ret.append(i)
+
+            return self._evaluate_query_return_value(query, ret)
+
         if not query.operator:
-            ret = [i for i in obj if query.field in i]
-            if query.first_only:
-                if ret:
-                    return ret[0]
-
-                raise GJSONParseError('Query for first element does not match anything.',
-                                      query=self._query, position=query.start)
-
-            return ret
+            return self._evaluate_query_return_value(query, [i for i in obj if query.field in i])
 
         key = query.field.replace('\\', '')
         try:
@@ -1085,14 +1124,7 @@ class GJSONObj:
         except TypeError:
             ret = []
 
-        if query.first_only:
-            if ret:
-                return ret[0]
-
-            raise GJSONParseError('Query for first element does not match anything.',
-                                  query=self._query, position=query.start)
-
-        return ret
+        return self._evaluate_query_return_value(query, ret)
 
     def _apply_modifier(self, modifier: ModifierQueryPart, obj: Any) -> Any:
         """Apply a modifier.
