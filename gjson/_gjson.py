@@ -5,7 +5,7 @@ import re
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from gjson._protocols import ModifierProtocol
 from gjson.exceptions import GJSONError, GJSONParseError
@@ -81,7 +81,7 @@ class ArrayQueryQueryPart(BaseQueryPart):
 
     field: str
     operator: str
-    value: str
+    value: Union[str, 'ArrayQueryQueryPart']
     first_only: bool
 
 
@@ -113,6 +113,10 @@ class MultipathsArrayQueryPart(BaseQueryPart):
     """JSON object multipaths query part."""
 
     parts: list[list[BaseQueryPart]]
+
+
+class LiteralQueryPart(BaseQueryPart):
+    """Literal query part."""
 
 
 class GJSONObj:
@@ -297,6 +301,8 @@ class GJSONObj:
                 part = self._parse_object_multipaths_query_part(i, delimiter, max_end=max_end)
             elif char == '[':
                 part = self._parse_array_multipaths_query_part(i, delimiter, max_end=max_end)
+            elif char == '!':
+                part = self._parse_literal_query_part(i, delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif in_multipaths and char == ',':
                 i -= 1
                 break
@@ -330,12 +336,12 @@ class GJSONObj:
 
         return parts
 
-    def _find_closing_parentheses(self, start: int, opening: set[str], suffix: str = '', max_end: int = 0) -> int:
-        """Find the matching parentheses that closes the opening one looking for unbalance of the given characters.
+    def _find_closing_parentheses(self, *, start: int, opening: str, suffix: str = '', max_end: int = 0) -> int:
+        """Find the matching parentheses that closes the opening one looking for unbalance of the given character.
 
         Arguments:
             start: the index of the opening parentheses in the query.
-            opening: the list of parentheses openings to look for imbalances.
+            opening: the opening parentheses to look for imbalances.
             suffix: an optional suffix that can be present after the closing parentheses before reaching a delimiter or
                 the end of the query.
             max_end: an optional last position up to where the parentheses can be found.
@@ -348,9 +354,8 @@ class GJSONObj:
             suffix if present.
 
         """
-        closing = set(PARENTHESES_PAIRS[char] for char in opening)
-        opened = []
-        closed = []
+        closing = PARENTHESES_PAIRS[opening]
+        opened = 0
         end = -1
         escaped = False
         in_string = False
@@ -376,27 +381,28 @@ class GJSONObj:
             if in_string:
                 continue
 
-            if char in opening:
-                opened.append(char)
-            elif char in closing:
-                if opened and opened[-1] == PARENTHESES_PAIRS[char]:
-                    opened.pop()
+            if char == opening:
+                opened += 1
+            elif char == closing:
+                if opened:
+                    opened -= 1
                     if not opened:
                         end = i
                         break
-                else:
-                    closed.append(char)
 
-        if opened or closed or end < 0:
-            raise GJSONParseError(f'Unbalanced parentheses, opened {opened} vs closed {closed}.',
+        if opened or end < 0:
+            raise GJSONParseError(f'Unbalanced parentheses `{opening}`, {opened} still opened.',
                                   query=self._query, position=start)
 
         if suffix and end + len(suffix) < len(query) and query[end + 1:end + len(suffix) + 1] == suffix:
             end += len(suffix)
 
         if end + 1 < len(query):
-            if ((max_end and query[end + 1] not in MULTIPATHS_DELIMITERS)
-                    or (not max_end and query[end + 1] not in DELIMITERS)):
+            delimiters = list(MULTIPATHS_DELIMITERS) if max_end else list(DELIMITERS)
+            if opening == '(' and suffix == '#':  # Nested queries
+                delimiters.append(')')
+
+            if (max_end and query[end + 1] not in delimiters) or (not max_end and query[end + 1] not in DELIMITERS):
                 raise GJSONParseError('Expected delimiter or end of query after closing parenthesis.',
                                       query=self._query, position=start + end)
 
@@ -508,7 +514,7 @@ class GJSONObj:
             the array query part object.
 
         """
-        end = self._find_closing_parentheses(start, set('('), '#', max_end=max_end)
+        end = self._find_closing_parentheses(start=start, opening='(', suffix='#', max_end=max_end)
         part = self._query[start:end + 1]
         if part[-1] == '#':
             content_end = -2
@@ -520,20 +526,26 @@ class GJSONObj:
         content = part[2: content_end]
         query_operator = ''
         key = ''
-        value = ''
+        value: Union[str, ArrayQueryQueryPart] = ''
 
         pattern = '|'.join(re.escape(op) for op in QUERIES_OPERATORS)
-        match = re.search(fr'(?<!\\)({pattern})', content)  # Negative lookbehind assertion
+        match = re.search(fr'(?<!\\)({pattern}|\.?#\()', content)  # Negative lookbehind assertion
         if match:
             query_operator = match.group()
             key = content[:match.start()]
-            value = content[match.end():]
+            value = content[match.end():].strip()
         else:  # No operator, assume existence match of key
             key = content
 
         key = key.strip()
-        value = value.strip()
-        if not key and not (operator and value):
+        if match and '#(' in query_operator:  # Nested queries
+            offset = 1 if query_operator[0] == '.' else 0
+            query_operator = ''
+            nested_start = start + 2 + match.start() + offset
+            value = self._parse_array_query_query_part(nested_start, delimiter, max_end=end + content_end)
+            value.first_only = False  # Nested queries first_only is controlled by the most external query
+
+        if not key and not (query_operator and value) and not isinstance(value, ArrayQueryQueryPart):
             raise GJSONParseError('Empty or invalid query.', query=self._query, position=start)
 
         return ArrayQueryQueryPart(start=start, end=end, part=part, delimiter=delimiter, is_last=False, previous=None,
@@ -580,7 +592,7 @@ class GJSONObj:
             gjson.GJSONParseError: on invalid query.
 
         """
-        end = self._find_closing_parentheses(start, set('{'), max_end=max_end)
+        end = self._find_closing_parentheses(start=start, opening='{', max_end=max_end)
         part = self._query[start:end + 1]
         parts = []
 
@@ -680,8 +692,21 @@ class GJSONObj:
 
     def _parse_array_multipaths_query_part(
             self, start: int, delimiter: str, max_end: int = 0) -> MultipathsArrayQueryPart:
-        """Todo."""
-        end = self._find_closing_parentheses(start, set('['), max_end=max_end)
+        """Parse a multipaths object query part.
+
+        Arguments:
+            start: the index of the start of the path in the query.
+            delimiter: the delimiter before the query part.
+            max_end: an optional last position up to where the multipaths can extend.
+
+        Returns:
+            the multipaths array query part.
+
+        Raises:
+            gjson.GJSONParseError: on invalid query.
+
+        """
+        end = self._find_closing_parentheses(start=start, opening='[', max_end=max_end)
         part = self._query[start:end + 1]
         parts = []
         skip_until = 0
@@ -711,6 +736,62 @@ class GJSONObj:
 
         return MultipathsArrayQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None,
                                         is_last=False, parts=parts)
+
+    def _parse_literal_query_part(self, start: int, delimiter: str, max_end: int = 0,
+                                  in_multipaths: bool = False) -> LiteralQueryPart:
+        """Parse a literal query part.
+
+        Arguments:
+            start: the index of the start of the path in the query.
+            delimiter: the delimiter before the query part.
+            max_end: an optional last position up to where the multipaths can extend.
+            in_multipaths: whether the part to be parsed is inside a multipaths.
+
+        Returns:
+            the literal query part.
+
+        Raises:
+            gjson.GJSONParseError: on invalid query.
+
+        """
+        end = -1
+        begin = self._query[start + 1:start + 2]
+        if begin in ('{', '['):
+            end = self._find_closing_parentheses(start=start + 1, opening=begin, max_end=max_end)
+
+        elif begin == '"':
+            query = self._query[start + 2:max_end + 1] if max_end else self._query[start + 2:]
+            match = re.search(r'(?<!\\)(")', query)  # Negative lookbehind assertion
+            if match is None or match.end() == -1:
+                raise GJSONParseError('Unable to find end of literal string.',
+                                      query=self._query, position=start + 2)
+
+            # match.end() returns the next position after the last matched character
+            end = start + 1 + match.end()
+
+        else:
+            query = self._query[start + 1:max_end + 1] if max_end else self._query[start + 1:]
+            if match := re.match(r'(true|false|null|NaN|(-)?Infinity)', query):
+                # Includes also Infinite and NaN values:
+                # https://docs.python.org/3/library/json.html#infinite-and-nan-number-values
+                offset = 0
+            elif match := re.match(r'-?(0|[1-9][0-9]*)(.[0-9]+)?((e|E)(\+|-|)[0-9]+)?', query):
+                offset = 0  # JSON number
+            else:  # Catch until the first delimiter or end of string
+                delimiters = MULTIPATHS_DELIMITERS if in_multipaths else DELIMITERS
+                pattern = '|'.join(re.escape(delimiter) for delimiter in delimiters)
+                match = re.search(fr'(?<!\\)({pattern}|$)', query)  # Negative lookbehind assertion
+                offset = 1 if match and match.group() else 0
+
+                if match is None or match.end() == -1:  # pragma: nocover the above regex always matches
+                    raise GJSONParseError('Invalid JSON literal.', query=self._query, position=start + 1)
+
+            end = start + match.end() - offset  # match.end() gives the next position after the last matched character
+
+        # Allow for empty literals '!' at this point to be able to handle them differently while parsing the parts
+        # based if it's in a multipaths or after a query.
+        part = self._query[start:end + 1]
+        return LiteralQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None, is_last=False)
 
     def _parse_part(self, part: BaseQueryPart, obj: Any, in_multipaths: bool = False) -> Any:
         """Parse the given part of the full query.
@@ -886,12 +967,63 @@ class GJSONObj:
                     if not isinstance(array_ret, NoResult):
                         ret.append(array_ret)
 
+        elif isinstance(part, LiteralQueryPart):
+            try:
+                new_obj = json.loads(part.part[1:])
+                json_error = ''
+            except json.JSONDecodeError as ex:
+                json_error = str(ex)
+                new_obj = NoResult()
+
+            ret = new_obj
+            if (self._after_hash or self._after_query_all) and isinstance(obj, Sequence):
+                if part.delimiter == DOT_DELIMITER:
+                    if isinstance(new_obj, NoResult):
+                        ret = []
+                    else:
+                        ret = [new_obj for _ in obj]
+                elif part.delimiter == PIPE_DELIMITER:
+                    ret = new_obj
+            else:
+                if part.delimiter == DOT_DELIMITER and not isinstance(new_obj, NoResult):
+                    json_error = 'literal afer a dot delimiter.'
+                    ret = NoResult()
+                elif part.delimiter == PIPE_DELIMITER:
+                    ret = new_obj
+
+            if not in_multipaths and isinstance(ret, NoResult):
+                raise GJSONParseError(
+                    f'Unable to load literal JSON: {json_error}', query=self._query, position=part.start)
+
         if in_hash:
             self._after_hash = True
         if in_query_all:
             self._after_query_all = True
 
         return ret
+
+    def _evaluate_query_return_value(self, query: ArrayQueryQueryPart, obj: Any) -> Any:
+        """Evaluate the return value of an inline query #(...) / #(...)# depending on first match or all matches.
+
+        Arguments:
+            query: the query part.
+            obj: the current object.
+
+        Raises:
+            gjson.GJSONParseError: if the query is for the first element and there are no matching items.
+
+        Returns:
+            the result of the query.
+
+        """
+        if query.first_only:
+            if obj:
+                return obj[0]
+
+            raise GJSONParseError('Query for first element does not match anything.',
+                                  query=self._query, position=query.start)
+
+        return obj
 
     def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:
         """Parse an inline query #(...) / #(...)#.
@@ -907,12 +1039,23 @@ class GJSONObj:
             the result of the query.
 
         """
-        if not query.operator:
-            ret = [i for i in obj if query.field in i]
-            if query.first_only:
-                return ret[0] if ret else []
+        if isinstance(query.value, ArrayQueryQueryPart):
+            ret = []
+            for i in obj:
+                nested_obj = None
+                if query.field:
+                    if isinstance(i, Mapping) and query.field in i:
+                        nested_obj = i[query.field]
+                elif isinstance(i, Sequence) and not isinstance(i, (str, bytes)):
+                    nested_obj = i
 
-            return ret
+                if nested_obj is not None and self._parse_query(query.value, nested_obj):
+                    ret.append(i)
+
+            return self._evaluate_query_return_value(query, ret)
+
+        if not query.operator:
+            return self._evaluate_query_return_value(query, [i for i in obj if query.field in i])
 
         key = query.field.replace('\\', '')
         try:
@@ -981,14 +1124,7 @@ class GJSONObj:
         except TypeError:
             ret = []
 
-        if query.first_only:
-            if ret:
-                return ret[0]
-
-            raise GJSONParseError('Query for first element does not match anything.',
-                                  query=self._query, position=query.start)
-
-        return ret
+        return self._evaluate_query_return_value(query, ret)
 
     def _apply_modifier(self, modifier: ModifierQueryPart, obj: Any) -> Any:
         """Apply a modifier.

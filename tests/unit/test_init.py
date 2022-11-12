@@ -4,6 +4,7 @@ import json
 import re
 
 from collections.abc import Mapping
+from math import isnan
 
 import pytest
 
@@ -126,10 +127,32 @@ INPUT_SUM_N = json.loads("""
     {"key": "c", "value": 9}
 ]
 """)
+INPUT_NESTED_QUERIES = json.loads("""
+{
+    "key": [
+        {"level1": [{"level2": [{"level3": [1, 2]}]}]},
+        {"level1": [{"level2": [{"level3": [2, 3]}]}]},
+        [[{"level3": [1, 2]}], [{"level3": [2, 3]}]],
+        [[{"level3": [2, 3]}], [{"level3": [3, 4]}]],
+        {"another": [{"level2": [{"level3": [2, 3]}]}]},
+        {"level1": [{"another": [{"level3": [2, 3]}]}]},
+        {"level1": [{"level2": [{"another": [2, 3]}]}]},
+        [[{"another": [2, 3]}], [{"another": [3, 4]}]],
+        "spurious",
+        12.34,
+        {"mixed": [[{"level4": [1, 2]}]]}
+    ]
+}
+""")
 
 
 def compare_values(result, expected):
     """Compare results with the expected values ensuring same-order of keys for dictionaries."""
+    if isinstance(expected, float):
+        if isnan(expected):
+            assert isnan(result)
+            return
+
     assert result == expected
     if isinstance(expected, Mapping):
         assert list(result.keys()) == list(expected.keys())
@@ -272,6 +295,37 @@ class TestObject:
         ('{friends.0.[age,nets.#(="ig")]}', {'_': [44, 'ig']}),
         ('{friends.0.[age,nets.#(="ig")],age}', {'_': [44, 'ig'], 'age': 37}),
         ('{friends.0.[invalid,nets.#(="ig")],age,invalid}', {'_': ['ig'], 'age': 37}),
+        # Literals
+        ('!true', True),
+        ('!false', False),
+        ('!null', None),
+        ('!NaN', float('nan')),
+        ('!Infinity', float('inf')),
+        ('!-Infinity', float('-inf')),
+        ('!"key"', 'key'),
+        ('!"line \\"quotes\\""', 'line "quotes"'),
+        ('!0', 0),
+        ('!12', 12),
+        ('!-12', -12),
+        ('!12.34', 12.34),
+        ('!12.34E2', 1234),
+        ('!12.34E+2', 1234),
+        ('!12.34e-2', 0.1234),
+        ('!-12.34e-2', -0.1234),
+        ('friends.#.!"value"', ['value', 'value', 'value']),
+        ('friends.#.!invalid', []),
+        ('friends.#|!"value"', 'value'),
+        ('friends.#(age>45)#.!"value"', ['value', 'value']),
+        ('name|!"value"', 'value'),
+        ('!{}', {}),
+        ('![]', []),
+        ('!{"name":{"first":"Tom"}}.{name.first}.first', 'Tom'),
+        ('{name.last,"key":!"value"}', {'last': 'Anderson', 'key': 'value'}),
+        ('{name.last,"key":!{"a":"b"},"invalid"}', {'last': 'Anderson', 'key': {'a': 'b'}}),
+        ('{name.last,"key":!{"c":"d"},!"valid"}', {'last': 'Anderson', 'key': {'c': 'd'}, '_': 'valid'}),
+        ('[!true,!false,!null,!Infinity,!invalid,{"name":!"andy",name.last},+Infinity,!["value1","value2"]]',
+         [True, False, None, float('inf'), {'name': 'andy', 'last': 'Anderson'}, ['value1', 'value2']]),
+        ('[!12.34,!-12.34e-2,!true]', [12.34, -0.1234, True]),
     ))
     def test_get_ok(self, query, expected):
         """It should query the JSON object and return the expected result."""
@@ -304,8 +358,9 @@ class TestObject:
         ('#.invalid', 'Invalid or unsupported query part `invalid`.'),
         ('friends.#(=="Murphy")', 'Query on mapping like objects require a key before the operator.'),
         ('friends.#(last=={1: 2})', 'Invalid value `{1: 2}` for the query key `last`'),
-        ('friends.#(invalid', "Unbalanced parentheses, opened ['('] vs closed []"),
+        ('friends.#(invalid', 'Unbalanced parentheses `(`, 1 still opened.'),
         ('#(first)', 'Queries are supported only for sequence like objects'),
+        ('friends.#(invalid)', 'Query for first element does not match anything.'),
         ('friends.#(last=="invalid")', 'Query for first element does not match anything.'),
         ('friends.#(first%"D?")', 'Query for first element does not match anything.'),
         ('friends.#(last=="Murphy")invalid', 'Expected delimiter or end of query after closing parenthesis.'),
@@ -328,6 +383,22 @@ class TestObject:
         # Multipaths objects
         (r'{"a\ge":age}', r'Failed to parse multipaths key "a\ge"'),
         ('{"age",age}', 'Expected colon after multipaths item with key "age".'),
+        # Literals
+        ('!', 'Unable to load literal JSON'),
+        ('name.!', 'Unable to load literal JSON'),
+        ('!invalid', 'Unable to load literal JSON'),
+        (r'!in\valid', 'Unable to load literal JSON'),
+        ('!0.a', 'Invalid or unsupported query part `a`.'),
+        ('!0.1ea', 'Invalid or unsupported query part `ea`.'),
+        ('!-12.', 'Delimiter at the end of the query.'),
+        ('!-12.e', 'Invalid or unsupported query part `e`.'),
+        ('name.!invalid', 'Unable to load literal JSON'),
+        ('!"invalid', 'Unable to find end of literal string.'),
+        ('friends.#|!invalid', 'Unable to load literal JSON'),
+        ('!{true,', 'Unbalanced parentheses `{`, 1 still opened.'),
+        ('![true,', 'Unbalanced parentheses `[`, 1 still opened.'),
+        ('!"value".invalid', 'Invalid or unsupported query part `invalid`.'),
+        ('name.!"value"', 'Unable to load literal JSON: literal afer a dot delimiter.'),
     ))
     def test_get_parser_raise(self, query, error):
         """It should raise a GJSONParseError error with the expected message."""
@@ -480,6 +551,52 @@ class TestTruthiness:
     @pytest.mark.parametrize('query, error', (
         ('vals.#(b==~"invalid")',
          "Queries ==~ operator requires a boolean value, got <class 'str'> instead: `invalid`"),
+    ))
+    def test_get_raise(self, query, error):
+        """It should raise a GJSONError error with the expected message."""
+        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+            self.object.get(query)
+
+
+class TestNestedQueries:
+    """Testing gjson nested queries."""
+
+    def setup_method(self):
+        """Initialize the test instance."""
+        self.object = gjson.GJSON(INPUT_NESTED_QUERIES)
+
+    @pytest.mark.parametrize('query, expected', (
+        # Arrays of objects
+        ('key.#(level1.#(level2.#(level3)))', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3)))#', INPUT_NESTED_QUERIES['key'][0:2]),
+        ('key.#(level1.#(level2.#(level3.#(==0))))#', []),
+        ('key.#(level1.#(level2.#(level3.#(=1))))', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3.#(=1)#)#)#)', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3.#(==1))))#', [INPUT_NESTED_QUERIES['key'][0]]),
+        ('key.#(level1.#(level2.#(level3.#(==2))))', INPUT_NESTED_QUERIES['key'][0]),
+        ('key.#(level1.#(level2.#(level3.#(=2))))#', INPUT_NESTED_QUERIES['key'][0:2]),
+        # Arrays of arrays
+        ('key.#(#(#(level3)))', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3)))#', INPUT_NESTED_QUERIES['key'][2:4]),
+        ('key.#(#(#(level3.#(==0))))#', []),
+        ('key.#(#(#(level3.#(==1))))', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3.#(==1)#)#)#)', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3.#(==1))))#', [INPUT_NESTED_QUERIES['key'][2]]),
+        ('key.#(#(#(level3.#(==2))))', INPUT_NESTED_QUERIES['key'][2]),
+        ('key.#(#(#(level3.#(==2))))#', INPUT_NESTED_QUERIES['key'][2:4]),
+        ('key.#(#(#(level3.#(>=4))))', INPUT_NESTED_QUERIES['key'][3]),
+        ('key.#(#(#(level3.#(>=4))))#', [INPUT_NESTED_QUERIES['key'][3]]),
+        # Mixed
+        ('key.#(mixed.#(#(level4)))', INPUT_NESTED_QUERIES['key'][-1]),
+        ('key.#(mixed.#(#(level4)))#', [INPUT_NESTED_QUERIES['key'][-1]]),
+    ))
+    def test_get_ok(self, query, expected):
+        """It should query the JSON object and return the expected result."""
+        compare_values(self.object.get(query), expected)
+
+    @pytest.mark.parametrize('query, error', (
+        ('key.#(level1.#(level2.#(level3.#(==0))))', 'Query for first element does not match anything.'),
+        ('key.#(#(#(level3.#(==0))))', 'Query for first element does not match anything.'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
