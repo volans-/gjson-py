@@ -1,6 +1,32 @@
 Release Notes
 =============
 
+`v0.4.0`_ (2022-11-12)
+^^^^^^^^^^^^^^^^^^^^^^
+
+New features
+""""""""""""
+
+* Query parsing: add support for the `GJSON Literals`_ feature.
+* Queries: add support for nested queries. There is no limit on the number of levels queries can be nested.
+
+Bug fixes
+"""""""""
+
+* Queries: fix bug on first element query without operator:
+
+  * When performing a query for the first element ``#(...)`` and there is no match, an exception should be raised.
+  * In the case of a key existence check when there is no operator (e.g. ``friends.#(nonexistent)``) an empty array was
+    erroneously returned instead of raising an exception.
+
+Miscellanea
+"""""""""""
+
+* documentation: add missing method docstring.
+* documentation: add note to modifiers specifying that the ``@keys`` and ``@values`` modifiers are valid only if applied
+  to a JSON object (mapping).
+* Query parsing: simplify internal method to find a matching parentheses for queries and multipaths.
+
 `v0.3.0`_ (2022-11-10)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -248,7 +274,8 @@ Miscellanea
 
 * Initial version.
 
-.. _`GJSON Multipaths`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipaths
+.. _`GJSON Literals`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#literals
+.. _`GJSON Multipaths`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipath
 
 .. _`issue #2`: https://github.com/volans-/gjson-py/issues/2
 
@@ -261,3 +288,4 @@ Miscellanea
 .. _`v0.2.0`: https://github.com/volans-/gjson-py/releases/tag/v0.2.0
 .. _`v0.2.1`: https://github.com/volans-/gjson-py/releases/tag/v0.2.1
 .. _`v0.3.0`: https://github.com/volans-/gjson-py/releases/tag/v0.3.0
+.. _`v0.4.0`: https://github.com/volans-/gjson-py/releases/tag/v0.4.0
