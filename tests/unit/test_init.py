@@ -343,6 +343,7 @@ class TestObject:
         ('friends.#(last=={1: 2})', 'Invalid value `{1: 2}` for the query key `last`'),
         ('friends.#(invalid', 'Unbalanced parentheses `(`, 1 still opened.'),
         ('#(first)', 'Queries are supported only for sequence like objects'),
+        ('friends.#(invalid)', 'Query for first element does not match anything.'),
         ('friends.#(last=="invalid")', 'Query for first element does not match anything.'),
         ('friends.#(first%"D?")', 'Query for first element does not match anything.'),
         ('friends.#(last=="Murphy")invalid', 'Expected delimiter or end of query after closing parenthesis.'),

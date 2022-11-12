@@ -1010,7 +1010,11 @@ class GJSONObj:
         if not query.operator:
             ret = [i for i in obj if query.field in i]
             if query.first_only:
-                return ret[0] if ret else []
+                if ret:
+                    return ret[0]
+
+                raise GJSONParseError('Query for first element does not match anything.',
+                                      query=self._query, position=query.start)
 
             return ret
 
