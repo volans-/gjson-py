@@ -79,7 +79,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">gjson._protocols</span> <span class="kn">import</span> <span class="n">ModifierProtocol</span>
 <span class="kn">from</span> <span class="nn">gjson.exceptions</span> <span class="kn">import</span> <span class="n">GJSONError</span><span class="p">,</span> <span class="n">GJSONParseError</span>
@@ -155,7 +155,7 @@
 
     <span class="n">field</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;ArrayQueryQueryPart&#39;</span><span class="p">]</span>
     <span class="n">first_only</span><span class="p">:</span> <span class="nb">bool</span>
 
 
@@ -187,6 +187,10 @@
     <span class="sd">&quot;&quot;&quot;JSON object multipaths query part.&quot;&quot;&quot;</span>
 
     <span class="n">parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">BaseQueryPart</span><span class="p">]]</span>
+
+
+<span class="k">class</span> <span class="nc">LiteralQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Literal query part.&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="GJSONObj"><a class="viewcode-back" href="../../api.html#gjson.GJSONObj">[docs]</a><span class="k">class</span> <span class="nc">GJSONObj</span><span class="p">:</span>
@@ -371,6 +375,8 @@
                 <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_object_multipaths_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
                 <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_multipaths_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;!&#39;</span><span class="p">:</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_literal_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">in_multipaths</span> <span class="ow">and</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span><span class="p">:</span>
                 <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
                 <span class="k">break</span>
@@ -404,12 +410,12 @@
 
         <span class="k">return</span> <span class="n">parts</span>
 
-    <span class="k">def</span> <span class="nf">_find_closing_parentheses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">opening</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Find the matching parentheses that closes the opening one looking for unbalance of the given characters.</span>
+    <span class="k">def</span> <span class="nf">_find_closing_parentheses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">opening</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Find the matching parentheses that closes the opening one looking for unbalance of the given character.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            start: the index of the opening parentheses in the query.</span>
-<span class="sd">            opening: the list of parentheses openings to look for imbalances.</span>
+<span class="sd">            opening: the opening parentheses to look for imbalances.</span>
 <span class="sd">            suffix: an optional suffix that can be present after the closing parentheses before reaching a delimiter or</span>
 <span class="sd">                the end of the query.</span>
 <span class="sd">            max_end: an optional last position up to where the parentheses can be found.</span>
@@ -422,9 +428,8 @@
 <span class="sd">            suffix if present.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">closing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">PARENTHESES_PAIRS</span><span class="p">[</span><span class="n">char</span><span class="p">]</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">opening</span><span class="p">)</span>
-        <span class="n">opened</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">closed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">closing</span> <span class="o">=</span> <span class="n">PARENTHESES_PAIRS</span><span class="p">[</span><span class="n">opening</span><span class="p">]</span>
+        <span class="n">opened</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="n">escaped</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">in_string</span> <span class="o">=</span> <span class="kc">False</span>
@@ -450,27 +455,28 @@
             <span class="k">if</span> <span class="n">in_string</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">opening</span><span class="p">:</span>
-                <span class="n">opened</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">closing</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">opened</span> <span class="ow">and</span> <span class="n">opened</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">PARENTHESES_PAIRS</span><span class="p">[</span><span class="n">char</span><span class="p">]:</span>
-                    <span class="n">opened</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="n">opening</span><span class="p">:</span>
+                <span class="n">opened</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="n">closing</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">opened</span><span class="p">:</span>
+                    <span class="n">opened</span> <span class="o">-=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">opened</span><span class="p">:</span>
                         <span class="n">end</span> <span class="o">=</span> <span class="n">i</span>
                         <span class="k">break</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">closed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">opened</span> <span class="ow">or</span> <span class="n">closed</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unbalanced parentheses, opened </span><span class="si">{</span><span class="n">opened</span><span class="si">}</span><span class="s1"> vs closed </span><span class="si">{</span><span class="n">closed</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span>
+        <span class="k">if</span> <span class="n">opened</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unbalanced parentheses `</span><span class="si">{</span><span class="n">opening</span><span class="si">}</span><span class="s1">`, </span><span class="si">{</span><span class="n">opened</span><span class="si">}</span><span class="s1"> still opened.&#39;</span><span class="p">,</span>
                                   <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">suffix</span> <span class="ow">and</span> <span class="n">end</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">)</span> <span class="ow">and</span> <span class="n">query</span><span class="p">[</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">suffix</span><span class="p">:</span>
             <span class="n">end</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">((</span><span class="n">max_end</span> <span class="ow">and</span> <span class="n">query</span><span class="p">[</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MULTIPATHS_DELIMITERS</span><span class="p">)</span>
-                    <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">max_end</span> <span class="ow">and</span> <span class="n">query</span><span class="p">[</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DELIMITERS</span><span class="p">)):</span>
+            <span class="n">delimiters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">MULTIPATHS_DELIMITERS</span><span class="p">)</span> <span class="k">if</span> <span class="n">max_end</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">DELIMITERS</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">opening</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span> <span class="ow">and</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">:</span>  <span class="c1"># Nested queries</span>
+                <span class="n">delimiters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">max_end</span> <span class="ow">and</span> <span class="n">query</span><span class="p">[</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">delimiters</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">max_end</span> <span class="ow">and</span> <span class="n">query</span><span class="p">[</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DELIMITERS</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Expected delimiter or end of query after closing parenthesis.&#39;</span><span class="p">,</span>
                                       <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">start</span> <span class="o">+</span> <span class="n">end</span><span class="p">)</span>
 
@@ -582,7 +588,7 @@
 <span class="sd">            the array query part object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_closing_parentheses</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">),</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_closing_parentheses</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">opening</span><span class="o">=</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
         <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">part</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">:</span>
             <span class="n">content_end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
@@ -594,20 +600,26 @@
         <span class="n">content</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span> <span class="n">content_end</span><span class="p">]</span>
         <span class="n">query_operator</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArrayQueryQueryPart</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">op</span><span class="p">)</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">QUERIES_OPERATORS</span><span class="p">)</span>
-        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">fr</span><span class="s1">&#39;(?&lt;!</span><span class="se">\\</span><span class="s1">)(</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>  <span class="c1"># Negative lookbehind assertion</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">fr</span><span class="s1">&#39;(?&lt;!</span><span class="se">\\</span><span class="s1">)(</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">|\.?#\()&#39;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>  <span class="c1"># Negative lookbehind assertion</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
             <span class="n">query_operator</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
             <span class="n">key</span> <span class="o">=</span> <span class="n">content</span><span class="p">[:</span><span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()]</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">():]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">():]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># No operator, assume existence match of key</span>
             <span class="n">key</span> <span class="o">=</span> <span class="n">content</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">operator</span> <span class="ow">and</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="s1">&#39;#(&#39;</span> <span class="ow">in</span> <span class="n">query_operator</span><span class="p">:</span>  <span class="c1"># Nested queries</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">query_operator</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">query_operator</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">nested_start</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">+</span> <span class="n">offset</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_query_query_part</span><span class="p">(</span><span class="n">nested_start</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">end</span> <span class="o">+</span> <span class="n">content_end</span><span class="p">)</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">first_only</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Nested queries first_only is controlled by the most external query</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">query_operator</span> <span class="ow">and</span> <span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ArrayQueryQueryPart</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Empty or invalid query.&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ArrayQueryQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -654,7 +666,7 @@
 <span class="sd">            gjson.GJSONParseError: on invalid query.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_closing_parentheses</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">),</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_closing_parentheses</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">opening</span><span class="o">=</span><span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
         <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -754,8 +766,21 @@
 
     <span class="k">def</span> <span class="nf">_parse_array_multipaths_query_part</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultipathsArrayQueryPart</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Todo.&quot;&quot;&quot;</span>
-        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_closing_parentheses</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">),</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;Parse a multipaths object query part.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            start: the index of the start of the path in the query.</span>
+<span class="sd">            delimiter: the delimiter before the query part.</span>
+<span class="sd">            max_end: an optional last position up to where the multipaths can extend.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the multipaths array query part.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONParseError: on invalid query.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_closing_parentheses</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">opening</span><span class="o">=</span><span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
         <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">skip_until</span> <span class="o">=</span> <span class="mi">0</span>
@@ -785,6 +810,62 @@
 
         <span class="k">return</span> <span class="n">MultipathsArrayQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="n">parts</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_literal_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                                  <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LiteralQueryPart</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Parse a literal query part.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            start: the index of the start of the path in the query.</span>
+<span class="sd">            delimiter: the delimiter before the query part.</span>
+<span class="sd">            max_end: an optional last position up to where the multipaths can extend.</span>
+<span class="sd">            in_multipaths: whether the part to be parsed is inside a multipaths.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the literal query part.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONParseError: on invalid query.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">begin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">start</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="p">):</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_closing_parentheses</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">opening</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">begin</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span><span class="n">max_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">max_end</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:]</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?&lt;!</span><span class="se">\\</span><span class="s1">)(&quot;)&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>  <span class="c1"># Negative lookbehind assertion</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Unable to find end of literal string.&#39;</span><span class="p">,</span>
+                                      <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">start</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="c1"># match.end() returns the next position after the last matched character</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">max_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">max_end</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="o">:=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(true|false|null|NaN|(-)?Infinity)&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+                <span class="c1"># Includes also Infinite and NaN values:</span>
+                <span class="c1"># https://docs.python.org/3/library/json.html#infinite-and-nan-number-values</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="n">match</span> <span class="o">:=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;-?(0|[1-9][0-9]*)(.[0-9]+)?((e|E)(\+|-|)[0-9]+)?&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># JSON number</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Catch until the first delimiter or end of string</span>
+                <span class="n">delimiters</span> <span class="o">=</span> <span class="n">MULTIPATHS_DELIMITERS</span> <span class="k">if</span> <span class="n">in_multipaths</span> <span class="k">else</span> <span class="n">DELIMITERS</span>
+                <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">delimiter</span><span class="p">)</span> <span class="k">for</span> <span class="n">delimiter</span> <span class="ow">in</span> <span class="n">delimiters</span><span class="p">)</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">fr</span><span class="s1">&#39;(?&lt;!</span><span class="se">\\</span><span class="s1">)(</span><span class="si">{</span><span class="n">pattern</span><span class="si">}</span><span class="s1">|$)&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>  <span class="c1"># Negative lookbehind assertion</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span>
+
+                <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="c1"># pragma: nocover the above regex always matches</span>
+                    <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Invalid JSON literal.&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">()</span> <span class="o">-</span> <span class="n">offset</span>  <span class="c1"># match.end() gives the next position after the last matched character</span>
+
+        <span class="c1"># Allow for empty literals &#39;!&#39; at this point to be able to handle them differently while parsing the parts</span>
+        <span class="c1"># based if it&#39;s in a multipaths or after a query.</span>
+        <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">LiteralQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_parse_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">:</span> <span class="n">BaseQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Parse the given part of the full query.</span>
@@ -960,12 +1041,63 @@
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array_ret</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
                         <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array_ret</span><span class="p">)</span>
 
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">LiteralQueryPart</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                <span class="n">json_error</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+                <span class="n">json_error</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+                <span class="n">new_obj</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
+
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">new_obj</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
+                        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_obj</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">new_obj</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
+                    <span class="n">json_error</span> <span class="o">=</span> <span class="s1">&#39;literal afer a dot delimiter.&#39;</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">new_obj</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">in_multipaths</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Unable to load literal JSON: </span><span class="si">{</span><span class="n">json_error</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">part</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">in_hash</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">in_query_all</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">_evaluate_query_return_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the return value of an inline query #(...) / #(...)# depending on first match or all matches.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            query: the query part.</span>
+<span class="sd">            obj: the current object.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONParseError: if the query is for the first element and there are no matching items.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the result of the query.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">first_only</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">obj</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Query for first element does not match anything.&#39;</span><span class="p">,</span>
+                                  <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">obj</span>
 
     <span class="k">def</span> <span class="nf">_parse_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Parse an inline query #(...) / #(...)#.</span>
@@ -981,12 +1113,23 @@
 <span class="sd">            the result of the query.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span><span class="p">:</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">first_only</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ret</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ArrayQueryQueryPart</span><span class="p">):</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                <span class="n">nested_obj</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+                        <span class="n">nested_obj</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">query</span><span class="o">.</span><span class="n">field</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+                    <span class="n">nested_obj</span> <span class="o">=</span> <span class="n">i</span>
 
-            <span class="k">return</span> <span class="n">ret</span>
+                <span class="k">if</span> <span class="n">nested_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_query</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">nested_obj</span><span class="p">):</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1055,14 +1198,7 @@
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">first_only</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-            <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Query for first element does not match anything.&#39;</span><span class="p">,</span>
-                                  <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_apply_modifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modifier</span><span class="p">:</span> <span class="n">ModifierQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Apply a modifier.</span>
