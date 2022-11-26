@@ -1411,6 +1411,41 @@ class GJSONObj:
         # Skip keys with value NoResult in each dictionary
         return [{k: v for k, v in i.items() if not isinstance(v, NoResult)} for i in obj]
 
+    def _apply_modifier_join(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @join modifier, that joins a list of dictionaries into a single dictionary.
+
+        Items in the sequence that are not dictionaries are skipped.
+        Differently from GJSON there is no support for duplicated keys as the can't exist in Python dictionaries.
+        Hence this modifier doesn't accept any option.
+
+        Example input::
+
+            [{"first": "Tom", "age": 37}, {"age": 41}]
+
+        Example output::
+
+            {"first": "Tom", "age":41}
+
+        Arguments:
+            options: the eventual options for the modifier, currently unused.
+            obj: the current element to join.
+            last: whether this is the final part of the query.
+
+        Returns:
+            the object untouched if the object is not a sequence, a dictionary with joined objects otherwise.
+
+        """
+        del last  # for pylint, unused argument
+        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+            return obj
+
+        ret: dict[Any, Any] = {}
+        for item in obj:
+            if isinstance(item, Mapping):
+                ret.update(item)
+
+        return ret
+
     def _apply_modifier_top_n(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @top_n modifier to find the most common values of a given field.
 

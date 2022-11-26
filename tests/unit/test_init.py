@@ -220,6 +220,11 @@ class TestObject:
         ('@pretty:{"indent": 4}', INPUT_OBJECT),
         (r'fav\.movie.@pretty:{"indent": 4}', 'Deer Hunter'),
         ('name.@tostr', '{"first": "Tom", "last": "Anderson"}'),
+        ('name.@join', {'first': 'Tom', 'last': 'Anderson'}),
+        ('age.@join', 37),
+        ('children.@join', {}),
+        ('children.0.@join', 'Sara'),
+        ('friends.@join', {'first': 'Jane', 'last': 'Murphy', 'age': 47, 'nets': ['ig', 'tw']}),
         # Dot vs Pipe
         ('friends.0.first', 'Dale'),
         ('friends|0.first', 'Dale'),
@@ -473,6 +478,8 @@ class TestBasic:
         ('happy', True),
         ('immortal', False),
         ('noop', {'what is a wren?': 'a bird'}),
+        # Modifiers
+        ('arr.@join', {'hello': 'world'}),
     ))
     def test_get_ok(self, query, expected):
         """It should query the basic test JSON and return the expected result."""
@@ -498,6 +505,8 @@ class TestList:
         ('#(first)', {'first': 'Dale'}),
         ('#(last)#', [{'last': 'Murphy'}]),
         ('#(last)', {'last': 'Murphy'}),
+        # Modifiers
+        ('@join', {'first': 'Jane', 'last': 'Murphy'}),
         # Multipaths
         ('#.{first.@reverse}', [{'@reverse': 'Dale'}, {'@reverse': 'Jane'}, {}]),
     ))
@@ -938,6 +947,6 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'ascii', 'flatten', 'fromstr', 'group', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this',
-                    'top_n', 'tostr', 'valid', 'values', 'ugly'}
+        expected = {'ascii', 'flatten', 'fromstr', 'group', 'join', 'keys', 'pretty', 'reverse', 'sort', 'sum_n',
+                    'this', 'top_n', 'tostr', 'valid', 'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected
