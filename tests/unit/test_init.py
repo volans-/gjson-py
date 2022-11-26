@@ -412,6 +412,8 @@ class TestObject:
         # Modifiers
         ('children.@keys', 'The current object does not have a keys() method.'),
         ('children.@values', 'The current object does not have a values() method.'),
+        ('age.@group', "Modifier @group got object of type <class 'int'> as input, expected dictionary."),
+        ('children.@group', "Modifier @group got object of type <class 'list'> as input, expected dictionary."),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
@@ -515,7 +517,7 @@ class TestList:
             self.list.get(query)
 
 
-class TestFlatten:
+class TestFlattenModifier:
     """Test gjson @flatten modifier."""
 
     def setup_method(self):
@@ -685,6 +687,29 @@ def test_get_modifier_tostr_raise():
     match = re.escape('The current object cannot be converted to a JSON-encoded string for @tostr.')
     with pytest.raises(gjson.GJSONError, match=match):
         obj.get('a.@tostr')
+
+
+def test_get_modifier_group_ok():
+    """It should group the dict of lists into a list of dicts."""
+    obj = gjson.GJSON({
+        'invalid1': 5,
+        'id': ['123', '456', '789'],
+        'val': [2, 1],
+        'invalid2': 'invalid',
+        'unit': ['ms', 's', 's', 'ms'],
+    })
+    assert obj.get('@group') == [
+        {'id': '123', 'val': 2, 'unit': 'ms'},
+        {'id': '456', 'val': 1, 'unit': 's'},
+        {'id': '789', 'unit': 's'},
+        {'unit': 'ms'},
+    ]
+
+
+def test_get_modifier_group_empty():
+    """It should return an empty list if no values are lists or are empty."""
+    obj = gjson.GJSON({'invalid1': 5, 'invalid2': 'invalid', 'invalid3': {'a': 5}, 'id': []})
+    assert obj.get('@group') == []
 
 
 def test_get_integer_index_on_mapping():
@@ -913,6 +938,6 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'ascii', 'flatten', 'fromstr', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n',
-                    'tostr', 'valid', 'values', 'ugly'}
+        expected = {'ascii', 'flatten', 'fromstr', 'group', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this',
+                    'top_n', 'tostr', 'valid', 'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected

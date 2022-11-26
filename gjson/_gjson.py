@@ -5,6 +5,7 @@ import re
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from itertools import zip_longest
 from typing import Any, Optional, Union
 
 from gjson._protocols import ModifierProtocol
@@ -1375,6 +1376,40 @@ class GJSONObj:
             return json.dumps(obj, ensure_ascii=False)
         except Exception as ex:
             raise GJSONError('The current object cannot be converted to a JSON-encoded string for @tostr.') from ex
+
+    def _apply_modifier_group(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @group modifier, that groups a dictionary of lists in a list of dictionaries.
+
+        Example input::
+
+            {"id": ["123", "456", "789"], "val": [2, 1]}
+
+        Example output::
+
+            [{"id": "123", "val": 2}, {"id": "456", "val": 1}, {"id": "789"}]
+
+        Arguments:
+            options: the eventual options for the modifier, currently unused.
+            obj: the current element to group.
+            last: whether this is the final part of the query.
+
+        Raises:
+            gjson.GJSONError: if the current object is not a dictionary.
+
+        Returns:
+            a list with the grouped objects or an empty list if the input has no lists as values.
+
+        """
+        del last  # for pylint, unused argument
+        if not isinstance(obj, Mapping):
+            raise GJSONError(f'Modifier @group got object of type {type(obj)} as input, expected dictionary.')
+
+        # Skip all values that aren't lists:
+        obj = {k: v for k, v in obj.items() if isinstance(v, Sequence) and not isinstance(v, (str, bytes))}
+        # Fill missing values with NoResult to remove them afterwards
+        obj = [dict(zip_longest(obj.keys(), values)) for values in zip_longest(*obj.values(), fillvalue=NoResult())]
+        # Skip keys with value NoResult in each dictionary
+        return [{k: v for k, v in i.items() if not isinstance(v, NoResult)} for i in obj]
 
     def _apply_modifier_top_n(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @top_n modifier to find the most common values of a given field.
