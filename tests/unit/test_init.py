@@ -219,6 +219,7 @@ class TestObject:
         ('age.@flatten', 37),
         ('@pretty:{"indent": 4}', INPUT_OBJECT),
         (r'fav\.movie.@pretty:{"indent": 4}', 'Deer Hunter'),
+        ('name.@tostr', '{"first": "Tom", "last": "Anderson"}'),
         # Dot vs Pipe
         ('friends.0.first', 'Dale'),
         ('friends|0.first', 'Dale'),
@@ -657,6 +658,35 @@ def test_get_modifier_sort(data, expected):
     compare_values(obj.get('@sort', quiet=True), expected)
 
 
+@pytest.mark.parametrize('data, query, expected', (
+    ({'a': '{"b": 25}'}, 'a.@fromstr', {'b': 25}),
+    ({'a': '{"b": 25}'}, 'a.@fromstr.b', 25),
+))
+def test_get_modifier_fromstr_ok(data, query, expected):
+    """It should load the JSON-encoded string."""
+    obj = gjson.GJSON(data)
+    assert obj.get(query, quiet=True) == expected
+
+
+@pytest.mark.parametrize('query, error', (
+    ('a.@fromstr', 'The current @fromstr input object cannot be converted to JSON.'),
+    ('b.@fromstr', "Modifier @fromstr got object of type <class 'dict'> as input, expected string or bytes."),
+))
+def test_get_modifier_fromstr_raise(query, error):
+    """It should raise a GJSONError if the JSON-encoded string has invalid JSON."""
+    obj = gjson.GJSON({'a': '{"invalid: json"', 'b': {'not': 'a string'}})
+    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        obj.get(query)
+
+
+def test_get_modifier_tostr_raise():
+    """It should raise a GJSONError if the object cannot be JSON-encoded."""
+    obj = gjson.GJSON({'a': {1, 2, 3}})  # Python sets cannot be JSON-encoded
+    match = re.escape('The current object cannot be converted to a JSON-encoded string for @tostr.')
+    with pytest.raises(gjson.GJSONError, match=match):
+        obj.get('a.@tostr')
+
+
 def test_get_integer_index_on_mapping():
     """It should access the integer as string key correctly."""
     obj = gjson.GJSON(json.loads('{"1": 5, "11": 7}'))
@@ -883,6 +913,6 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n', 'valid',
-                    'values', 'ugly'}
+        expected = {'ascii', 'flatten', 'fromstr', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n',
+                    'tostr', 'valid', 'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected

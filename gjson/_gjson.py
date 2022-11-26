@@ -1331,6 +1331,51 @@ class GJSONObj:
         del last  # for pylint, unused argument
         return obj
 
+    def _apply_modifier_fromstr(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @fromstr modifier, converting a string to JSON, if valid.
+
+        Arguments:
+            options: the eventual options for the modifier, currently unused.
+            obj: the current element from where to extract the JSON.
+            last: whether this is the final part of the query.
+
+        Raises:
+            gjson.GJSONError: if the current object cannot be converted to JSON.
+
+        Returns:
+            the parsed JSON.
+
+        """
+        del last  # for pylint, unused argument
+        if not isinstance(obj, (str, bytes)):
+            raise GJSONError(f'Modifier @fromstr got object of type {type(obj)} as input, expected string or bytes.')
+
+        try:
+            return json.loads(obj, strict=False)
+        except Exception as ex:
+            raise GJSONError('The current @fromstr input object cannot be converted to JSON.') from ex
+
+    def _apply_modifier_tostr(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
+        """Apply the @tostr modifier, converting the current object to a JSON-encoded string, if valid.
+
+        Arguments:
+            options: the eventual options for the modifier, currently unused.
+            obj: the current element from where to extract the JSON.
+            last: whether this is the final part of the query.
+
+        Raises:
+            gjson.GJSONError: if the current object cannot be converted to a JSON-encoded string.
+
+        Returns:
+            the JSON-encoded string.
+
+        """
+        del last  # for pylint, unused argument
+        try:
+            return json.dumps(obj, ensure_ascii=False)
+        except Exception as ex:
+            raise GJSONError('The current object cannot be converted to a JSON-encoded string for @tostr.') from ex
+
     def _apply_modifier_top_n(self, options: dict[str, Any], obj: Any, *, last: bool) -> Any:
         """Apply the @top_n modifier to find the most common values of a given field.
 
