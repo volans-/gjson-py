@@ -69,6 +69,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/x-rst',
     name='gjson',
+    package_data={'gjson': ['py.typed']},
     packages=find_packages(),
     platforms=['GNU/Linux', 'BSD', 'MacOSX'],
     python_requires='>=3.9',
