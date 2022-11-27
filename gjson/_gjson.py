@@ -650,7 +650,7 @@ class GJSONObj:
 
                 if char == '"':
                     try:
-                        key = json.loads(part[key_start:i + 1])
+                        key = json.loads(part[key_start:i + 1], strict=False)
                     except json.JSONDecodeError as ex:
                         raise GJSONParseError(f'Failed to parse multipaths key {part[key_start:i + 1]}.',
                                               query=self._query, position=key_start) from ex
@@ -970,7 +970,7 @@ class GJSONObj:
 
         elif isinstance(part, LiteralQueryPart):
             try:
-                new_obj = json.loads(part.part[1:])
+                new_obj = json.loads(part.part[1:], strict=False)
                 json_error = ''
             except json.JSONDecodeError as ex:
                 json_error = str(ex)
@@ -1060,7 +1060,7 @@ class GJSONObj:
 
         key = query.field.replace('\\', '')
         try:
-            value = json.loads(query.value)
+            value = json.loads(query.value, strict=False)
         except json.JSONDecodeError as ex:
             position = query.start + len(query.field) + len(query.operator)
             raise GJSONParseError(f'Invalid value `{query.value}` for the query key `{key}`.',
