@@ -1,9 +1,9 @@
 """GJSON module."""
 import json
+import os
 import re
+from importlib.metadata import PackageNotFoundError, version
 from typing import Any
-
-from pkg_resources import DistributionNotFound, get_distribution
 
 from gjson._gjson import GJSONObj, MODIFIER_NAME_RESERVED_CHARS
 from gjson._protocols import ModifierProtocol
@@ -208,7 +208,9 @@ class GJSON:
 
 
 try:
-    __version__: str = get_distribution('gjson').version
+    __version__: str = version('gjson')
     """str: the version of the current gjson module."""
-except DistributionNotFound:  # pragma: no cover - this should never happen during tests
-    pass  # package is not installed
+except PackageNotFoundError:  # pragma: no cover - this should never happen during tests
+    # Read the override from the environment, if present (like inside Debian build system)
+    if 'SETUPTOOLS_SCM_PRETEND_VERSION' in os.environ:
+        __version__ = os.environ['SETUPTOOLS_SCM_PRETEND_VERSION']
