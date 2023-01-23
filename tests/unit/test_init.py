@@ -163,7 +163,17 @@ class TestObject:
 
     def setup_method(self):
         """Initialize the test instance."""
+        def upper(options, obj, *, last):
+            """Custom modifier to return a string upper case."""
+            del options
+            del last
+            if isinstance(obj, list):
+                return [i.upper() for i in obj]
+
+            return obj.upper()
+
         self.object = gjson.GJSON(INPUT_OBJECT)
+        self.object.register_modifier('upper', upper)
 
     @pytest.mark.parametrize('query, expected', (
         # Basic
@@ -272,6 +282,12 @@ class TestObject:
         ('friends.{0.first,1.last,2.age}.@values', ['Dale', 'Craig', 47]),
         ('{friends.{"a":0.{nets.{0}}}}', {'_': {'a': {'_': {'0': 'ig'}}}}),
         ('{friends.{"a":0.{nets.{0,1}}}}', {'_': {'a': {'_': {'0': 'ig', '1': 'fb'}}}}),
+        ('friends.#.{age,first|@upper}',
+         [{"age": 44, "@upper": "DALE"}, {"age": 68, "@upper": "ROGER"}, {"age": 47, "@upper": "JANE"}]),
+        ('{friends.#.{age,"first":first|@upper}|0.first}', {"first": "DALE"}),
+        ('{"children":children|@upper,"name":name.first,"age":age}',
+         {"children": ["SARA", "ALEX", "JACK"], "name": "Tom", "age": 37}),
+        ('friends.#.{age,"first":first.invalid}', [{'age': 44}, {'age': 68}, {'age': 47}]),
         # Multipaths arrays
         ('[]', []),
         ('[.]', []),
@@ -298,6 +314,7 @@ class TestObject:
         # Multipaths mixed
         ('[{}]', [{}]),
         ('{[]}', {'_': []}),
+        ('[{},[],{}]', [{}, [], {}]),
         ('{"a":[]}', {'a': []}),
         ('[{age},{name.first}]', [{'age': 37}, {'first': 'Tom'}]),
         ('{friends.0.[age,nets.#(="ig")]}', {'_': [44, 'ig']}),
@@ -389,9 +406,15 @@ class TestObject:
         ('friends.@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
         # JSON Lines
         ('..name', 'Invalid query starting with a path delimiter.'),
-        # Multipaths objects
+        # Multipaths
         (r'{"a\ge":age}', r'Failed to parse multipaths key "a\ge"'),
         ('{"age",age}', 'Expected colon after multipaths item with key "age".'),
+        ('{]', 'Unbalanced parentheses `{`, 1 still opened.'),
+        ('{', 'Unbalanced parentheses `{`, 1 still opened.'),
+        ('{}@pretty', 'Expected delimiter or end of query after closing parenthesis.'),
+        ('[{age}}]', 'Missing separator after multipath.'),
+        ('{[age]]}', 'Missing separator after multipath.'),
+        ('[{age,name.first]},age]', 'Expected delimiter or end of query after closing parenthesis.'),
         # Literals
         ('!', 'Unable to load literal JSON'),
         ('name.!', 'Unable to load literal JSON'),
@@ -847,6 +870,8 @@ class TestJSONOutput:
          '{\n    "key": "value",\n    "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
         ('@pretty:{"indent": "\t"}',
          '{\n\t"key": "value",\n\t"hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
+        # Multipaths
+        ('{key,"another":key}.@pretty', '{\n  "key": "value",\n  "another": "value"\n}'),
     ))
     def test_modifier_pretty(self, query, expected):
         """It should prettyfy the JSON string based on the parameters."""

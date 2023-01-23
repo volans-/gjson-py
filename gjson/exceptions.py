@@ -32,3 +32,7 @@ class GJSONParseError(GJSONError):
         default = super().__str__()
         line = '-' * (self.position + 7)  # 7 is for the lenght of 'Query: '
         return f'{default}\nQuery: {self.query}\n{line}^'
+
+
+class GJSONInvalidSyntaxError(GJSONParseError):
+    """Raised when there is a query with an invalid syntax."""

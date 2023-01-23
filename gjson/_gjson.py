@@ -9,7 +9,7 @@ from itertools import zip_longest
 from typing import Any, Optional, Union
 
 from gjson._protocols import ModifierProtocol
-from gjson.exceptions import GJSONError, GJSONParseError
+from gjson.exceptions import GJSONError, GJSONInvalidSyntaxError, GJSONParseError
 
 ESCAPE_CHARACTER = '\\'
 """str: The grammar escape character."""
@@ -250,6 +250,7 @@ class GJSONObj:
         current_start = -1
         parts: list[BaseQueryPart] = []
         previous: Optional[BaseQueryPart] = None
+        require_delimiter = False
 
         i = start
         while True:
@@ -283,6 +284,7 @@ class GJSONObj:
                     current_start = -1
 
                 delimiter = char
+                require_delimiter = False
                 if next_char is None:
                     raise GJSONParseError('Delimiter at the end of the query.', query=self._query, position=i)
 
@@ -290,7 +292,7 @@ class GJSONObj:
                 continue
 
             if char == '@':
-                part = self._parse_modifier_query_part(i, delimiter, max_end=max_end)
+                part = self._parse_modifier_query_part(i, delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif char == '#' and (next_char in DELIMITERS or next_char is None):
                 part = ArrayLenghtQueryPart(start=i, end=i, part=char, delimiter=delimiter, is_last=next_char is None,
                                             previous=previous)
@@ -300,13 +302,17 @@ class GJSONObj:
                 part = self._parse_array_index_query_part(i, delimiter, in_multipaths=in_multipaths)
             elif char == '{':
                 part = self._parse_object_multipaths_query_part(i, delimiter, max_end=max_end)
+                require_delimiter = True
             elif char == '[':
                 part = self._parse_array_multipaths_query_part(i, delimiter, max_end=max_end)
+                require_delimiter = True
             elif char == '!':
                 part = self._parse_literal_query_part(i, delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif in_multipaths and char == ',':
                 i -= 1
                 break
+            elif in_multipaths and require_delimiter:
+                raise GJSONInvalidSyntaxError('Missing separator after multipath.', query=self._query, position=i)
 
             if part:
                 part.previous = previous
@@ -336,6 +342,19 @@ class GJSONObj:
             parts.append(part)
 
         return parts
+
+    @staticmethod
+    def _is_sequence(obj: Any) -> bool:
+        """Check if an object is a sequence but not a string or bytes object.
+
+        Arguments:
+            obj: the object to test.
+
+        Returns:
+            :py:data:`True` if the object is a sequence but not a string or bytes, :py:data:`False` otherwise.
+
+        """
+        return isinstance(obj, Sequence) and not isinstance(obj, (str, bytes))
 
     def _find_closing_parentheses(self, *, start: int, opening: str, suffix: str = '', max_end: int = 0) -> int:
         """Find the matching parentheses that closes the opening one looking for unbalance of the given character.
@@ -409,13 +428,15 @@ class GJSONObj:
 
         return start + end
 
-    def _parse_modifier_query_part(self, start: int, delimiter: str, max_end: int = 0) -> ModifierQueryPart:
+    def _parse_modifier_query_part(self, start: int, delimiter: str, max_end: int = 0,
+                                   in_multipaths: bool = False) -> ModifierQueryPart:
         """Find the modifier end position in the query starting from a given point.
 
         Arguments:
             start: the index of the ``@`` symbol that starts a modifier in the query.
             delimiter: the delimiter before the modifier.
             max_end: an optional last position up to where the last character can be found.
+            in_multipaths: whether the part to be parsed is inside a multipaths.
 
         Raises:
             gjson.GJSONParseError: on invalid modifier.
@@ -426,6 +447,7 @@ class GJSONObj:
         """
         end = start
         escaped = False
+        delimiters = MULTIPATHS_DELIMITERS if in_multipaths else DELIMITERS
         options: dict[Any, Any] = {}
         query = self._query[start:max_end + 1] if max_end else self._query[start:]
         for i, char in enumerate(query):
@@ -443,7 +465,7 @@ class GJSONObj:
                 end = start + i + options_len
                 break
 
-            if char in DELIMITERS:
+            if char in delimiters:
                 end = start + i - 1
                 name = self._query[start + 1:start + i]
                 break
@@ -673,6 +695,8 @@ class GJSONObj:
                         max_end=max_end - 1 if max_end else end - 1,
                         delimiter=delimiter,
                         in_multipaths=True)
+                except GJSONInvalidSyntaxError:
+                    raise
                 except GJSONParseError:  # In multipaths, paths that fails are silently suppressed
                     values = []
 
@@ -726,6 +750,8 @@ class GJSONObj:
                     max_end=max_end - 1 if max_end else end - 1,
                     delimiter=delimiter,
                     in_multipaths=True)
+            except GJSONInvalidSyntaxError:
+                raise
             except GJSONParseError:  # In multipaths, paths that fails are silently suppressed
                 values = []
 
@@ -824,7 +850,7 @@ class GJSONObj:
                 elif part.delimiter == PIPE_DELIMITER and isinstance(part.previous, ArrayLenghtQueryPart):
                     raise GJSONParseError('The pipe delimiter cannot immediately follow the # element.',
                                           query=self._query, position=part.start)
-                elif isinstance(obj, Sequence):
+                elif self._is_sequence(obj):
                     ret = len(obj)
                 else:
                     raise GJSONParseError('Expected a sequence like object for query part # at the end of the query, '
@@ -833,7 +859,7 @@ class GJSONObj:
                 ret = obj
 
         elif isinstance(part, ArrayQueryQueryPart):
-            if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+            if not self._is_sequence(obj):
                 raise GJSONParseError(f'Queries are supported only for sequence like objects, got {type(obj)}.',
                                       query=self._query, position=part.start)
 
@@ -849,11 +875,12 @@ class GJSONObj:
                     raise GJSONParseError(f'Mapping object does not have key `{part}`.',
                                           query=self._query, position=part.start)
                 ret = obj.get(part.part, NoResult())
-            elif isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
+            elif self._is_sequence(obj):
                 if (self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER:
                     # Skip non mapping items and items without the given key
                     ret = [i[part.part] for i in obj if isinstance(i, Mapping) and part.part in i]
-                elif self._after_hash and part.delimiter == PIPE_DELIMITER:
+                elif (self._after_hash and part.delimiter == PIPE_DELIMITER
+                        and isinstance(part.previous, ArrayLenghtQueryPart)):
                     raise GJSONParseError('Integer query part after a pipe delimiter on an sequence like object.',
                                           query=self._query, position=part.start)
                 else:
@@ -904,11 +931,13 @@ class GJSONObj:
                                               query=self._query, position=part.start)
                     ret = obj.get(key, NoResult())
                 elif (self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER:
-                    if isinstance(obj, Sequence):
+                    if self._is_sequence(obj):
                         # Skip non mapping items and items without the given key
                         ret = [i[key] for i in obj if isinstance(i, Mapping) and key in i]
                     elif in_multipaths and isinstance(obj, Mapping):
                         ret = obj.get(key, NoResult())
+                    elif in_multipaths:
+                        ret = NoResult()
                     else:
                         failed = True
                 else:
@@ -920,7 +949,7 @@ class GJSONObj:
 
         elif isinstance(part, MultipathsObjectQueryPart):
             if ((self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER
-                    and isinstance(obj, Sequence)):
+                    and self._is_sequence(obj)):
                 ret = []
                 for i in obj:
                     obj_item = {}
@@ -945,7 +974,7 @@ class GJSONObj:
 
         elif isinstance(part, MultipathsArrayQueryPart):
             if ((self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER
-                    and isinstance(obj, Sequence)):
+                    and self._is_sequence(obj)):
                 ret = []
                 for i in obj:
                     array_item = []
@@ -977,7 +1006,7 @@ class GJSONObj:
                 new_obj = NoResult()
 
             ret = new_obj
-            if (self._after_hash or self._after_query_all) and isinstance(obj, Sequence):
+            if (self._after_hash or self._after_query_all) and self._is_sequence(obj):
                 if part.delimiter == DOT_DELIMITER:
                     if isinstance(new_obj, NoResult):
                         ret = []
@@ -1047,7 +1076,7 @@ class GJSONObj:
                 if query.field:
                     if isinstance(i, Mapping) and query.field in i:
                         nested_obj = i[query.field]
-                elif isinstance(i, Sequence) and not isinstance(i, (str, bytes)):
+                elif self._is_sequence(i):
                     nested_obj = i
 
                 if nested_obj is not None and self._parse_query(query.value, nested_obj):
@@ -1172,7 +1201,7 @@ class GJSONObj:
         del last  # for pylint, unused argument
         if isinstance(obj, Mapping):
             return {k: obj[k] for k in reversed(obj.keys())}
-        if isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
+        if self._is_sequence(obj):
             return obj[::-1]
 
         return obj
@@ -1288,7 +1317,7 @@ class GJSONObj:
         del last  # for pylint, unused argument
         if isinstance(obj, Mapping):
             return {k: obj[k] for k in sorted(obj.keys())}
-        if isinstance(obj, Sequence) and not isinstance(obj, (str, bytes)):
+        if self._is_sequence(obj):
             return sorted(obj)
 
         raise GJSONError(f'@sort modifier not supported for object of type {type(obj)}. '
@@ -1405,7 +1434,7 @@ class GJSONObj:
             raise GJSONError(f'Modifier @group got object of type {type(obj)} as input, expected dictionary.')
 
         # Skip all values that aren't lists:
-        obj = {k: v for k, v in obj.items() if isinstance(v, Sequence) and not isinstance(v, (str, bytes))}
+        obj = {k: v for k, v in obj.items() if self._is_sequence(v)}
         # Fill missing values with NoResult to remove them afterwards
         obj = [dict(zip_longest(obj.keys(), values)) for values in zip_longest(*obj.values(), fillvalue=NoResult())]
         # Skip keys with value NoResult in each dictionary
@@ -1436,7 +1465,7 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+        if not self._is_sequence(obj):
             return obj
 
         ret: dict[Any, Any] = {}
@@ -1463,7 +1492,7 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+        if not self._is_sequence(obj):
             raise GJSONError(f'@top_n modifier not supported for object of type {type(obj)}. '
                              'Expected a sequence like object.')
 
@@ -1490,7 +1519,7 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+        if not self._is_sequence(obj):
             raise GJSONError(f'@sum_n modifier not supported for object of type {type(obj)}. '
                              'Expected a sequence like object.')
 
@@ -1512,7 +1541,7 @@ class GJSONObj:
 
         """
         del last  # for pylint, unused argument
-        if not isinstance(obj, Sequence) or isinstance(obj, (str, bytes)):
+        if not self._is_sequence(obj):
             return obj
 
         return list(self._flatten_sequence(obj, deep=options.get('deep', False)))
@@ -1530,7 +1559,7 @@ class GJSONObj:
 
         """
         for elem in obj:
-            if isinstance(elem, Sequence) and not isinstance(elem, (str, bytes)):
+            if self._is_sequence(elem):
                 if deep:
                     yield from self._flatten_sequence(elem, deep=deep)
                 else:
