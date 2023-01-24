@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson &mdash; gjson-py 0.3.0 documentation</title>
+  <title>gjson &mdash; gjson-py 1.0.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -29,7 +29,7 @@
             <a href="../index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.3.0
+                1.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -43,6 +43,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
 </ul>
 
@@ -73,10 +75,10 @@
   <h1>Source code for gjson</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;GJSON module.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">importlib.metadata</span> <span class="kn">import</span> <span class="n">PackageNotFoundError</span><span class="p">,</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">DistributionNotFound</span><span class="p">,</span> <span class="n">get_distribution</span>
 
 <span class="kn">from</span> <span class="nn">gjson._gjson</span> <span class="kn">import</span> <span class="n">GJSONObj</span><span class="p">,</span> <span class="n">MODIFIER_NAME_RESERVED_CHARS</span>
 <span class="kn">from</span> <span class="nn">gjson._protocols</span> <span class="kn">import</span> <span class="n">ModifierProtocol</span>
@@ -89,7 +91,7 @@
 
 <span class="c1"># TODO: use a proper type hint for obj once https://github.com/python/typing/issues/182 will be fixed</span>
 <div class="viewcode-block" id="get"><a class="viewcode-back" href="../api.html#gjson.get">[docs]</a><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">as_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Quick accessor to GJSON functionalities exposed for simplicity of use.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quick accessor to GJSON functionalities exposed for simplicity of use.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        Import and directly use this quick helper for the simpler usage::</span>
@@ -119,10 +121,10 @@
 
 
 <div class="viewcode-block" id="GJSON"><a class="viewcode-back" href="../api.html#gjson.GJSON">[docs]</a><span class="k">class</span> <span class="nc">GJSON</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;The GJSON class to operate on JSON-like objects.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The GJSON class to operate on JSON-like objects.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the instance with the given object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the instance with the given object.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            Use the :py:class:`gjson.GJSON` class for more complex usage or to perform multiple queries on the same</span>
@@ -140,7 +142,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ModifierProtocol</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="GJSON.__str__"><a class="viewcode-back" href="../api.html#gjson.GJSON.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the current object as a JSON-encoded string.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the current object as a JSON-encoded string.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            Converting to string a :py:class:`gjson.GJSON` object returns it as a JSON-encoded string::</span>
@@ -155,7 +157,7 @@
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GJSON.get"><a class="viewcode-back" href="../api.html#gjson.GJSON.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Perform a query on the instantiated object and return the resulting object.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a query on the instantiated object and return the resulting object.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            Perform a query and get the resulting object::</span>
@@ -184,7 +186,7 @@
             <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="GJSON.getj"><a class="viewcode-back" href="../api.html#gjson.GJSON.getj">[docs]</a>    <span class="k">def</span> <span class="nf">getj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Perform a query on the instantiated object and return the resulting object as JSON-encoded string.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a query on the instantiated object and return the resulting object as JSON-encoded string.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            Perform a query and get the resulting object as a JSON-encoded string::</span>
@@ -213,7 +215,7 @@
             <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="GJSON.get_gjson"><a class="viewcode-back" href="../api.html#gjson.GJSON.get_gjson">[docs]</a>    <span class="k">def</span> <span class="nf">get_gjson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;GJSON&#39;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Perform a query on the instantiated object and return the resulting object as a GJSON instance.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a query on the instantiated object and return the resulting object as a GJSON instance.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            Perform a query and get the resulting object already encapsulated into a :py:class:`gjson.GJSON` object::</span>
@@ -240,7 +242,7 @@
         <span class="k">return</span> <span class="n">GJSON</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="GJSON.register_modifier"><a class="viewcode-back" href="../api.html#gjson.GJSON.register_modifier">[docs]</a>    <span class="k">def</span> <span class="nf">register_modifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">ModifierProtocol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Register a custom modifier.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a custom modifier.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            Register a custom modifier that sums all the numbers in a list:</span>
@@ -281,10 +283,12 @@
 
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">__version__</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">get_distribution</span><span class="p">(</span><span class="s1">&#39;gjson&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">version</span>
-    <span class="sd">&quot;&quot;&quot;str: the version of the current gjson module.&quot;&quot;&quot;</span>
-<span class="k">except</span> <span class="n">DistributionNotFound</span><span class="p">:</span>  <span class="c1"># pragma: no cover - this should never happen during tests</span>
-    <span class="k">pass</span>  <span class="c1"># package is not installed</span>
+    <span class="n">__version__</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">version</span><span class="p">(</span><span class="s1">&#39;gjson&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;str: the version of the current gjson module.&quot;&quot;&quot;</span>
+<span class="k">except</span> <span class="n">PackageNotFoundError</span><span class="p">:</span>  <span class="c1"># pragma: no cover - this should never happen during tests</span>
+    <span class="c1"># Read the override from the environment, if present (like inside Debian build system)</span>
+    <span class="k">if</span> <span class="s1">&#39;SETUPTOOLS_SCM_PRETEND_VERSION&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">__version__</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;SETUPTOOLS_SCM_PRETEND_VERSION&#39;</span><span class="p">]</span>
 </pre></div>
 
            </div>

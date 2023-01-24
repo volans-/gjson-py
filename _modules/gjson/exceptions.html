@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson.exceptions &mdash; gjson-py 0.3.0 documentation</title>
+  <title>gjson.exceptions &mdash; gjson-py 1.0.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -29,7 +29,7 @@
             <a href="../../index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.3.0
+                1.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -43,6 +43,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Notes</a></li>
 </ul>
 
@@ -77,14 +79,14 @@
 
 
 <div class="viewcode-block" id="GJSONError"><a class="viewcode-back" href="../../api.html#gjson.GJSONError">[docs]</a><span class="k">class</span> <span class="nc">GJSONError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Raised by the gjson module on error while performing queries or converting to JSON.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised by the gjson module on error while performing queries or converting to JSON.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="GJSONParseError"><a class="viewcode-back" href="../../api.html#gjson.GJSONParseError">[docs]</a><span class="k">class</span> <span class="nc">GJSONParseError</span><span class="p">(</span><span class="n">GJSONError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Raised when there is an error parsing the query string, with nicer representation of the error.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there is an error parsing the query string, with nicer representation of the error.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the exception with the additional data of the query part.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the exception with the additional data of the query part.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            *args: all positional arguments like any regular exception.</span>
@@ -97,7 +99,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span>
 
 <div class="viewcode-block" id="GJSONParseError.__str__"><a class="viewcode-back" href="../../api.html#gjson.GJSONParseError.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return a custom representation of the error.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a custom representation of the error.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            the whole query string with a clear indication on where the error occurred.</span>
@@ -106,6 +108,10 @@
         <span class="n">default</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span>  <span class="c1"># 7 is for the lenght of &#39;Query: &#39;</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">default</span><span class="si">}</span><span class="se">\n</span><span class="s1">Query: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">query</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">^&#39;</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">GJSONInvalidSyntaxError</span><span class="p">(</span><span class="n">GJSONParseError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when there is a query with an invalid syntax.&quot;&quot;&quot;</span>
 </pre></div>
 
            </div>

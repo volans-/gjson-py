@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction &mdash; gjson-py 0.3.0 documentation</title>
+  <title>Introduction &mdash; gjson-py 1.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="CLI" href="cli.html" />
-    <link rel="prev" title="gjson-py 0.3.0 documentation" href="index.html" /> 
+    <link rel="prev" title="gjson-py 1.0.0 documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,7 +32,7 @@
             <a href="index.html" class="icon icon-home"> gjson-py
           </a>
               <div class="version">
-                0.3.0
+                1.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -72,6 +72,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Notes</a></li>
 </ul>
 
@@ -162,12 +164,12 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
 <section id="how-to-use-the-cli">
 <h2>How to use the CLI<a class="headerlink" href="#how-to-use-the-cli" title="Permalink to this heading">¶</a></h2>
 <p>gjson-py provides also a command line interface (CLI) for ease of use:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;{&quot;name&quot;: {&quot;first&quot;: &quot;Tom&quot;, &quot;last&quot;: &quot;Anderson&quot;}, &quot;age&quot;: 37}&#39;</span> &gt; test.json
-<span class="gp">$ </span>cat test.json <span class="p">|</span> gjson <span class="s1">&#39;name.first&#39;</span>  <span class="c1"># Read from stdin</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;{&quot;name&quot;: {&quot;first&quot;: &quot;Tom&quot;, &quot;last&quot;: &quot;Anderson&quot;}, &quot;age&quot;: 37}&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>test.json
+<span class="gp">$ </span>cat<span class="w"> </span>test.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>gjson<span class="w"> </span><span class="s1">&#39;name.first&#39;</span><span class="w">  </span><span class="c1"># Read from stdin</span>
 <span class="go">&quot;Tom&quot;</span>
-<span class="gp">$ </span>gjson test.json <span class="s1">&#39;age&#39;</span>  <span class="c1"># Read from a file</span>
+<span class="gp">$ </span>gjson<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;age&#39;</span><span class="w">  </span><span class="c1"># Read from a file</span>
 <span class="go">37</span>
-<span class="gp">$ </span>cat test.json <span class="p">|</span> gjson - <span class="s1">&#39;name.first&#39;</span>  <span class="c1"># Explicitely read from stdin</span>
+<span class="gp">$ </span>cat<span class="w"> </span>test.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>gjson<span class="w"> </span>-<span class="w"> </span><span class="s1">&#39;name.first&#39;</span><span class="w">  </span><span class="c1"># Explicitely read from stdin</span>
 <span class="go">&quot;Tom&quot;</span>
 </pre></div>
 </div>
@@ -175,7 +177,7 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
 <h3>JSON Lines<a class="headerlink" href="#json-lines" title="Permalink to this heading">¶</a></h3>
 <p>JSON Lines support in the CLI allows for different use cases. All the examples in this section operates on a
 <code class="docutils literal notranslate"><span class="pre">test.json</span></code> file generated with:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> -e <span class="s1">&#39;{&quot;name&quot;: &quot;Gilbert&quot;, &quot;age&quot;: 61}\n{&quot;name&quot;: &quot;Alexa&quot;, &quot;age&quot;: 34}\n{&quot;name&quot;: &quot;May&quot;, &quot;age&quot;: 57}&#39;</span> &gt; test.json
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span><span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;{&quot;name&quot;: &quot;Gilbert&quot;, &quot;age&quot;: 61}\n{&quot;name&quot;: &quot;Alexa&quot;, &quot;age&quot;: 34}\n{&quot;name&quot;: &quot;May&quot;, &quot;age&quot;: 57}&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>test.json
 </pre></div>
 </div>
 <section id="apply-the-same-query-to-each-line">
@@ -183,11 +185,11 @@ or return <cite>None</cite>. See the full API documentation for more details.</p
 <p>Using the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> CLI argument, for each input line gjson-py applies the query and filters the data according
 to it. Lines are read one by one so there is no memory overhead for the processing. It can be used while tailing log
 files in JSON format for example.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;age&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson<span class="w"> </span>--lines<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;age&#39;</span>
 <span class="go">61</span>
 <span class="go">34</span>
 <span class="go">57</span>
-<span class="gp">$ </span>tail -f log.json <span class="p">|</span> gjson --lines <span class="s1">&#39;bytes_sent&#39;</span>  <span class="c1"># Dummy example</span>
+<span class="gp">$ </span>tail<span class="w"> </span>-f<span class="w"> </span>log.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>gjson<span class="w"> </span>--lines<span class="w"> </span><span class="s1">&#39;bytes_sent&#39;</span><span class="w">  </span><span class="c1"># Dummy example</span>
 </pre></div>
 </div>
 </section>
@@ -196,7 +198,7 @@ files in JSON format for example.</p>
 <p>Using the special query prefix syntax <code class="docutils literal notranslate"><span class="pre">..</span></code>, as described in GJSON’s documentation for <a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a>, gjson-py will
 read all lines from the input and encapsulate them into an array. This approach has of course the memory overhead of
 loading the whole input to perform the query.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson test.json <span class="s1">&#39;..#.name&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;..#.name&#39;</span>
 <span class="go">[&quot;Gilbert&quot;, &quot;Alexa&quot;, &quot;May&quot;]</span>
 </pre></div>
 </div>
@@ -208,7 +210,7 @@ input lines based on their values. In this case gjson-py encapsulates each line 
 the <a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#queries">Queries</a> GJSON syntax to filter them. As the ecapsulation is performed on each line, there is no memory overhead.
 Because technically when a line is filtered is because there was no match on the whole line query, the final exit code,
 if any line is filtered, will be <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;..#(age&gt;40).name&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson<span class="w"> </span>--lines<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;..#(age&gt;40).name&#39;</span>
 <span class="go">&quot;Gilbert&quot;</span>
 <span class="go">&quot;May&quot;</span>
 </pre></div>
@@ -219,9 +221,9 @@ if any line is filtered, will be <code class="docutils literal notranslate"><spa
 <p>Combining the methods above is possible for example to filter/extract data from the lines first and then apply a query
 to the aggregated result. The memory overhead in this case is based on the amount of data resulting from the first
 filtering/extraction.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;age&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;..@sort&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gjson<span class="w"> </span>--lines<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;age&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gjson<span class="w"> </span><span class="s1">&#39;..@sort&#39;</span>
 <span class="go">[34, 57, 61]</span>
-<span class="gp">$ </span>gjson --lines test.json <span class="s1">&#39;..#(age&gt;40).age&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;..@sort&#39;</span>
+<span class="gp">$ </span>gjson<span class="w"> </span>--lines<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;..#(age&gt;40).age&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gjson<span class="w"> </span><span class="s1">&#39;..@sort&#39;</span>
 <span class="go">[57, 61]</span>
 </pre></div>
 </div>
@@ -238,7 +240,7 @@ filtering/extraction.</p>
 <colgroup>
 <col style="width: 24%" />
 <col style="width: 24%" />
-<col style="width: 52%" />
+<col style="width: 53%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>GJSON feature</p></th>
@@ -269,15 +271,15 @@ filtering/extraction.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#queries">Queries</a></p></td>
 <td><p>YES</p></td>
-<td><p>Using Python’s operators <a class="footnote-reference brackets" href="#id7" id="id1">1</a> <a class="footnote-reference brackets" href="#id8" id="id2">2</a></p></td>
+<td><p>Using Python’s operators <a class="footnote-reference brackets" href="#id8" id="id1">1</a> <a class="footnote-reference brackets" href="#id9" id="id2">2</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#dot-vs-pipe">Dot vs Pipe</a></p></td>
 <td><p>YES</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers">Modifiers</a></p></td>
-<td><p>PARTIALLY</p></td>
-<td><p>See the table below</p></td>
+<td><p>YES</p></td>
+<td><p>See the table below for all the details</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#modifiers">Modifier arguments</a></p></td>
 <td><p>YES</p></td>
@@ -285,42 +287,45 @@ filtering/extraction.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#custom-modifiers">Custom modifiers</a></p></td>
 <td><p>YES</p></td>
-<td><p>Only a JSON object is accepted as argument <a class="footnote-reference brackets" href="#id9" id="id3">3</a></p></td>
+<td><p>Only a JSON object is accepted as argument <a class="footnote-reference brackets" href="#id10" id="id3">3</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipaths">Multipaths</a></p></td>
 <td><p>YES</p></td>
-<td></td>
+<td><p>Object keys, if specified, must be JSON strings <a class="footnote-reference brackets" href="#id11" id="id4">4</a></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#literals">Literals</a></p></td>
 <td><p>YES</p></td>
-<td><p>Including infinite and NaN values <a class="footnote-reference brackets" href="#id10" id="id4">4</a></p></td>
+<td><p>Including infinite and NaN values <a class="footnote-reference brackets" href="#id12" id="id5">5</a></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a></p></td>
 <td><p>YES</p></td>
-<td><p>CLI support <a class="footnote-reference brackets" href="#id11" id="id5">5</a> <a class="footnote-reference brackets" href="#id12" id="id6">6</a></p></td>
+<td><p>CLI support <a class="footnote-reference brackets" href="#id13" id="id6">6</a> <a class="footnote-reference brackets" href="#id14" id="id7">7</a></p></td>
 </tr>
 </tbody>
 </table>
 <dl class="footnote brackets">
-<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>The queries matching is based on Python’s operator and as such the results might be different than the ones from
 the Go GJSON package. In particular for the <code class="docutils literal notranslate"><span class="pre">~</span></code> operator that checks the truthy-ness of objects.</p>
 </dd>
-<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p>When using nested queries, only the outermost one controls whether to return only the first item or all items.</p>
 </dd>
-<dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
 <dd><p>Custom modifiers names cannot contain reserved characters used by the GJSON grammar.</p>
 </dd>
-<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
+<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
+<dd><p>For example <code class="docutils literal notranslate"><span class="pre">{&quot;years&quot;:age}</span></code> is valid while <code class="docutils literal notranslate"><span class="pre">{years:age}</span></code> is not, although that’s valid in GJSON.</p>
+</dd>
+<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id5">5</a></span></dt>
 <dd><p>Those special cases are handled according to <a class="reference external" href="https://docs.python.org/3/library/json.html#infinite-and-nan-number-values">Python’s JSON documentation</a>.</p>
 </dd>
-<dt class="label" id="id11"><span class="brackets"><a class="fn-backref" href="#id5">5</a></span></dt>
+<dt class="label" id="id13"><span class="brackets"><a class="fn-backref" href="#id6">6</a></span></dt>
 <dd><p>Both for applying the same query to each line using the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> argument and to automatically encapsulate
 the input lines in a list and apply the query to the list using the <code class="docutils literal notranslate"><span class="pre">..</span></code> special query prefix described in
 <a class="reference external" href="https://github.com/tidwall/gjson#json-lines">JSON Lines</a>.</p>
 </dd>
-<dt class="label" id="id12"><span class="brackets"><a class="fn-backref" href="#id6">6</a></span></dt>
+<dt class="label" id="id14"><span class="brackets"><a class="fn-backref" href="#id7">7</a></span></dt>
 <dd><p>Library support is not currently present because gjson-py accepts only Python objects, making it impossible to
 pass JSON Lines directly. The client is free to choose if calling gjson-py for each line or to encapsulate them in
 a list before calling gjson-py.</p>
@@ -363,8 +368,8 @@ a list before calling gjson-py.</p>
 <td></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;join</span></code></p></td>
-<td><p>NO</p></td>
-<td></td>
+<td><p>PARTIALLY</p></td>
+<td><p>Preserving duplicate keys not supported</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;keys</span></code></p></td>
 <td><p>YES</p></td>
@@ -375,15 +380,15 @@ a list before calling gjson-py.</p>
 <td><p>Valid only on JSON objects (mappings)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;tostr</span></code></p></td>
-<td><p>NO</p></td>
+<td><p>YES</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;fromstr</span></code></p></td>
-<td><p>NO</p></td>
+<td><p>YES</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&#64;group</span></code></p></td>
-<td><p>NO</p></td>
+<td><p>YES</p></td>
 <td></td>
 </tr>
 </tbody>
@@ -405,9 +410,9 @@ present. It returns a mapping object where the keys are the distinct values of t
 of times the key was present in the list, ordered from the most common to the least common item. The items in the
 original sequence object must be Python hashable. This modifier accepts an optional argument <code class="docutils literal notranslate"><span class="pre">n</span></code> to return just the
 N items with the higher counts. When the <code class="docutils literal notranslate"><span class="pre">n</span></code> argument is not provided all items are returned. Example usage:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;]&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;@top_n&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;]&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gjson<span class="w"> </span><span class="s1">&#39;@top_n&#39;</span>
 <span class="go">{&quot;c&quot;: 3, &quot;b&quot;: 2, &quot;a&quot;: 1}</span>
-<span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;]&#39;</span> <span class="p">|</span> gjson <span class="s1">&#39;@top_n:{&quot;n&quot;:2}&#39;</span>
+<span class="gp">$ </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;b&quot;, &quot;c&quot;, &quot;c&quot;]&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gjson<span class="w"> </span><span class="s1">&#39;@top_n:{&quot;n&quot;:2}&#39;</span>
 <span class="go">{&quot;c&quot;: 3, &quot;b&quot;: 2}</span>
 </pre></div>
 </div>
@@ -419,10 +424,10 @@ the lowest. The values of the grouping key must be Python hashable. The values o
 floats. This modifier required two mandatory arguments, <code class="docutils literal notranslate"><span class="pre">group</span></code> and <code class="docutils literal notranslate"><span class="pre">sum</span></code> that have as values the respective keys
 in the objects of the sequence. An optional <code class="docutils literal notranslate"><span class="pre">n</span></code> argument is also accepted to return just the top N items with the
 highest sum. Example usage:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span> <span class="s1">&#39;[{&quot;key&quot;: &quot;a&quot;, &quot;time&quot;: 1}, {&quot;key&quot;: &quot;b&quot;, &quot;time&quot;: 2}, {&quot;key&quot;: &quot;c&quot;, &quot;time&quot;: 3}, {&quot;key&quot;: &quot;a&quot;, &quot;time&quot;: 4}]&#39;</span> &gt; test.json
-<span class="gp">$ </span>gjson test.json <span class="s1">&#39;@sum_n:{&quot;group&quot;: &quot;key&quot;, &quot;sum&quot;: &quot;time&quot;}&#39;</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;[{&quot;key&quot;: &quot;a&quot;, &quot;time&quot;: 1}, {&quot;key&quot;: &quot;b&quot;, &quot;time&quot;: 2}, {&quot;key&quot;: &quot;c&quot;, &quot;time&quot;: 3}, {&quot;key&quot;: &quot;a&quot;, &quot;time&quot;: 4}]&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>test.json
+<span class="gp">$ </span>gjson<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;@sum_n:{&quot;group&quot;: &quot;key&quot;, &quot;sum&quot;: &quot;time&quot;}&#39;</span>
 <span class="go">{&quot;a&quot;: 5, &quot;c&quot;: 3, &quot;b&quot;: 2}</span>
-<span class="gp">$ </span>gjson test.json <span class="s1">&#39;@sum_n:{&quot;group&quot;: &quot;key&quot;, &quot;sum&quot;: &quot;time&quot;, &quot;n&quot;: 2}&#39;</span>
+<span class="gp">$ </span>gjson<span class="w"> </span>test.json<span class="w"> </span><span class="s1">&#39;@sum_n:{&quot;group&quot;: &quot;key&quot;, &quot;sum&quot;: &quot;time&quot;, &quot;n&quot;: 2}&#39;</span>
 <span class="go">{&quot;a&quot;: 5, &quot;c&quot;: 3}</span>
 </pre></div>
 </div>
@@ -437,7 +442,7 @@ highest sum. Example usage:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 0.3.0 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="gjson-py 1.0.0 documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cli.html" class="btn btn-neutral float-right" title="CLI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

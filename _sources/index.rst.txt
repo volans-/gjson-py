@@ -7,4 +7,9 @@ gjson-py |release| documentation
    introduction
    cli
    api
+
+
+.. toctree::
+   :maxdepth: 1
+
    release
