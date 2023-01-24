@@ -17,7 +17,7 @@ extras_require = {
         'pytest-cov',
         'pytest-xdist',
         'pytest',
-        'sphinx_rtd_theme',
+        'sphinx_rtd_theme>=1.0',
         'sphinx-argparse',
         'sphinx-autodoc-typehints',
         'Sphinx',
