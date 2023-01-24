@@ -1,3 +1,16 @@
+python-gjson (1.0.0-1) unstable; urgency=medium
+
+  * v1.0.0 upstream release.
+  * debian/rules: remove X-Python3-Version, superseded.
+  * debian/rules: add Rules-Requires-Root: no.
+  * debian/rules: bump Standards-Version.
+  * debian/copyright: update copyright year.
+  * debian/rules: refactor to use SETUPTOOLS_SCM_PRETEND_VERSION and not
+    install the package or require a $HOME. Remove override_dh_auto_test.
+  * debian/watch: increment the amount of releases returned by GitHub APIs.
+
+ -- Riccardo Coccioli <volans-@users.noreply.github.com>  Tue, 24 Jan 2023 10:41:42 -0000
+
 python-gjson (0.4.0-1) unstable; urgency=medium
 
   * v0.4.0 upstream release.

@@ -1,17 +1,18 @@
 #!/usr/bin/make -f
 
-export PYBUILD_NAME = gjson-py
+export PYBUILD_NAME = gjson
 export PYBUILD_TEST_PYTEST = 1
-export HOME = /tmp
+export PYBUILD_TEST_ARGS = {dir}/tests/unit
+
+include /usr/share/dpkg/pkg-info.mk
+
+# tell the test suite and build_sphinx about our version number
+export SETUPTOOLS_SCM_PRETEND_VERSION=$(DEB_VERSION_UPSTREAM)
 
 %:
 	dh $@ --with python3 --buildsystem=pybuild
 
-override_dh_auto_test:
-	SETUPTOOLS_SCM_PRETEND_VERSION="$(shell dpkg-parsechangelog -S version | cut -d '+' -f 1)" python3 setup.py develop --user
-	py.test-3 --strict --cov-report=term-missing --cov=gjson tests/unit
-
 override_dh_installman:
-	SETUPTOOLS_SCM_PRETEND_VERSION="$(shell dpkg-parsechangelog -S version | cut -d '+' -f 1)" python3 setup.py build_sphinx -b man
+	python3 setup.py build_sphinx -b man
 	sed -i='' -e 's/^\.B/.B /' doc/build/man/gjson.1
 	dh_installman

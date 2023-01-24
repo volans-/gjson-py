@@ -2,7 +2,7 @@ Source: python-gjson
 Section: python
 Priority: optional
 Maintainer: Riccardo Coccioli <volans-@users.noreply.github.com>
-Standards-Version: 4.6.1.0
+Standards-Version: 4.6.2
 Build-Depends:
   debhelper-compat (=13),
   dh-python (>= 4.20201102),
@@ -18,7 +18,7 @@ Build-Depends:
   python3-sphinx-autodoc-typehints,
   python3-sphinx-rtd-theme,
 Homepage: https://volans-.github.io/gjson-py/
-X-Python3-Version: >= 3.9
+Rules-Requires-Root: no
 
 Package: python3-gjson
 Architecture: all
