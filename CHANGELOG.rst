@@ -1,6 +1,49 @@
 Release Notes
 =============
 
+`v1.0.0`_ (2023-01-24)
+^^^^^^^^^^^^^^^^^^^^^^
+
+With this release ``gjson-py`` has reached pretty much feature parity with `GJSON`_, with only some inherent minor
+caveats, differences and limitations due to the different programming languages and technologies used. With this
+release ``gjson-py`` can also be considered stable and production ready.
+
+Minor improvements
+""""""""""""""""""
+
+* Modifiers: add support for missing upstream GJSON modifiers: ``@tostr``, ``@fromstr``, ``@group`` and ``@join``.
+* gjson: make ``__version__`` more reliable:
+
+  * Migrate the reading of the version from ``pkg_resources`` to ``importlib`` as it's more efficient and avoids
+    an additional dependency.
+  * If the version is not detectable, as a fallback, attempt to read the ``SETUPTOOLS_SCM_PRETEND_VERSION`` environment
+    variable as documented in ``setuptools_scm``.
+
+Bug fixes
+"""""""""
+
+* I/O: allow control characters in all JSON inputs, loading the data with ``strict=False`` both for the JSON input
+  and when parsing eventual JSON bits present in the query.
+* gjson: fix some corner cases:
+
+  * In some corner cases gjson was not parsing correctly the query string.
+  * Introduce a new ``GJSONInvalidSyntaxError`` exception to distinguish some special parsing errors.
+  * Extract the check for sequence objects into a private static method.
+
+Miscellanea
+"""""""""""
+
+* setup.py: add ``python_requires`` to prevent the package to be installed in an unsupported version of Python.
+* setup.py: update classifiers.
+* setup.py: mark the package as typed according to PEP 561.
+* setup.py: mark Python 3.11 as officially supported.
+* tox.ini: add Python 3.11 in the test matrix of tox.
+* documentation: reduce the ``maxdepth`` property for the release notes page to not show all releases to avoid showing
+  all the releases in the documentation home page.
+* documentation: clarify limits on multipaths keys, specifying that in gjson-py if a key of a multipath object is
+  given, it must be specified as a JSON string (e.g. ``"key":query``) and that bare words (e.g. ``key:query``) are not
+  accepted although they are in GJSON.
+
 `v0.4.0`_ (2022-11-12)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -274,6 +317,7 @@ Miscellanea
 
 * Initial version.
 
+.. _`GJSON`: https://github.com/tidwall/gjson/
 .. _`GJSON Literals`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#literals
 .. _`GJSON Multipaths`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipath
 
@@ -289,3 +333,4 @@ Miscellanea
 .. _`v0.2.1`: https://github.com/volans-/gjson-py/releases/tag/v0.2.1
 .. _`v0.3.0`: https://github.com/volans-/gjson-py/releases/tag/v0.3.0
 .. _`v0.4.0`: https://github.com/volans-/gjson-py/releases/tag/v0.4.0
+.. _`v1.0.0`: https://github.com/volans-/gjson-py/releases/tag/v1.0.0

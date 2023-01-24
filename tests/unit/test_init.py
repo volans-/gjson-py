@@ -163,7 +163,17 @@ class TestObject:
 
     def setup_method(self):
         """Initialize the test instance."""
+        def upper(options, obj, *, last):
+            """Custom modifier to return a string upper case."""
+            del options
+            del last
+            if isinstance(obj, list):
+                return [i.upper() for i in obj]
+
+            return obj.upper()
+
         self.object = gjson.GJSON(INPUT_OBJECT)
+        self.object.register_modifier('upper', upper)
 
     @pytest.mark.parametrize('query, expected', (
         # Basic
@@ -191,6 +201,7 @@ class TestObject:
         ('friends.#(last=="Murphy")#.first', ['Dale', 'Jane']),
         ('friends.#(=="Murphy")#', []),
         ('friends.#(=="Mu)(phy")#', []),
+        ('friends.#(=="Mur\tphy")#', []),
         ('friends.#(age\\===44)#', []),
         ('friends.#(age>47)#.last', ['Craig']),
         ('friends.#(age>=47)#.last', ['Craig', 'Murphy']),
@@ -219,6 +230,12 @@ class TestObject:
         ('age.@flatten', 37),
         ('@pretty:{"indent": 4}', INPUT_OBJECT),
         (r'fav\.movie.@pretty:{"indent": 4}', 'Deer Hunter'),
+        ('name.@tostr', '{"first": "Tom", "last": "Anderson"}'),
+        ('name.@join', {'first': 'Tom', 'last': 'Anderson'}),
+        ('age.@join', 37),
+        ('children.@join', {}),
+        ('children.0.@join', 'Sara'),
+        ('friends.@join', {'first': 'Jane', 'last': 'Murphy', 'age': 47, 'nets': ['ig', 'tw']}),
         # Dot vs Pipe
         ('friends.0.first', 'Dale'),
         ('friends|0.first', 'Dale'),
@@ -242,6 +259,7 @@ class TestObject:
         ('{age}', {'age': 37}),
         (r'{a\ge}', {r'a\ge': 37}),
         (r'{"a\\ge":age}', {r'a\ge': 37}),
+        ('{"a\tb":age}', {'a\tb': 37}),
         ('{"key":age}', {'key': 37}),
         ('{age,age}', {'age': 37}),
         ('{age,"years":age}', {'age': 37, 'years': 37}),
@@ -264,6 +282,12 @@ class TestObject:
         ('friends.{0.first,1.last,2.age}.@values', ['Dale', 'Craig', 47]),
         ('{friends.{"a":0.{nets.{0}}}}', {'_': {'a': {'_': {'0': 'ig'}}}}),
         ('{friends.{"a":0.{nets.{0,1}}}}', {'_': {'a': {'_': {'0': 'ig', '1': 'fb'}}}}),
+        ('friends.#.{age,first|@upper}',
+         [{"age": 44, "@upper": "DALE"}, {"age": 68, "@upper": "ROGER"}, {"age": 47, "@upper": "JANE"}]),
+        ('{friends.#.{age,"first":first|@upper}|0.first}', {"first": "DALE"}),
+        ('{"children":children|@upper,"name":name.first,"age":age}',
+         {"children": ["SARA", "ALEX", "JACK"], "name": "Tom", "age": 37}),
+        ('friends.#.{age,"first":first.invalid}', [{'age': 44}, {'age': 68}, {'age': 47}]),
         # Multipaths arrays
         ('[]', []),
         ('[.]', []),
@@ -290,6 +314,7 @@ class TestObject:
         # Multipaths mixed
         ('[{}]', [{}]),
         ('{[]}', {'_': []}),
+        ('[{},[],{}]', [{}, [], {}]),
         ('{"a":[]}', {'a': []}),
         ('[{age},{name.first}]', [{'age': 37}, {'first': 'Tom'}]),
         ('{friends.0.[age,nets.#(="ig")]}', {'_': [44, 'ig']}),
@@ -304,6 +329,7 @@ class TestObject:
         ('!-Infinity', float('-inf')),
         ('!"key"', 'key'),
         ('!"line \\"quotes\\""', 'line "quotes"'),
+        ('!"a\tb"', 'a\tb'),
         ('!0', 0),
         ('!12', 12),
         ('!-12', -12),
@@ -380,9 +406,15 @@ class TestObject:
         ('friends.@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
         # JSON Lines
         ('..name', 'Invalid query starting with a path delimiter.'),
-        # Multipaths objects
+        # Multipaths
         (r'{"a\ge":age}', r'Failed to parse multipaths key "a\ge"'),
         ('{"age",age}', 'Expected colon after multipaths item with key "age".'),
+        ('{]', 'Unbalanced parentheses `{`, 1 still opened.'),
+        ('{', 'Unbalanced parentheses `{`, 1 still opened.'),
+        ('{}@pretty', 'Expected delimiter or end of query after closing parenthesis.'),
+        ('[{age}}]', 'Missing separator after multipath.'),
+        ('{[age]]}', 'Missing separator after multipath.'),
+        ('[{age,name.first]},age]', 'Expected delimiter or end of query after closing parenthesis.'),
         # Literals
         ('!', 'Unable to load literal JSON'),
         ('name.!', 'Unable to load literal JSON'),
@@ -411,6 +443,8 @@ class TestObject:
         # Modifiers
         ('children.@keys', 'The current object does not have a keys() method.'),
         ('children.@values', 'The current object does not have a values() method.'),
+        ('age.@group', "Modifier @group got object of type <class 'int'> as input, expected dictionary."),
+        ('children.@group', "Modifier @group got object of type <class 'list'> as input, expected dictionary."),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
@@ -470,6 +504,8 @@ class TestBasic:
         ('happy', True),
         ('immortal', False),
         ('noop', {'what is a wren?': 'a bird'}),
+        # Modifiers
+        ('arr.@join', {'hello': 'world'}),
     ))
     def test_get_ok(self, query, expected):
         """It should query the basic test JSON and return the expected result."""
@@ -495,6 +531,8 @@ class TestList:
         ('#(first)', {'first': 'Dale'}),
         ('#(last)#', [{'last': 'Murphy'}]),
         ('#(last)', {'last': 'Murphy'}),
+        # Modifiers
+        ('@join', {'first': 'Jane', 'last': 'Murphy'}),
         # Multipaths
         ('#.{first.@reverse}', [{'@reverse': 'Dale'}, {'@reverse': 'Jane'}, {}]),
     ))
@@ -514,7 +552,7 @@ class TestList:
             self.list.get(query)
 
 
-class TestFlatten:
+class TestFlattenModifier:
     """Test gjson @flatten modifier."""
 
     def setup_method(self):
@@ -657,6 +695,58 @@ def test_get_modifier_sort(data, expected):
     compare_values(obj.get('@sort', quiet=True), expected)
 
 
+@pytest.mark.parametrize('data, query, expected', (
+    ({'a': '{"b": 25}'}, 'a.@fromstr', {'b': 25}),
+    ({'a': '{"b": 25}'}, 'a.@fromstr.b', 25),
+))
+def test_get_modifier_fromstr_ok(data, query, expected):
+    """It should load the JSON-encoded string."""
+    obj = gjson.GJSON(data)
+    assert obj.get(query, quiet=True) == expected
+
+
+@pytest.mark.parametrize('query, error', (
+    ('a.@fromstr', 'The current @fromstr input object cannot be converted to JSON.'),
+    ('b.@fromstr', "Modifier @fromstr got object of type <class 'dict'> as input, expected string or bytes."),
+))
+def test_get_modifier_fromstr_raise(query, error):
+    """It should raise a GJSONError if the JSON-encoded string has invalid JSON."""
+    obj = gjson.GJSON({'a': '{"invalid: json"', 'b': {'not': 'a string'}})
+    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        obj.get(query)
+
+
+def test_get_modifier_tostr_raise():
+    """It should raise a GJSONError if the object cannot be JSON-encoded."""
+    obj = gjson.GJSON({'a': {1, 2, 3}})  # Python sets cannot be JSON-encoded
+    match = re.escape('The current object cannot be converted to a JSON-encoded string for @tostr.')
+    with pytest.raises(gjson.GJSONError, match=match):
+        obj.get('a.@tostr')
+
+
+def test_get_modifier_group_ok():
+    """It should group the dict of lists into a list of dicts."""
+    obj = gjson.GJSON({
+        'invalid1': 5,
+        'id': ['123', '456', '789'],
+        'val': [2, 1],
+        'invalid2': 'invalid',
+        'unit': ['ms', 's', 's', 'ms'],
+    })
+    assert obj.get('@group') == [
+        {'id': '123', 'val': 2, 'unit': 'ms'},
+        {'id': '456', 'val': 1, 'unit': 's'},
+        {'id': '789', 'unit': 's'},
+        {'unit': 'ms'},
+    ]
+
+
+def test_get_modifier_group_empty():
+    """It should return an empty list if no values are lists or are empty."""
+    obj = gjson.GJSON({'invalid1': 5, 'invalid2': 'invalid', 'invalid3': {'a': 5}, 'id': []})
+    assert obj.get('@group') == []
+
+
 def test_get_integer_index_on_mapping():
     """It should access the integer as string key correctly."""
     obj = gjson.GJSON(json.loads('{"1": 5, "11": 7}'))
@@ -780,6 +870,8 @@ class TestJSONOutput:
          '{\n    "key": "value",\n    "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
         ('@pretty:{"indent": "\t"}',
          '{\n\t"key": "value",\n\t"hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
+        # Multipaths
+        ('{key,"another":key}.@pretty', '{\n  "key": "value",\n  "another": "value"\n}'),
     ))
     def test_modifier_pretty(self, query, expected):
         """It should prettyfy the JSON string based on the parameters."""
@@ -883,6 +975,6 @@ class TestCustomModifiers:
 
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
-        expected = {'ascii', 'flatten', 'keys', 'pretty', 'reverse', 'sort', 'sum_n', 'this', 'top_n', 'valid',
-                    'values', 'ugly'}
+        expected = {'ascii', 'flatten', 'fromstr', 'group', 'join', 'keys', 'pretty', 'reverse', 'sort', 'sum_n',
+                    'this', 'top_n', 'tostr', 'valid', 'values', 'ugly'}
         assert gjson.GJSONObj.builtin_modifiers() == expected

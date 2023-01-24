@@ -53,17 +53,17 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
         try:
             if encapsulate:
                 if line:
-                    input_data = [json.loads(line)]
+                    input_data = [json.loads(line, strict=False)]
                 elif file_obj is not None:
                     input_data = []
                     for input_line in file_obj:
                         if input_line.strip():
-                            input_data.append(json.loads(input_line))
+                            input_data.append(json.loads(input_line, strict=False))
             else:
                 if line:
-                    input_data = json.loads(line)
+                    input_data = json.loads(line, strict=False)
                 elif file_obj is not None:
-                    input_data = json.load(file_obj)
+                    input_data = json.load(file_obj, strict=False)
 
             result = get(input_data, args.query, as_str=True)
             exit_code = 0

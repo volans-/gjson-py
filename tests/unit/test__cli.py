@@ -32,6 +32,35 @@ def test_cli_file(tmp_path, capsys):
     assert not captured.err
 
 
+@pytest.mark.parametrize('query', (
+    'a\tkey',
+    '..0.a\tkey',
+))
+def test_cli_file_with_control_chars(query, tmp_path, capsys):
+    """It should read the data from the provided file and query it."""
+    data_file = tmp_path / 'input.json'
+    data_file.write_text('{"a\tkey": "a\tvalue"}')
+    ret = cli(['-vvv', str(data_file), query])
+    assert ret == 0
+    captured = capsys.readouterr()
+    assert captured.out == '"a\\tvalue"\n'
+    assert not captured.err
+
+
+@pytest.mark.parametrize('query', (
+    'a\tkey',
+    '..0.a\tkey',
+))
+def test_cli_stdin_with_control_chars(query, monkeypatch, capsys):
+    """It should read the data from stdin and query it."""
+    monkeypatch.setattr('sys.stdin', io.StringIO('{"a\tkey": "a\tvalue"}'))
+    ret = cli(['-vvv', '-', query])
+    assert ret == 0
+    captured = capsys.readouterr()
+    assert captured.out == '"a\\tvalue"\n'
+    assert not captured.err
+
+
 def test_cli_nonexistent_file(tmp_path, capsys):
     """It should exit with a failure exit code and no output."""
     ret = cli([str(tmp_path / 'nonexistent.json'), 'name.first'])
