@@ -18,9 +18,9 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
         The CLI exit code to use.
 
     Raises:
-        OSError: for system-related error, including I/O failures.
+        OSError: for system-related errors, including I/O failures.
         json.JSONDecodeError: when the input data is not a valid JSON.
-        gjson.GJSONError: for any query-related error in gjson.
+        gjson.GJSONError: for any query-related error raised by gjson.
 
     """
     parser = get_parser()

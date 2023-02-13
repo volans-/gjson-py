@@ -11,6 +11,18 @@ from gjson.exceptions import GJSONParseError
 from .test_init import INPUT_JSON, INPUT_LINES, INPUT_LINES_WITH_ERRORS
 
 
+def test_cli_help(capsys):
+    """It should read the data from stdin and query it."""
+    with pytest.raises(SystemExit) as exc_info:
+        cli(['--help'])
+
+    assert exc_info.value.args[0] == 0
+    captured = capsys.readouterr()
+    assert 'usage: gjson' in captured.out
+    assert 'See also the full documentation available at' in captured.out
+    assert not captured.err
+
+
 def test_cli_stdin(monkeypatch, capsys):
     """It should read the data from stdin and query it."""
     monkeypatch.setattr('sys.stdin', io.StringIO(INPUT_JSON))
@@ -51,10 +63,15 @@ def test_cli_file_with_control_chars(query, tmp_path, capsys):
     'a\tkey',
     '..0.a\tkey',
 ))
-def test_cli_stdin_with_control_chars(query, monkeypatch, capsys):
+@pytest.mark.parametrize('lines', (True, False))
+def test_cli_stdin_with_control_chars(query, lines, monkeypatch, capsys):
     """It should read the data from stdin and query it."""
     monkeypatch.setattr('sys.stdin', io.StringIO('{"a\tkey": "a\tvalue"}'))
-    ret = cli(['-vvv', '-', query])
+    params = ['-vvv', '-', query]
+    if lines:
+        params.insert(0, '--lines')
+
+    ret = cli(params)
     assert ret == 0
     captured = capsys.readouterr()
     assert captured.out == '"a\\tvalue"\n'

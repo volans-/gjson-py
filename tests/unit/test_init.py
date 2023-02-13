@@ -760,11 +760,18 @@ def test_module_get():
     assert gjson.get({'key': 'value'}, 'key') == 'value'
 
 
-def test_gjson_get_gjson():
+def test_gjson_get_gjson_ok():
     """It should return the queried object as a GJSON object."""
     ret = gjson.GJSON(INPUT_OBJECT).get_gjson('children')
     assert isinstance(ret, gjson.GJSON)
     assert str(ret) == '["Sara", "Alex", "Jack"]'
+
+
+@pytest.mark.parametrize('kwargs', ({}, {'quiet': False}))
+def test_gjson_get_gjson_raise(kwargs):
+    """It should raise a GJSONError if the quiet parameter is not passed or is False."""
+    with pytest.raises(gjson.GJSONError, match=r'^Mapping object does not have key `nonexistent`.'):
+        gjson.GJSON(INPUT_OBJECT).get_gjson('nonexistent', **kwargs)
 
 
 @pytest.mark.parametrize('data, num, expected', (
@@ -849,6 +856,10 @@ class TestJSONOutput:
         """It should return the queried object as a JSON string."""
         assert gjson.get(self.obj, self.query, as_str=True) == self.value
         assert gjson.get(self.obj, '', as_str=True, quiet=True) == ''
+
+    def test_module_get_str(self):
+        """It should return the string representation of the object."""
+        assert str(self.gjson) == '{"key": "value", "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"}'
 
     def test_gjson_getj(self):
         """It should return the queried object as a JSON string."""
