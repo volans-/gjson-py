@@ -434,7 +434,7 @@ class TestObject:
     ))
     def test_get_parser_raise(self, query, error):
         """It should raise a GJSONParseError error with the expected message."""
-        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONParseError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
     @pytest.mark.parametrize('query, error', (
@@ -448,7 +448,7 @@ class TestObject:
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
 
@@ -548,7 +548,7 @@ class TestList:
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONParseError, match=fr'^{re.escape(error)}'):
             self.list.get(query)
 
 
@@ -592,7 +592,7 @@ class TestTruthiness:
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
 
@@ -638,7 +638,7 @@ class TestNestedQueries:
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
 
@@ -667,7 +667,8 @@ def test_get_integer_mapping_keys_ok(query, expected):
 ))
 def test_get_integer_mapping_keys_raise(query, error):
     """It should return the expected result."""
-    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+    with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
+
         gjson.GJSON([{'0': 'zero'}]).get(query)
 
 
@@ -712,7 +713,7 @@ def test_get_modifier_fromstr_ok(data, query, expected):
 def test_get_modifier_fromstr_raise(query, error):
     """It should raise a GJSONError if the JSON-encoded string has invalid JSON."""
     obj = gjson.GJSON({'a': '{"invalid: json"', 'b': {'not': 'a string'}})
-    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+    with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
         obj.get(query)
 
 
@@ -720,7 +721,7 @@ def test_get_modifier_tostr_raise():
     """It should raise a GJSONError if the object cannot be JSON-encoded."""
     obj = gjson.GJSON({'a': {1, 2, 3}})  # Python sets cannot be JSON-encoded
     match = re.escape('The current object cannot be converted to a JSON-encoded string for @tostr.')
-    with pytest.raises(gjson.GJSONError, match=match):
+    with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
         obj.get('a.@tostr')
 
 
@@ -815,7 +816,7 @@ def test_get_modifier_sum_n_valid(num, expected):
 def test_get_modifier_sum_n_invalid_data(data):
     """It should raise a GJSONError if the input is invalid."""
     obj = gjson.GJSON(json.loads(data))
-    with pytest.raises(gjson.GJSONError, match="@sum_n modifier not supported for object of type"):
+    with pytest.raises(gjson.GJSONError, match=r'^@sum_n modifier not supported for object of type'):
         obj.get('@sum_n:{"group": "key", "sum": "value"}')
 
 
@@ -830,7 +831,7 @@ def test_get_modifier_sum_n_invalid_data(data):
 def test_get_modifier_sum_n_invalid_options(options):
     """It should raise a GJSONError if the options are invalid."""
     obj = gjson.GJSON(INPUT_SUM_N)
-    with pytest.raises(gjson.GJSONError, match="Modifier @sum_n raised an exception"):
+    with pytest.raises(gjson.GJSONError, match=r'^Modifier @sum_n raised an exception'):
         obj.get(f'@sum_n{options}')
 
 
@@ -856,12 +857,12 @@ class TestJSONOutput:
 
     def test_module_get_as_str_raise(self):
         """It should raise a GJSONError with the proper message on failure."""
-        with pytest.raises(gjson.GJSONError, match='Empty query.'):
+        with pytest.raises(gjson.GJSONError, match=r'^Empty query.'):
             gjson.get(self.obj, '', as_str=True)
 
     def test_gjson_get_as_str_raise(self):
         """It should raise a GJSONError with the proper message on failure."""
-        with pytest.raises(gjson.GJSONError, match='Empty query.'):
+        with pytest.raises(gjson.GJSONError, match=r'^Empty query.'):
             self.gjson.getj('')
 
     @pytest.mark.parametrize('query, expected', (
@@ -935,20 +936,22 @@ class TestCustomModifiers:
         name = fr'a{char}b'
         with pytest.raises(
                 gjson.GJSONError,
-                match=fr'Unable to register modifier `{re.escape(name)}`, contains at least one not allowed'):
+                match=fr'^Unable to register modifier `{re.escape(name)}`, contains at least one not allowed'):
             obj.register_modifier(name, custom_sum)
 
     def test_gjson_register_modifier_override_builtin(self):
         """It should raise a GJSONError if trying to register a modifier with the same name of a built-in one."""
         obj = gjson.GJSON(self.valid_obj)
-        with pytest.raises(gjson.GJSONError,
-                           match=r'Unable to register a modifier with the same name of the built-in modifier: @valid'):
+        match = re.escape('Unable to register a modifier with the same name of the built-in modifier: @valid')
+        with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
             obj.register_modifier('valid', custom_sum)
 
     def test_gjson_register_modifier_not_callable(self):
         """It should raise a GJSONError if trying to register a modifier that is not callable."""
         obj = gjson.GJSON(self.valid_obj)
-        with pytest.raises(gjson.GJSONError, match=r'The given func "not-callable" for the custom modifier @sum does'):
+        match = re.escape('The given func "not-callable" for the custom modifier @sum does not adhere to the '
+                          'gjson.ModifierProtocol.')
+        with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
             obj.register_modifier('sum', 'not-callable')
 
     def test_gjsonobj_custom_modifiers_ok(self):
@@ -958,19 +961,19 @@ class TestCustomModifiers:
 
     def test_gjsonobj_custom_modifiers_raise(self):
         """It should encapsulate the modifier raised exception in a GJSONError."""
-        with pytest.raises(gjson.GJSONError,
-                           match=r'Modifier @sum raised an exception'):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape("Modifier @sum raised an exception")}'):
             gjson.GJSONObj(self.invalid_obj, self.query, custom_modifiers={'sum': custom_sum}).get()
 
     def test_gjsonobj_custom_modifiers_override_builtin(self):
         """It should raise a GJSONError if passing custom modifiers that have the same name of a built-in one."""
         with pytest.raises(gjson.GJSONError,
-                           match=r"Some provided custom_modifiers have the same name of built-in ones: {'valid'}"):
+                           match=r"^Some provided custom_modifiers have the same name of built-in ones: {'valid'}"):
             gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'valid': custom_sum})
 
     def test_gjsoniobj_custom_modifiers_not_callable(self):
         """It should raise a GJSONError if passing custom modifiers that are not callable."""
-        with pytest.raises(gjson.GJSONError, match=r'The given func "not-callable" for the custom modifier @sum does'):
+        match = re.escape('The given func "not-callable" for the custom modifier @sum does not adhere to the')
+        with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
             gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'sum': 'not-callable'})
 
     def test_gjsonobj_builtin_modifiers(self):
