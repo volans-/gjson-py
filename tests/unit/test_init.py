@@ -269,9 +269,9 @@ class TestObject:
         ('{name.first,age,name.last}', {'first': 'Tom', 'age': 37, 'last': 'Anderson'}),
         ('{{age}}', {'_': {'age': 37}}),
         ('{{age},age}', {'_': {'age': 37}, 'age': 37}),
-        ('friends.0.{age,nets.#(="ig")}', {'age': 44, "_": 'ig'}),
-        ('friends.0.{age,nets.#(="ig"),invalid}', {'age': 44, "_": 'ig'}),
-        ('friends.0.{age,nets.#(="ig")#}', {'age': 44, "_": ['ig']}),
+        ('friends.0.{age,nets.#(="ig")}', {'age': 44, '_': 'ig'}),
+        ('friends.0.{age,nets.#(="ig"),invalid}', {'age': 44, '_': 'ig'}),
+        ('friends.0.{age,nets.#(="ig")#}', {'age': 44, '_': ['ig']}),
         ('friends.#.{age,"key":first}',
          [{'age': 44, 'key': 'Dale'}, {'age': 68, 'key': 'Roger'}, {'age': 47, 'key': 'Jane'}]),
         ('friends.#(age>44)#.{age,"key":first}', [{'age': 68, 'key': 'Roger'}, {'age': 47, 'key': 'Jane'}]),
@@ -283,10 +283,10 @@ class TestObject:
         ('{friends.{"a":0.{nets.{0}}}}', {'_': {'a': {'_': {'0': 'ig'}}}}),
         ('{friends.{"a":0.{nets.{0,1}}}}', {'_': {'a': {'_': {'0': 'ig', '1': 'fb'}}}}),
         ('friends.#.{age,first|@upper}',
-         [{"age": 44, "@upper": "DALE"}, {"age": 68, "@upper": "ROGER"}, {"age": 47, "@upper": "JANE"}]),
-        ('{friends.#.{age,"first":first|@upper}|0.first}', {"first": "DALE"}),
+         [{'age': 44, '@upper': 'DALE'}, {'age': 68, '@upper': 'ROGER'}, {'age': 47, '@upper': 'JANE'}]),
+        ('{friends.#.{age,"first":first|@upper}|0.first}', {'first': 'DALE'}),
         ('{"children":children|@upper,"name":name.first,"age":age}',
-         {"children": ["SARA", "ALEX", "JACK"], "name": "Tom", "age": 37}),
+         {'children': ['SARA', 'ALEX', 'JACK'], 'name': 'Tom', 'age': 37}),
         ('friends.#.{age,"first":first.invalid}', [{'age': 44}, {'age': 68}, {'age': 47}]),
         # Multipaths arrays
         ('[]', []),
@@ -401,7 +401,7 @@ class TestObject:
         ('friends.@', 'Got empty modifier name.'),
         ('friends.@pretty:', 'Modifier with options separator `:` without any option.'),
         ('friends.@pretty:{invalid', 'Unable to load modifier options.'),
-        ('friends.@pretty:["invalid"]', "Expected JSON object `{...}` as modifier options."),
+        ('friends.@pretty:["invalid"]', 'Expected JSON object `{...}` as modifier options.'),
         ('friends.@invalid', 'Unknown modifier @invalid.'),
         ('friends.@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
         # JSON Lines
@@ -687,7 +687,7 @@ def test_get_modifier_valid_raise():
 
 @pytest.mark.parametrize('data, expected', (
     ('[3, 1, 5, 8, 2]', [1, 2, 3, 5, 8]),
-    ('{"b": 2, "d": 4, "c": 3, "a": 1}', {"a": 1, "b": 2, "c": 3, "d": 4}),
+    ('{"b": 2, "d": 4, "c": 3, "a": 1}', {'a': 1, 'b': 2, 'c': 3, 'd': 4}),
     ('"a string"', None),
 ))
 def test_get_modifier_sort(data, expected):
@@ -800,11 +800,11 @@ def test_get_modifier_top_n(data, num, expected):
 
 @pytest.mark.parametrize('num, expected', (
     (0, {}),
-    (1, {"c": 12}),
-    (2, {"c": 12, "a": 8}),
-    (3, {"c": 12, "a": 8, "d": 4}),
-    (4, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
-    (None, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
+    (1, {'c': 12}),
+    (2, {'c': 12, 'a': 8}),
+    (3, {'c': 12, 'a': 8, 'd': 4}),
+    (4, {'c': 12, 'a': 8, 'd': 4, 'b': 3.5}),
+    (None, {'c': 12, 'a': 8, 'd': 4, 'b': 3.5}),
 ))
 def test_get_modifier_sum_n_valid(num, expected):
     """It should group and sum and return the top N items."""
