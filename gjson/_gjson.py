@@ -19,7 +19,7 @@ PIPE_DELIMITER = '|'
 """str: One of the available delimiters in the query grammar."""
 DELIMITERS = (DOT_DELIMITER, PIPE_DELIMITER)
 """tuple: All the available delimiters in the query grammar."""
-MULTIPATHS_DELIMITERS = DELIMITERS + (']', '}', ',')
+MULTIPATHS_DELIMITERS = (*DELIMITERS, ']', '}', ',')
 """tuple: All the available delimiters in the query grammar."""
 # Single character operators goes last to avoid mis-detection.
 QUERIES_OPERATORS = ('==~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
@@ -292,22 +292,24 @@ class GJSONObj:
                 continue
 
             if char == '@':
-                part = self._parse_modifier_query_part(i, delimiter, max_end=max_end, in_multipaths=in_multipaths)
+                part = self._parse_modifier_query_part(
+                    start=i, delimiter=delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif char == '#' and (next_char in DELIMITERS or next_char is None):
                 part = ArrayLenghtQueryPart(start=i, end=i, part=char, delimiter=delimiter, is_last=next_char is None,
                                             previous=previous)
             elif char == '#' and next_char == '(':
-                part = self._parse_array_query_query_part(i, delimiter, max_end=max_end)
+                part = self._parse_array_query_query_part(start=i, delimiter=delimiter, max_end=max_end)
             elif re.match(r'[0-9]', char) and not current:
-                part = self._parse_array_index_query_part(i, delimiter, in_multipaths=in_multipaths)
+                part = self._parse_array_index_query_part(start=i, delimiter=delimiter, in_multipaths=in_multipaths)
             elif char == '{':
-                part = self._parse_object_multipaths_query_part(i, delimiter, max_end=max_end)
+                part = self._parse_object_multipaths_query_part(start=i, delimiter=delimiter, max_end=max_end)
                 require_delimiter = True
             elif char == '[':
-                part = self._parse_array_multipaths_query_part(i, delimiter, max_end=max_end)
+                part = self._parse_array_multipaths_query_part(start=i, delimiter=delimiter, max_end=max_end)
                 require_delimiter = True
             elif char == '!':
-                part = self._parse_literal_query_part(i, delimiter, max_end=max_end, in_multipaths=in_multipaths)
+                part = self._parse_literal_query_part(
+                    start=i, delimiter=delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif in_multipaths and char == ',':
                 i -= 1
                 break
@@ -391,11 +393,7 @@ class GJSONObj:
                 continue
 
             if char == '"':
-                if in_string:
-                    in_string = False
-                else:
-                    in_string = True
-
+                in_string = not in_string
                 continue
 
             if in_string:
@@ -428,7 +426,7 @@ class GJSONObj:
 
         return start + end
 
-    def _parse_modifier_query_part(self, start: int, delimiter: str, max_end: int = 0,
+    def _parse_modifier_query_part(self, *, start: int, delimiter: str, max_end: int = 0,
                                    in_multipaths: bool = False) -> ModifierQueryPart:
         """Find the modifier end position in the query starting from a given point.
 
@@ -522,7 +520,7 @@ class GJSONObj:
 
         return len(options_string), options
 
-    def _parse_array_query_query_part(self, start: int, delimiter: str, max_end: int = 0) -> ArrayQueryQueryPart:
+    def _parse_array_query_query_part(self, *, start: int, delimiter: str, max_end: int = 0) -> ArrayQueryQueryPart:
         """Parse an array query part starting from the given point.
 
         Arguments:
@@ -565,7 +563,8 @@ class GJSONObj:
             offset = 1 if query_operator[0] == '.' else 0
             query_operator = ''
             nested_start = start + 2 + match.start() + offset
-            value = self._parse_array_query_query_part(nested_start, delimiter, max_end=end + content_end)
+            value = self._parse_array_query_query_part(
+                start=nested_start, delimiter=delimiter, max_end=end + content_end)
             value.first_only = False  # Nested queries first_only is controlled by the most external query
 
         if not key and not (query_operator and value) and not isinstance(value, ArrayQueryQueryPart):
@@ -574,7 +573,7 @@ class GJSONObj:
         return ArrayQueryQueryPart(start=start, end=end, part=part, delimiter=delimiter, is_last=False, previous=None,
                                    field=key, operator=query_operator, value=value, first_only=first_only)
 
-    def _parse_array_index_query_part(self, start: int, delimiter: str,
+    def _parse_array_index_query_part(self, *, start: int, delimiter: str,
                                       in_multipaths: bool = False) -> Optional[ArrayIndexQueryPart]:
         """Parse an array index query part.
 
@@ -600,7 +599,7 @@ class GJSONObj:
         return ArrayIndexQueryPart(start=start, end=end, part=part, delimiter=delimiter, is_last=False, previous=None)
 
     def _parse_object_multipaths_query_part(
-            self, start: int, delimiter: str, max_end: int = 0) -> MultipathsObjectQueryPart:
+            self, *, start: int, delimiter: str, max_end: int = 0) -> MultipathsObjectQueryPart:
         """Parse a multipaths object query part.
 
         Arguments:
@@ -716,7 +715,7 @@ class GJSONObj:
                                          is_last=False, parts=parts)
 
     def _parse_array_multipaths_query_part(
-            self, start: int, delimiter: str, max_end: int = 0) -> MultipathsArrayQueryPart:
+            self, *, start: int, delimiter: str, max_end: int = 0) -> MultipathsArrayQueryPart:
         """Parse a multipaths object query part.
 
         Arguments:
@@ -764,7 +763,7 @@ class GJSONObj:
         return MultipathsArrayQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None,
                                         is_last=False, parts=parts)
 
-    def _parse_literal_query_part(self, start: int, delimiter: str, max_end: int = 0,
+    def _parse_literal_query_part(self, *, start: int, delimiter: str, max_end: int = 0,
                                   in_multipaths: bool = False) -> LiteralQueryPart:
         """Parse a literal query part.
 
@@ -820,7 +819,7 @@ class GJSONObj:
         part = self._query[start:end + 1]
         return LiteralQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None, is_last=False)
 
-    def _parse_part(self, part: BaseQueryPart, obj: Any, in_multipaths: bool = False) -> Any:
+    def _parse_part(self, part: BaseQueryPart, obj: Any, *, in_multipaths: bool = False) -> Any:
         """Parse the given part of the full query.
 
         Arguments:
@@ -914,7 +913,7 @@ class GJSONObj:
                 pattern_parts.append('$')
                 pattern = ''.join(pattern_parts)
 
-                for key in obj.keys():
+                for key in obj:
                     if re.match(pattern, key):
                         ret = obj[key]
                         break
@@ -1546,7 +1545,7 @@ class GJSONObj:
 
         return list(self._flatten_sequence(obj, deep=options.get('deep', False)))
 
-    def _flatten_sequence(self, obj: Any, deep: bool = False) -> Any:
+    def _flatten_sequence(self, obj: Any, *, deep: bool = False) -> Any:
         """Flatten nested sequences in the given object.
 
         Arguments:
