@@ -4,7 +4,6 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-
 # Extra dependencies
 extras_require = {
     # Test dependencies

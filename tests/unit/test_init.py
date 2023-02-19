@@ -2,15 +2,12 @@
 # pylint: disable=attribute-defined-outside-init
 import json
 import re
-
 from collections.abc import Mapping
 from math import isnan
 
-import pytest
-
 import gjson
+import pytest
 from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS
-
 
 INPUT_JSON = """
 {
