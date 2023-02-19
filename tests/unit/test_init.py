@@ -164,7 +164,7 @@ class TestObject:
     def setup_method(self):
         """Initialize the test instance."""
         def upper(options, obj, *, last):
-            """Custom modifier to return a string upper case."""
+            """Change the case of the object returning its upper version. Custom modifier to be used in tests."""
             del options
             del last
             if isinstance(obj, list):
@@ -910,11 +910,11 @@ class TestJSONOutput:
 
 
 def custom_sum(options, obj, *, last):
-    """Custom modifier function."""
+    """Sum items in list. Custom modifier function to be used in tests."""
     assert last is True
     assert options == {}
     if not isinstance(obj, list):
-        raise RuntimeError('@sum can be used only on lists')
+        raise TypeError('@sum can be used only on lists')
 
     return sum(obj)
 
