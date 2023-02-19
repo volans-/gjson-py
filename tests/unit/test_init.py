@@ -212,10 +212,8 @@ class TestObject:
         ('friends.#(>40)#', []),
         ('children.#(!%"*a*")', 'Alex'),
         ('children.#(%"*a*")#', ['Sara', 'Jack']),
-        # Nested queries (TODO)
-        # ('friends.#(nets.#(=="fb"))#.first', ['Dale', 'Roger']),
-        # Tilde in queries (TODO)
-        # ('vals.#(b==~true)#.a')
+        # Nested queries
+        ('friends.#(nets.#(=="fb"))#.first', ['Dale', 'Roger']),
         # Modifiers
         ('children.@reverse', ['Jack', 'Alex', 'Sara']),
         ('children.@reverse.0', 'Jack'),
