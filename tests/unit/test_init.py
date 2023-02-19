@@ -175,7 +175,7 @@ class TestObject:
         self.object = gjson.GJSON(INPUT_OBJECT)
         self.object.register_modifier('upper', upper)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         # Basic
         ('name.last', 'Anderson'),
         ('name.first', 'Tom'),
@@ -357,7 +357,7 @@ class TestObject:
         """It should query the JSON object and return the expected result."""
         compare_values(self.object.get(query), expected)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         # Basic
         ('.', 'Invalid query starting with a path delimiter.'),
         ('|', 'Invalid query starting with a path delimiter.'),
@@ -437,7 +437,7 @@ class TestObject:
         with pytest.raises(gjson.GJSONParseError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         # Basic
         ('', 'Empty query.'),
         # Modifiers
@@ -459,7 +459,7 @@ class TestEscape:
         """Initialize the test instance."""
         self.escape = gjson.GJSON(INPUT_ESCAPE)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         (r'test.\*', 'valZ'),
         (r'test.\*v', 'val0'),
         (r'test.keyv\*', 'val1'),
@@ -483,7 +483,7 @@ class TestBasic:
         """Initialize the test instance."""
         self.basic = gjson.GJSON(INPUT_BASIC)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('loggy.programmers.#(age=101).firstName', 1002.3),
         ('loggy.programmers.#(firstName != "Brett").firstName', 'Jason'),
         ('loggy.programmers.#(firstName % "Bre*").email', 'aaaa'),
@@ -519,7 +519,7 @@ class TestList:
         """Initialize the test instance."""
         self.list = gjson.GJSON(INPUT_LIST)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         # Dot vs Pipe
         ('#.first', ['Dale', 'Jane']),
         ('#.first.#', []),
@@ -540,7 +540,7 @@ class TestList:
         """It should query the list test JSON and return the expected result."""
         assert self.list.get(query, quiet=False) == expected
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         # Dot vs Pipe
         ('#|first', 'Invalid or unsupported query part `first`.'),
         ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
@@ -559,7 +559,7 @@ class TestFlattenModifier:
         """Initialize the test instance."""
         self.list = gjson.GJSON(json.loads('[1, [2], [3, 4], [5, [6, 7]], [8, [9, [10, 11]]]]'))
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('@flatten', [1, 2, 3, 4, 5, [6, 7], 8, [9, [10, 11]]]),
         ('@flatten:{"deep":true}', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
     ))
@@ -575,7 +575,7 @@ class TestTruthiness:
         """Initialize the test instance."""
         self.object = gjson.GJSON(INPUT_TRUTHINESS)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('vals.#(b==~true).a', 1),
         ('vals.#(b==~true)#.a', [1, 2, 4, 6, 7, 8]),
         ('vals.#(b==~false).a', 3),
@@ -586,7 +586,7 @@ class TestTruthiness:
         """It should query the JSON object and return the expected result."""
         compare_values(self.object.get(query), expected)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         ('vals.#(b==~"invalid")',
          "Queries ==~ operator requires a boolean value, got <class 'str'> instead: `invalid`"),
     ))
@@ -603,7 +603,7 @@ class TestNestedQueries:
         """Initialize the test instance."""
         self.object = gjson.GJSON(INPUT_NESTED_QUERIES)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         # Arrays of objects
         ('key.#(level1.#(level2.#(level3)))', INPUT_NESTED_QUERIES['key'][0]),
         ('key.#(level1.#(level2.#(level3)))#', INPUT_NESTED_QUERIES['key'][0:2]),
@@ -632,7 +632,7 @@ class TestNestedQueries:
         """It should query the JSON object and return the expected result."""
         compare_values(self.object.get(query), expected)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         ('key.#(level1.#(level2.#(level3.#(==0))))', 'Query for first element does not match anything.'),
         ('key.#(#(#(level3.#(==0))))', 'Query for first element does not match anything.'),
     ))
@@ -642,7 +642,7 @@ class TestNestedQueries:
             self.object.get(query)
 
 
-@pytest.mark.parametrize('query, expected', (
+@pytest.mark.parametrize(('query', 'expected'), (
     ('0.0', 'zero'),
     ('0|0', 'zero'),
     ('#.0', ['zero']),
@@ -659,7 +659,7 @@ def test_get_integer_mapping_keys_ok(query, expected):
     assert obj.get(query, quiet=True) == expected
 
 
-@pytest.mark.parametrize('query, error', (
+@pytest.mark.parametrize(('query', 'error'), (
     ('0.1', 'Mapping object does not have key `1`.'),
     ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
     ('#|9', 'Integer query part after a pipe delimiter on an sequence like object.'),
@@ -685,7 +685,7 @@ def test_get_modifier_valid_raise():
     assert obj.get('@valid', quiet=True) is None
 
 
-@pytest.mark.parametrize('data, expected', (
+@pytest.mark.parametrize(('data', 'expected'), (
     ('[3, 1, 5, 8, 2]', [1, 2, 3, 5, 8]),
     ('{"b": 2, "d": 4, "c": 3, "a": 1}', {'a': 1, 'b': 2, 'c': 3, 'd': 4}),
     ('"a string"', None),
@@ -696,7 +696,7 @@ def test_get_modifier_sort(data, expected):
     compare_values(obj.get('@sort', quiet=True), expected)
 
 
-@pytest.mark.parametrize('data, query, expected', (
+@pytest.mark.parametrize(('data', 'query', 'expected'), (
     ({'a': '{"b": 25}'}, 'a.@fromstr', {'b': 25}),
     ({'a': '{"b": 25}'}, 'a.@fromstr.b', 25),
 ))
@@ -706,7 +706,7 @@ def test_get_modifier_fromstr_ok(data, query, expected):
     assert obj.get(query, quiet=True) == expected
 
 
-@pytest.mark.parametrize('query, error', (
+@pytest.mark.parametrize(('query', 'error'), (
     ('a.@fromstr', 'The current @fromstr input object cannot be converted to JSON.'),
     ('b.@fromstr', "Modifier @fromstr got object of type <class 'dict'> as input, expected string or bytes."),
 ))
@@ -774,7 +774,7 @@ def test_gjson_get_gjson_raise(kwargs):
         gjson.GJSON(INPUT_OBJECT).get_gjson('nonexistent', **kwargs)
 
 
-@pytest.mark.parametrize('data, num, expected', (
+@pytest.mark.parametrize(('data', 'num', 'expected'), (
     # Valid data
     ('[1, 2, 3, 4, 5]', None, {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}),
     ('[1, 2, 3, 4, 5]', 0, {}),
@@ -798,7 +798,7 @@ def test_get_modifier_top_n(data, num, expected):
         compare_values(obj.get('@top_n', quiet=True), expected)
 
 
-@pytest.mark.parametrize('num, expected', (
+@pytest.mark.parametrize(('num', 'expected'), (
     (0, {}),
     (1, {'c': 12}),
     (2, {'c': 12, 'a': 8}),
@@ -876,7 +876,7 @@ class TestJSONOutput:
         with pytest.raises(gjson.GJSONError, match=r'^Empty query.'):
             self.gjson.getj('')
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('@pretty', '{\n  "key": "value",\n  "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
         ('@pretty:{"indent": 4}',
          '{\n    "key": "value",\n    "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
