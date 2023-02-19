@@ -145,10 +145,9 @@ INPUT_NESTED_QUERIES = json.loads("""
 
 def compare_values(result, expected):
     """Compare results with the expected values ensuring same-order of keys for dictionaries."""
-    if isinstance(expected, float):
-        if isnan(expected):
-            assert isnan(result)
-            return
+    if isinstance(expected, float) and isnan(expected):
+        assert isnan(result)
+        return
 
     assert result == expected
     if isinstance(expected, Mapping):

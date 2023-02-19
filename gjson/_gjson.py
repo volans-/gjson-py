@@ -45,7 +45,7 @@ class BaseQueryPart:
     is_last: bool
 
     def __str__(self) -> str:
-        """String representation of the part.
+        """Return the string representation of the part.
 
         Returns:
             The part property of the instance.
@@ -163,7 +163,7 @@ class GJSONObj:
         self._after_query_all = False
 
     @classmethod
-    def builtin_modifiers(cls) -> set[str]:
+    def builtin_modifiers(cls: 'GJSONObj') -> set[str]:
         """Return the names of the built-in modifiers.
 
         Returns:
@@ -224,7 +224,7 @@ class GJSONObj:
         json_string = json.dumps(obj, **self._dump_params)
 
         if prefix:
-            json_string = '\n'.join(f'{prefix}{line}' for line in json_string.splitlines())
+            return '\n'.join(f'{prefix}{line}' for line in json_string.splitlines())
 
         return json_string
 
@@ -1159,7 +1159,7 @@ class GJSONObj:
         """Apply a modifier.
 
         Arguments:
-            part: the modifier query part to parse.
+            modifier: the modifier query part to parse.
             obj: the current object before applying the modifier.
 
         Raises:
