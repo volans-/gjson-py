@@ -1,0 +1,41 @@
+target-version = 'py39'
+line-length = 120
+select = ['F', 'E', 'W', 'C90', 'B', 'I', 'N', 'D', 'YTT', 'ANN', 'S', 'FBT', 'A', 'C4', 'DTZ', 'T10', 'EXE', 'ISC',
+          'G', 'INP', 'T20', 'PT', 'Q', 'RSE', 'RET', 'SLF', 'SIM', 'TID', 'TCH', 'ARG', 'PTH', 'ERA', 'PL', 'TRY',
+          'RUF']
+ignore = [
+    'D203',
+    'D213',
+    'D406',
+    'D407',
+    'ANN101',
+    'ANN401',
+    'TRY003',
+    'C901',
+    'N999',
+]
+
+[per-file-ignores]
+'doc/source/conf.py' = ['A001', 'ERA001', 'INP001']
+'gjson/_cli.py' = ['T201']
+'setup.py' = ['EXE001']
+
+[flake8-annotations]
+mypy-init-return = true
+
+[flake8-bandit]
+check-typed-exception = true
+
+[flake8-pytest-style]
+parametrize-values-type = 'tuple'
+raises-extend-require-match-for = [
+    'GJSONError',
+    'GJSONParseError',
+    'GJSONInvalidSyntaxError',
+]
+
+[flake8-quotes]
+inline-quotes = 'single'
+
+[pydocstyle]
+convention = 'google'

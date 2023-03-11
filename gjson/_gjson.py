@@ -124,8 +124,6 @@ class LiteralQueryPart(BaseQueryPart):
 class GJSONObj:
     """A low-level class to perform the GJSON query on a JSON-like object."""
 
-    # pylint: disable=too-many-branches,too-many-statements,too-many-locals
-
     def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[dict[str, ModifierProtocol]] = None):
         """Initialize the instance with the starting object and query.
 
@@ -229,9 +227,9 @@ class GJSONObj:
 
         return json_string
 
-    def _parse(self, *, start: int, end: int, max_end: int = 0, delimiter: str = '',
-               in_multipaths: bool = False) -> list[BaseQueryPart]:
-        """Main parser of the query that will delegate to more specific parsers for each different feature.
+    def _parse(self, *, start: int, end: int, max_end: int = 0,  # noqa: PLR0912, PLR0913, PLR0915
+               delimiter: str = '', in_multipaths: bool = False) -> list[BaseQueryPart]:
+        """Parse the query. It will delegate to more specific parsers for each different feature.
 
         Arguments:
             start: the start position in the query.
@@ -359,7 +357,8 @@ class GJSONObj:
         """
         return isinstance(obj, Sequence) and not isinstance(obj, (str, bytes))
 
-    def _find_closing_parentheses(self, *, start: int, opening: str, suffix: str = '', max_end: int = 0) -> int:
+    def _find_closing_parentheses(self, *, start: int, opening: str, suffix: str = '',  # noqa: PLR0912
+                                  max_end: int = 0) -> int:
         """Find the matching parentheses that closes the opening one looking for unbalance of the given character.
 
         Arguments:
@@ -402,7 +401,7 @@ class GJSONObj:
 
             if char == opening:
                 opened += 1
-            elif char == closing:
+            elif char == closing:  # noqa: SIM102
                 if opened:
                     opened -= 1
                     if not opened:
@@ -514,7 +513,7 @@ class GJSONObj:
             try:
                 options = json.loads(options_string, strict=False)
                 break
-            except json.JSONDecodeError:
+            except json.JSONDecodeError:  # noqa: S110
                 pass
         else:
             raise GJSONParseError('Unable to load modifier options.', query=self._query, position=start)
@@ -599,7 +598,7 @@ class GJSONObj:
 
         return ArrayIndexQueryPart(start=start, end=end, part=part, delimiter=delimiter, is_last=False, previous=None)
 
-    def _parse_object_multipaths_query_part(
+    def _parse_object_multipaths_query_part(  # noqa: PLR0912, PLR0915
             self, *, start: int, delimiter: str, max_end: int = 0) -> MultipathsObjectQueryPart:
         """Parse a multipaths object query part.
 
@@ -820,7 +819,8 @@ class GJSONObj:
         part = self._query[start:end + 1]
         return LiteralQueryPart(start=start, end=end, part=part, delimiter=delimiter, previous=None, is_last=False)
 
-    def _parse_part(self, part: BaseQueryPart, obj: Any, *, in_multipaths: bool = False) -> Any:
+    def _parse_part(self, part: BaseQueryPart, obj: Any, *,  # noqa: PLR0912, PLR0915
+            in_multipaths: bool = False) -> Any:
         """Parse the given part of the full query.
 
         Arguments:
@@ -1013,12 +1013,13 @@ class GJSONObj:
             ret = new_obj
             if (self._after_hash or self._after_query_all) and self._is_sequence(obj):
                 if part.delimiter == DOT_DELIMITER:
-                    if isinstance(new_obj, NoResult):
+                    if isinstance(new_obj, NoResult):  # noqa: SIM108
                         ret = []
                     else:
                         ret = [new_obj for _ in obj]
                 elif part.delimiter == PIPE_DELIMITER:
                     ret = new_obj
+
             elif not self._after_hash and not self._after_query_all:
                 if part.delimiter == DOT_DELIMITER and not isinstance(new_obj, NoResult):
                     json_error = 'literal afer a dot delimiter.'
@@ -1060,7 +1061,7 @@ class GJSONObj:
 
         return obj
 
-    def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:
+    def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:  # noqa: PLR0912, PLR0915
         """Parse an inline query #(...) / #(...)#.
 
         Arguments:
@@ -1113,7 +1114,7 @@ class GJSONObj:
 
                 return []
 
-            def truthy_op(obj_a: Any, obj_b: bool) -> bool:
+            def truthy_op(obj_a: Any, obj_b: bool) -> bool:  # noqa: FBT001
                 truthy = operator.truth(obj_a)
                 if obj_b:
                     return truthy
@@ -1203,7 +1204,7 @@ class GJSONObj:
             the reversed object. If the object cannot be reversed is returned untouched.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if isinstance(obj, Mapping):
             return {k: obj[k] for k in reversed(obj.keys())}
         if self._is_sequence(obj):
@@ -1226,7 +1227,7 @@ class GJSONObj:
             the current object keys as list.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         try:
             return list(obj.keys())
         except AttributeError as ex:
@@ -1247,7 +1248,7 @@ class GJSONObj:
             the current object values as list.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         try:
             return list(obj.values())
         except AttributeError as ex:
@@ -1265,7 +1266,7 @@ class GJSONObj:
             the current object, unmodified.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         self._dump_params['separators'] = (',', ':')
         self._dump_params['indent'] = None
         return obj
@@ -1282,7 +1283,7 @@ class GJSONObj:
             the current object, unmodified.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         self._dump_params['indent'] = options.get('indent', 2)
         self._dump_params['sort_keys'] = options.get('sortKeys', False)
         self._dump_params['prefix'] = options.get('prefix', '')
@@ -1300,7 +1301,7 @@ class GJSONObj:
             the current object, unmodified.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         self._dump_params['ensure_ascii'] = True
         return obj
 
@@ -1319,7 +1320,7 @@ class GJSONObj:
             the sorted object.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if isinstance(obj, Mapping):
             return {k: obj[k] for k in sorted(obj.keys())}
         if self._is_sequence(obj):
@@ -1343,7 +1344,7 @@ class GJSONObj:
             the current object, unmodified.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         try:
             json.dumps(obj, **self._dump_params)
         except Exception as ex:
@@ -1363,7 +1364,7 @@ class GJSONObj:
             the current object, unmodified.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         return obj
 
     def _apply_modifier_fromstr(self, _options: dict[str, Any], obj: Any, *, last: bool) -> Any:
@@ -1381,7 +1382,7 @@ class GJSONObj:
             the parsed JSON.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if not isinstance(obj, (str, bytes)):
             raise GJSONError(f'Modifier @fromstr got object of type {type(obj)} as input, expected string or bytes.')
 
@@ -1405,7 +1406,7 @@ class GJSONObj:
             the JSON-encoded string.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         try:
             return json.dumps(obj, ensure_ascii=False)
         except Exception as ex:
@@ -1434,7 +1435,7 @@ class GJSONObj:
             a list with the grouped objects or an empty list if the input has no lists as values.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if not isinstance(obj, Mapping):
             raise GJSONError(f'Modifier @group got object of type {type(obj)} as input, expected dictionary.')
 
@@ -1469,7 +1470,7 @@ class GJSONObj:
             the object untouched if the object is not a sequence, a dictionary with joined objects otherwise.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if not self._is_sequence(obj):
             return obj
 
@@ -1496,7 +1497,7 @@ class GJSONObj:
             dict: a dictionary of unique items as keys and the count as value.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if not self._is_sequence(obj):
             raise GJSONError(f'@top_n modifier not supported for object of type {type(obj)}. '
                              'Expected a sequence like object.')
@@ -1523,7 +1524,7 @@ class GJSONObj:
             dict: a dictionary of unique items as keys and the sum as value.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if not self._is_sequence(obj):
             raise GJSONError(f'@sum_n modifier not supported for object of type {type(obj)}. '
                              'Expected a sequence like object.')
@@ -1545,7 +1546,7 @@ class GJSONObj:
             the modified object.
 
         """
-        del last  # for pylint, unused argument
+        del last  # unused argument
         if not self._is_sequence(obj):
             return obj
 

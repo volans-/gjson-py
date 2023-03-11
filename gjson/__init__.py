@@ -5,7 +5,7 @@ import re
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
-from gjson._gjson import GJSONObj, MODIFIER_NAME_RESERVED_CHARS
+from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS, GJSONObj
 from gjson._protocols import ModifierProtocol
 from gjson.exceptions import GJSONError, GJSONParseError
 

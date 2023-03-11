@@ -1,0 +1,7 @@
+extend = "../ruff.toml"
+ignore = [
+    'ANN',
+    'S101',
+    'PLR2004',
+]
+

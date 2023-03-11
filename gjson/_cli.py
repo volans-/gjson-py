@@ -3,12 +3,12 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
-from typing import Any, IO, Optional
+from typing import IO, Any, Optional
 
-from gjson import get, GJSONError
+from gjson import GJSONError, get
 
 
-def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
+def cli(argv: Optional[Sequence[str]] = None) -> int:
     """Command line entry point to run gjson as a CLI tool.
 
     Arguments:
@@ -38,7 +38,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     except (OSError, argparse.ArgumentTypeError) as ex:
         if args.verbose == 1:
             print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
-        elif args.verbose >= 2:
+        elif args.verbose >= 2:  # noqa: PLR2004
             raise
 
         return 1
@@ -59,11 +59,10 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
                     for input_line in file_obj:
                         if input_line.strip():
                             input_data.append(json.loads(input_line, strict=False))
-            else:
-                if line:
-                    input_data = json.loads(line, strict=False)
-                elif file_obj is not None:
-                    input_data = json.load(file_obj, strict=False)
+            elif line:
+                input_data = json.loads(line, strict=False)
+            elif file_obj is not None:
+                input_data = json.load(file_obj, strict=False)
 
             result = get(input_data, args.query, as_str=True)
             exit_code = 0
@@ -72,7 +71,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
             exit_code = 1
             if args.verbose == 1:
                 print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
-            elif args.verbose >= 2:
+            elif args.verbose >= 2:  # noqa: PLR2004
                 raise
 
         if result:
@@ -83,10 +82,10 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     if args.lines:
         exit_code = 0
         for line in args.file:
-            line = line.strip()
-            if not line:
+            data = line.strip()
+            if not data:
                 continue
-            ret = _execute(line, None)
+            ret = _execute(data, None)
             if ret > exit_code:
                 exit_code = ret
     else:
