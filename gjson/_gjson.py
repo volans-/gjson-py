@@ -6,7 +6,7 @@ from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from itertools import zip_longest
-from typing import Any, Optional, Union
+from typing import Any, Optional, Type, TypeVar, Union
 
 from gjson._protocols import ModifierProtocol
 from gjson.exceptions import GJSONError, GJSONInvalidSyntaxError, GJSONParseError
@@ -27,6 +27,7 @@ QUERIES_OPERATORS = ('==~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
 MODIFIER_NAME_RESERVED_CHARS = ('"', ',', '.', '|', ':', '@', '{', '}', '[', ']', '(', ')')
 """tuple: The list of reserver characters not usable in a modifier's name."""
 PARENTHESES_PAIRS = {'(': ')', ')': '(', '[': ']', ']': '[', '{': '}', '}': '{'}
+GJSONObjT = TypeVar('GJSONObjT', bound='GJSONObj')
 
 
 class NoResult:
@@ -163,7 +164,7 @@ class GJSONObj:
         self._after_query_all = False
 
     @classmethod
-    def builtin_modifiers(cls: 'GJSONObj') -> set[str]:
+    def builtin_modifiers(cls: Type[GJSONObjT]) -> set[str]:
         """Return the names of the built-in modifiers.
 
         Returns:

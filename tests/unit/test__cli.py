@@ -4,6 +4,7 @@ import io
 import json
 
 import pytest
+
 from gjson._cli import cli
 from gjson.exceptions import GJSONParseError
 

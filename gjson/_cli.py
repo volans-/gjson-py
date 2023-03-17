@@ -3,9 +3,9 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
-from typing import IO, Any, Optional
+from typing import Any, IO, Optional
 
-from gjson import GJSONError, get
+from gjson import get, GJSONError
 
 
 def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001

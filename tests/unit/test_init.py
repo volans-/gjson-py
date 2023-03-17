@@ -5,8 +5,9 @@ import re
 from collections.abc import Mapping
 from math import isnan
 
-import gjson
 import pytest
+
+import gjson
 from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS
 
 INPUT_JSON = """
