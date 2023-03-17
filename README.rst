@@ -25,7 +25,11 @@ gjson-py is available on the `Python Package Index`_ (PyPI) and can be easily in
 
     pip install gjson
 
-A ``debian`` branch is also present with all the configuration to build the package for Debian-based systems.
+It's also available as a Debian package (`python3-gjson`_) on Debian systems starting from Debian 12 (*bookworm*) and
+can be installed with::
+
+    apt-get install python3-gjson
+
 A ``.deb`` package for the current stable and unstable Debian versions is also available for download on the
 `releases page on GitHub`_.
 
@@ -286,6 +290,7 @@ This is the list of additional modifiers specific to gjson-py not present in GJS
 .. _`gjson-py documentation`: https://volans-.github.io/gjson-py/index.html
 .. _`releases page on GitHub`: https://github.com/volans-/gjson-py/releases
 .. _`Python's JSON documentation`: https://docs.python.org/3/library/json.html#infinite-and-nan-number-values
+.. _`python3-gjson`: https://packages.debian.org/sid/python3-gjson
 
 .. _`Path Structure`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#path-structure
 .. _`Basic`: https://github.com/tidwall/gjson/blob/master/SYNTAX.md#basic
