@@ -20,6 +20,6 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install tox and any other packages
-        run: pip install "tox~=3.0"
+        run: pip install tox
       - name: Run tox
         run: tox
