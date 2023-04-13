@@ -878,7 +878,12 @@ class GJSONObj:
             elif self._is_sequence(obj):
                 if (self._after_hash or self._after_query_all) and part.delimiter == DOT_DELIMITER:
                     # Skip non mapping items and items without the given key
-                    ret = [i[part.part] for i in obj if isinstance(i, Mapping) and part.part in i]
+                    ret = []
+                    for i in obj:
+                        if isinstance(i, Mapping) and part.part in i:
+                            ret.append(i[part.part])
+                        elif self._is_sequence(i) and len(i):
+                            ret.append(i[int(part.part)])
                 elif (self._after_hash and part.delimiter == PIPE_DELIMITER
                         and isinstance(part.previous, ArrayLenghtQueryPart)):
                     raise GJSONParseError('Integer query part after a pipe delimiter on an sequence like object.',
@@ -1014,7 +1019,7 @@ class GJSONObj:
                         ret = [new_obj for _ in obj]
                 elif part.delimiter == PIPE_DELIMITER:
                     ret = new_obj
-            else:
+            elif not self._after_hash and not self._after_query_all:
                 if part.delimiter == DOT_DELIMITER and not isinstance(new_obj, NoResult):
                     json_error = 'literal afer a dot delimiter.'
                     ret = NoResult()

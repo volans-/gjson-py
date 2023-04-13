@@ -193,6 +193,7 @@ class TestObject:
         ('friends.#', 3),
         ('friends.#.age', [44, 68, 47]),
         ('friends.#.first', ['Dale', 'Roger', 'Jane']),
+        ('friends.#.nets.0', ['ig', 'fb', 'ig']),
         # Queries
         ('friends.#(last=="Murphy").first', 'Dale'),
         ('friends.#(last=="Murphy")#.first', ['Dale', 'Jane']),
