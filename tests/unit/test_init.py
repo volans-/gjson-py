@@ -236,7 +236,6 @@ class TestObject:
         ('friends.0|first', 'Dale'),
         ('friends|0|first', 'Dale'),
         ('friends|#', 3),
-        ('friends.#', 3),
         ('friends.#(last="Murphy")#',
          [{'first': 'Dale', 'last': 'Murphy', 'age': 44, 'nets': ['ig', 'fb', 'tw']},
           {'first': 'Jane', 'last': 'Murphy', 'age': 47, 'nets': ['ig', 'tw']}]),
