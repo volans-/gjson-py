@@ -1,5 +1,7 @@
 target-version = 'py39'
 line-length = 120
+
+[lint]
 select = ['F', 'E', 'W', 'C90', 'B', 'I', 'N', 'D', 'YTT', 'ANN', 'S', 'FBT', 'A', 'C4', 'DTZ', 'T10', 'EXE', 'ISC',
           'G', 'INP', 'T20', 'PT', 'Q', 'RSE', 'RET', 'SLF', 'SIM', 'TID', 'TCH', 'ARG', 'PTH', 'ERA', 'PL', 'TRY',
           'RUF']
@@ -15,18 +17,18 @@ ignore = [
     'N999',
 ]
 
-[per-file-ignores]
+[lint.per-file-ignores]
 'doc/source/conf.py' = ['A001', 'ERA001', 'INP001']
 'gjson/_cli.py' = ['T201']
 'setup.py' = ['EXE001']
 
-[flake8-annotations]
+[lint.flake8-annotations]
 mypy-init-return = true
 
-[flake8-bandit]
+[lint.flake8-bandit]
 check-typed-exception = true
 
-[flake8-pytest-style]
+[lint.flake8-pytest-style]
 parametrize-values-type = 'tuple'
 raises-extend-require-match-for = [
     'GJSONError',
@@ -34,8 +36,8 @@ raises-extend-require-match-for = [
     'GJSONInvalidSyntaxError',
 ]
 
-[flake8-quotes]
+[lint.flake8-quotes]
 inline-quotes = 'single'
 
-[pydocstyle]
+[lint.pydocstyle]
 convention = 'google'
