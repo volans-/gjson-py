@@ -8,7 +8,7 @@ from typing import IO, Any, Optional
 from gjson import GJSONError, get
 
 
-def cli(argv: Optional[Sequence[str]] = None) -> int:
+def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: PLR0915
     """Command line entry point to run gjson as a CLI tool.
 
     Arguments:
@@ -46,8 +46,10 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:
     # Reconfigure __stdin__ and __stdout__ instead of stdin and stdout because the latters are TextIO and could not
     # have the reconfigure() method if re-assigned, while reconfigure() is part of TextIOWrapper.
     # See also: https://github.com/python/typeshed/pull/8171
-    sys.__stdin__.reconfigure(errors='surrogateescape')
-    sys.__stdout__.reconfigure(errors='surrogateescape')
+    if sys.__stdin__ is not None:
+        sys.__stdin__.reconfigure(errors='surrogateescape')
+    if sys.__stdout__ is not None:
+        sys.__stdout__.reconfigure(errors='surrogateescape')
 
     def _execute(line: str, file_obj: Optional[IO[Any]]) -> int:
         try:
@@ -86,8 +88,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:
             if not data:
                 continue
             ret = _execute(data, None)
-            if ret > exit_code:
-                exit_code = ret
+            exit_code = max(exit_code, ret)
     else:
         exit_code = _execute('', args.file)
 

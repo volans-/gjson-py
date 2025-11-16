@@ -227,7 +227,7 @@ class GJSONObj:
 
         return json_string
 
-    def _parse(self, *, start: int, end: int, max_end: int = 0,  # noqa: PLR0912, PLR0913, PLR0915
+    def _parse(self, *, start: int, end: int, max_end: int = 0,  # noqa: PLR0912, PLR0915
                delimiter: str = '', in_multipaths: bool = False) -> list[BaseQueryPart]:
         """Parse the query. It will delegate to more specific parsers for each different feature.
 
@@ -1206,7 +1206,7 @@ class GJSONObj:
         """
         del last  # unused argument
         if isinstance(obj, Mapping):
-            return {k: obj[k] for k in reversed(obj.keys())}
+            return {k: obj[k] for k in reversed(list(obj.keys()))}
         if self._is_sequence(obj):
             return obj[::-1]
 

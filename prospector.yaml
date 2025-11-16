@@ -12,8 +12,5 @@ output-format: grouped
 ignore-paths:
   - doc/source/conf.py
 
-pyroma:
-  run: true
-
 vulture:
   run: true

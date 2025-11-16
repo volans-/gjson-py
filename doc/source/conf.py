@@ -4,10 +4,10 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import sys
+from importlib.metadata import version as meta_version
 from pathlib import Path
 
-import sphinx_rtd_theme
-from pkg_resources import get_distribution
+import sphinx_rtd_theme  # noqa: F401
 
 # -- Path setup --------------------------------------------------------------
 
@@ -33,7 +33,7 @@ author = 'Riccardo Coccioli'
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = get_distribution('gjson').version
+release = meta_version('gjson')
 # The short X.Y version.
 version = release
 
@@ -75,7 +75,6 @@ man_pages = [
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
