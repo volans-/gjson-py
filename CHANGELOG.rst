@@ -1,6 +1,51 @@
 Release Notes
 =============
 
+`v1.1.0`_ (2025-11-23)
+^^^^^^^^^^^^^^^^^^^^^^
+
+Minor improvements
+""""""""""""""""""
+
+* Add official support for Python 3.12, 3.13 and 3.13, remove support for Python 3.9.
+
+Bug fixes
+"""""""""
+
+* Query parsing: fix array index in corner case queries like ``friends.#.nets.0``.
+
+Miscellanea
+"""""""""""
+
+* code: various improvements:
+
+  * Fix minor issues reported by the latest version of the linters and checkers.
+  * Fix quote inconsistencies in tests.
+  * Improve code readability.
+  * Sort imports.
+
+* tox: various improvements:
+
+  * Remove pyroma from the tools run by prospector.
+  * Adopt ruff as static checker/linter.
+  * Add support for tox v4, remove optimization for tox < v4.
+  * Call ``sphinx-build`` instead of ``setup.py`` to build the documentation.
+
+* setup.py:
+
+  * Force a more recent ``sphinx_rtd_theme``.
+  * Use pathlib to read README file.
+
+* doc: add configuration file for Read the Docs, mention inclusion in Debian repositories.
+
+* tests: various improvements:
+
+  * Make regex matching more strict.
+  * Improve test coverage.
+  * Use canonical param for pytest.
+  * Improve docstring and test exceptions.
+  * Remove or adopt commented out tests.
+
 `v1.0.0`_ (2023-01-24)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -334,3 +379,4 @@ Miscellanea
 .. _`v0.3.0`: https://github.com/volans-/gjson-py/releases/tag/v0.3.0
 .. _`v0.4.0`: https://github.com/volans-/gjson-py/releases/tag/v0.4.0
 .. _`v1.0.0`: https://github.com/volans-/gjson-py/releases/tag/v1.0.0
+.. _`v1.1.0`: https://github.com/volans-/gjson-py/releases/tag/v1.1.0
