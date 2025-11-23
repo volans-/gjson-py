@@ -5,13 +5,12 @@ import re
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
-from gjson._gjson import GJSONObj, MODIFIER_NAME_RESERVED_CHARS
+from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS, GJSONObj
 from gjson._protocols import ModifierProtocol
 from gjson.exceptions import GJSONError, GJSONParseError
 
-
 # Explicit export of modules for the import * syntax, custom order to force the documentation order
-__all__ = ['get', 'GJSON', 'GJSONError', 'GJSONParseError', 'ModifierProtocol', 'GJSONObj', '__version__']
+__all__ = ['GJSON', 'GJSONError', 'GJSONObj', 'GJSONParseError', 'ModifierProtocol', '__version__', 'get']
 
 
 # TODO: use a proper type hint for obj once https://github.com/python/typing/issues/182 will be fixed

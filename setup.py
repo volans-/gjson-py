@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 """Package configuration."""
+from pathlib import Path
+
 from setuptools import find_packages, setup
-
-
-with open('README.rst', 'r') as readme:
-    long_description = readme.read()
 
 # Extra dependencies
 extras_require = {
@@ -17,14 +15,15 @@ extras_require = {
         'pytest-cov',
         'pytest-xdist',
         'pytest',
-        'sphinx_rtd_theme',
+        'ruff',
+        'sphinx_rtd_theme>=1.0',
         'sphinx-argparse',
         'sphinx-autodoc-typehints',
         'Sphinx',
-        'types-pkg_resources',
+        'types-setuptools',
     ],
     'prospector': [
-        'prospector[with_everything]',
+        'prospector[with-vulture]',
         'pytest',
     ],
 }
@@ -47,9 +46,11 @@ setup(
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
         'Programming Language :: Python :: 3 :: Only',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Text Processing',
@@ -67,7 +68,7 @@ setup(
     install_requires=[],
     keywords=['gjson', 'json'],
     license='GPLv3+',
-    long_description=long_description,
+    long_description=Path('README.rst').read_text(),
     long_description_content_type='text/x-rst',
     name='gjson',
     package_data={'gjson': ['py.typed']},

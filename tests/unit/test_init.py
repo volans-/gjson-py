@@ -1,16 +1,12 @@
 """GJSON test module."""
-# pylint: disable=attribute-defined-outside-init
 import json
 import re
-
 from collections.abc import Mapping
 from math import isnan
 
-import pytest
-
 import gjson
+import pytest
 from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS
-
 
 INPUT_JSON = """
 {
@@ -148,10 +144,9 @@ INPUT_NESTED_QUERIES = json.loads("""
 
 def compare_values(result, expected):
     """Compare results with the expected values ensuring same-order of keys for dictionaries."""
-    if isinstance(expected, float):
-        if isnan(expected):
-            assert isnan(result)
-            return
+    if isinstance(expected, float) and isnan(expected):
+        assert isnan(result)
+        return
 
     assert result == expected
     if isinstance(expected, Mapping):
@@ -164,7 +159,7 @@ class TestObject:
     def setup_method(self):
         """Initialize the test instance."""
         def upper(options, obj, *, last):
-            """Custom modifier to return a string upper case."""
+            """Change the case of the object returning its upper version. Custom modifier to be used in tests."""
             del options
             del last
             if isinstance(obj, list):
@@ -175,7 +170,7 @@ class TestObject:
         self.object = gjson.GJSON(INPUT_OBJECT)
         self.object.register_modifier('upper', upper)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         # Basic
         ('name.last', 'Anderson'),
         ('name.first', 'Tom'),
@@ -196,6 +191,7 @@ class TestObject:
         ('friends.#', 3),
         ('friends.#.age', [44, 68, 47]),
         ('friends.#.first', ['Dale', 'Roger', 'Jane']),
+        ('friends.#.nets.0', ['ig', 'fb', 'ig']),
         # Queries
         ('friends.#(last=="Murphy").first', 'Dale'),
         ('friends.#(last=="Murphy")#.first', ['Dale', 'Jane']),
@@ -216,10 +212,8 @@ class TestObject:
         ('friends.#(>40)#', []),
         ('children.#(!%"*a*")', 'Alex'),
         ('children.#(%"*a*")#', ['Sara', 'Jack']),
-        # Nested queries (TODO)
-        # ('friends.#(nets.#(=="fb"))#.first', ['Dale', 'Roger']),
-        # Tilde in queries (TODO)
-        # ('vals.#(b==~true)#.a')
+        # Nested queries
+        ('friends.#(nets.#(=="fb"))#.first', ['Dale', 'Roger']),
         # Modifiers
         ('children.@reverse', ['Jack', 'Alex', 'Sara']),
         ('children.@reverse.0', 'Jack'),
@@ -242,7 +236,6 @@ class TestObject:
         ('friends.0|first', 'Dale'),
         ('friends|0|first', 'Dale'),
         ('friends|#', 3),
-        ('friends.#', 3),
         ('friends.#(last="Murphy")#',
          [{'first': 'Dale', 'last': 'Murphy', 'age': 44, 'nets': ['ig', 'fb', 'tw']},
           {'first': 'Jane', 'last': 'Murphy', 'age': 47, 'nets': ['ig', 'tw']}]),
@@ -269,9 +262,9 @@ class TestObject:
         ('{name.first,age,name.last}', {'first': 'Tom', 'age': 37, 'last': 'Anderson'}),
         ('{{age}}', {'_': {'age': 37}}),
         ('{{age},age}', {'_': {'age': 37}, 'age': 37}),
-        ('friends.0.{age,nets.#(="ig")}', {'age': 44, "_": 'ig'}),
-        ('friends.0.{age,nets.#(="ig"),invalid}', {'age': 44, "_": 'ig'}),
-        ('friends.0.{age,nets.#(="ig")#}', {'age': 44, "_": ['ig']}),
+        ('friends.0.{age,nets.#(="ig")}', {'age': 44, '_': 'ig'}),
+        ('friends.0.{age,nets.#(="ig"),invalid}', {'age': 44, '_': 'ig'}),
+        ('friends.0.{age,nets.#(="ig")#}', {'age': 44, '_': ['ig']}),
         ('friends.#.{age,"key":first}',
          [{'age': 44, 'key': 'Dale'}, {'age': 68, 'key': 'Roger'}, {'age': 47, 'key': 'Jane'}]),
         ('friends.#(age>44)#.{age,"key":first}', [{'age': 68, 'key': 'Roger'}, {'age': 47, 'key': 'Jane'}]),
@@ -283,10 +276,10 @@ class TestObject:
         ('{friends.{"a":0.{nets.{0}}}}', {'_': {'a': {'_': {'0': 'ig'}}}}),
         ('{friends.{"a":0.{nets.{0,1}}}}', {'_': {'a': {'_': {'0': 'ig', '1': 'fb'}}}}),
         ('friends.#.{age,first|@upper}',
-         [{"age": 44, "@upper": "DALE"}, {"age": 68, "@upper": "ROGER"}, {"age": 47, "@upper": "JANE"}]),
-        ('{friends.#.{age,"first":first|@upper}|0.first}', {"first": "DALE"}),
+         [{'age': 44, '@upper': 'DALE'}, {'age': 68, '@upper': 'ROGER'}, {'age': 47, '@upper': 'JANE'}]),
+        ('{friends.#.{age,"first":first|@upper}|0.first}', {'first': 'DALE'}),
         ('{"children":children|@upper,"name":name.first,"age":age}',
-         {"children": ["SARA", "ALEX", "JACK"], "name": "Tom", "age": 37}),
+         {'children': ['SARA', 'ALEX', 'JACK'], 'name': 'Tom', 'age': 37}),
         ('friends.#.{age,"first":first.invalid}', [{'age': 44}, {'age': 68}, {'age': 47}]),
         # Multipaths arrays
         ('[]', []),
@@ -357,7 +350,7 @@ class TestObject:
         """It should query the JSON object and return the expected result."""
         compare_values(self.object.get(query), expected)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         # Basic
         ('.', 'Invalid query starting with a path delimiter.'),
         ('|', 'Invalid query starting with a path delimiter.'),
@@ -401,7 +394,7 @@ class TestObject:
         ('friends.@', 'Got empty modifier name.'),
         ('friends.@pretty:', 'Modifier with options separator `:` without any option.'),
         ('friends.@pretty:{invalid', 'Unable to load modifier options.'),
-        ('friends.@pretty:["invalid"]', "Expected JSON object `{...}` as modifier options."),
+        ('friends.@pretty:["invalid"]', 'Expected JSON object `{...}` as modifier options.'),
         ('friends.@invalid', 'Unknown modifier @invalid.'),
         ('friends.@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
         # JSON Lines
@@ -434,10 +427,10 @@ class TestObject:
     ))
     def test_get_parser_raise(self, query, error):
         """It should raise a GJSONParseError error with the expected message."""
-        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONParseError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         # Basic
         ('', 'Empty query.'),
         # Modifiers
@@ -448,7 +441,7 @@ class TestObject:
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
 
@@ -459,7 +452,7 @@ class TestEscape:
         """Initialize the test instance."""
         self.escape = gjson.GJSON(INPUT_ESCAPE)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         (r'test.\*', 'valZ'),
         (r'test.\*v', 'val0'),
         (r'test.keyv\*', 'val1'),
@@ -483,7 +476,7 @@ class TestBasic:
         """Initialize the test instance."""
         self.basic = gjson.GJSON(INPUT_BASIC)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('loggy.programmers.#(age=101).firstName', 1002.3),
         ('loggy.programmers.#(firstName != "Brett").firstName', 'Jason'),
         ('loggy.programmers.#(firstName % "Bre*").email', 'aaaa'),
@@ -519,7 +512,7 @@ class TestList:
         """Initialize the test instance."""
         self.list = gjson.GJSON(INPUT_LIST)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         # Dot vs Pipe
         ('#.first', ['Dale', 'Jane']),
         ('#.first.#', []),
@@ -540,7 +533,7 @@ class TestList:
         """It should query the list test JSON and return the expected result."""
         assert self.list.get(query, quiet=False) == expected
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         # Dot vs Pipe
         ('#|first', 'Invalid or unsupported query part `first`.'),
         ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
@@ -548,7 +541,7 @@ class TestList:
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONParseError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONParseError, match=fr'^{re.escape(error)}'):
             self.list.get(query)
 
 
@@ -559,7 +552,7 @@ class TestFlattenModifier:
         """Initialize the test instance."""
         self.list = gjson.GJSON(json.loads('[1, [2], [3, 4], [5, [6, 7]], [8, [9, [10, 11]]]]'))
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('@flatten', [1, 2, 3, 4, 5, [6, 7], 8, [9, [10, 11]]]),
         ('@flatten:{"deep":true}', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
     ))
@@ -575,7 +568,7 @@ class TestTruthiness:
         """Initialize the test instance."""
         self.object = gjson.GJSON(INPUT_TRUTHINESS)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('vals.#(b==~true).a', 1),
         ('vals.#(b==~true)#.a', [1, 2, 4, 6, 7, 8]),
         ('vals.#(b==~false).a', 3),
@@ -586,13 +579,13 @@ class TestTruthiness:
         """It should query the JSON object and return the expected result."""
         compare_values(self.object.get(query), expected)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         ('vals.#(b==~"invalid")',
          "Queries ==~ operator requires a boolean value, got <class 'str'> instead: `invalid`"),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
 
@@ -603,7 +596,7 @@ class TestNestedQueries:
         """Initialize the test instance."""
         self.object = gjson.GJSON(INPUT_NESTED_QUERIES)
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         # Arrays of objects
         ('key.#(level1.#(level2.#(level3)))', INPUT_NESTED_QUERIES['key'][0]),
         ('key.#(level1.#(level2.#(level3)))#', INPUT_NESTED_QUERIES['key'][0:2]),
@@ -632,17 +625,17 @@ class TestNestedQueries:
         """It should query the JSON object and return the expected result."""
         compare_values(self.object.get(query), expected)
 
-    @pytest.mark.parametrize('query, error', (
+    @pytest.mark.parametrize(('query', 'error'), (
         ('key.#(level1.#(level2.#(level3.#(==0))))', 'Query for first element does not match anything.'),
         ('key.#(#(#(level3.#(==0))))', 'Query for first element does not match anything.'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
-        with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
 
-@pytest.mark.parametrize('query, expected', (
+@pytest.mark.parametrize(('query', 'expected'), (
     ('0.0', 'zero'),
     ('0|0', 'zero'),
     ('#.0', ['zero']),
@@ -659,7 +652,7 @@ def test_get_integer_mapping_keys_ok(query, expected):
     assert obj.get(query, quiet=True) == expected
 
 
-@pytest.mark.parametrize('query, error', (
+@pytest.mark.parametrize(('query', 'error'), (
     ('0.1', 'Mapping object does not have key `1`.'),
     ('#|0', 'Integer query part after a pipe delimiter on an sequence like object.'),
     ('#|9', 'Integer query part after a pipe delimiter on an sequence like object.'),
@@ -667,7 +660,8 @@ def test_get_integer_mapping_keys_ok(query, expected):
 ))
 def test_get_integer_mapping_keys_raise(query, error):
     """It should return the expected result."""
-    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+    with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
+
         gjson.GJSON([{'0': 'zero'}]).get(query)
 
 
@@ -684,9 +678,9 @@ def test_get_modifier_valid_raise():
     assert obj.get('@valid', quiet=True) is None
 
 
-@pytest.mark.parametrize('data, expected', (
+@pytest.mark.parametrize(('data', 'expected'), (
     ('[3, 1, 5, 8, 2]', [1, 2, 3, 5, 8]),
-    ('{"b": 2, "d": 4, "c": 3, "a": 1}', {"a": 1, "b": 2, "c": 3, "d": 4}),
+    ('{"b": 2, "d": 4, "c": 3, "a": 1}', {'a': 1, 'b': 2, 'c': 3, 'd': 4}),
     ('"a string"', None),
 ))
 def test_get_modifier_sort(data, expected):
@@ -695,7 +689,7 @@ def test_get_modifier_sort(data, expected):
     compare_values(obj.get('@sort', quiet=True), expected)
 
 
-@pytest.mark.parametrize('data, query, expected', (
+@pytest.mark.parametrize(('data', 'query', 'expected'), (
     ({'a': '{"b": 25}'}, 'a.@fromstr', {'b': 25}),
     ({'a': '{"b": 25}'}, 'a.@fromstr.b', 25),
 ))
@@ -705,14 +699,14 @@ def test_get_modifier_fromstr_ok(data, query, expected):
     assert obj.get(query, quiet=True) == expected
 
 
-@pytest.mark.parametrize('query, error', (
+@pytest.mark.parametrize(('query', 'error'), (
     ('a.@fromstr', 'The current @fromstr input object cannot be converted to JSON.'),
     ('b.@fromstr', "Modifier @fromstr got object of type <class 'dict'> as input, expected string or bytes."),
 ))
 def test_get_modifier_fromstr_raise(query, error):
     """It should raise a GJSONError if the JSON-encoded string has invalid JSON."""
     obj = gjson.GJSON({'a': '{"invalid: json"', 'b': {'not': 'a string'}})
-    with pytest.raises(gjson.GJSONError, match=re.escape(error)):
+    with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
         obj.get(query)
 
 
@@ -720,7 +714,7 @@ def test_get_modifier_tostr_raise():
     """It should raise a GJSONError if the object cannot be JSON-encoded."""
     obj = gjson.GJSON({'a': {1, 2, 3}})  # Python sets cannot be JSON-encoded
     match = re.escape('The current object cannot be converted to a JSON-encoded string for @tostr.')
-    with pytest.raises(gjson.GJSONError, match=match):
+    with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
         obj.get('a.@tostr')
 
 
@@ -759,14 +753,21 @@ def test_module_get():
     assert gjson.get({'key': 'value'}, 'key') == 'value'
 
 
-def test_gjson_get_gjson():
+def test_gjson_get_gjson_ok():
     """It should return the queried object as a GJSON object."""
     ret = gjson.GJSON(INPUT_OBJECT).get_gjson('children')
     assert isinstance(ret, gjson.GJSON)
     assert str(ret) == '["Sara", "Alex", "Jack"]'
 
 
-@pytest.mark.parametrize('data, num, expected', (
+@pytest.mark.parametrize('kwargs', ({}, {'quiet': False}))
+def test_gjson_get_gjson_raise(kwargs):
+    """It should raise a GJSONError if the quiet parameter is not passed or is False."""
+    with pytest.raises(gjson.GJSONError, match=r'^Mapping object does not have key `nonexistent`.'):
+        gjson.GJSON(INPUT_OBJECT).get_gjson('nonexistent', **kwargs)
+
+
+@pytest.mark.parametrize(('data', 'num', 'expected'), (
     # Valid data
     ('[1, 2, 3, 4, 5]', None, {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}),
     ('[1, 2, 3, 4, 5]', 0, {}),
@@ -790,13 +791,13 @@ def test_get_modifier_top_n(data, num, expected):
         compare_values(obj.get('@top_n', quiet=True), expected)
 
 
-@pytest.mark.parametrize('num, expected', (
+@pytest.mark.parametrize(('num', 'expected'), (
     (0, {}),
-    (1, {"c": 12}),
-    (2, {"c": 12, "a": 8}),
-    (3, {"c": 12, "a": 8, "d": 4}),
-    (4, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
-    (None, {"c": 12, "a": 8, "d": 4, "b": 3.5}),
+    (1, {'c': 12}),
+    (2, {'c': 12, 'a': 8}),
+    (3, {'c': 12, 'a': 8, 'd': 4}),
+    (4, {'c': 12, 'a': 8, 'd': 4, 'b': 3.5}),
+    (None, {'c': 12, 'a': 8, 'd': 4, 'b': 3.5}),
 ))
 def test_get_modifier_sum_n_valid(num, expected):
     """It should group and sum and return the top N items."""
@@ -815,7 +816,7 @@ def test_get_modifier_sum_n_valid(num, expected):
 def test_get_modifier_sum_n_invalid_data(data):
     """It should raise a GJSONError if the input is invalid."""
     obj = gjson.GJSON(json.loads(data))
-    with pytest.raises(gjson.GJSONError, match="@sum_n modifier not supported for object of type"):
+    with pytest.raises(gjson.GJSONError, match=r'^@sum_n modifier not supported for object of type'):
         obj.get('@sum_n:{"group": "key", "sum": "value"}')
 
 
@@ -830,7 +831,7 @@ def test_get_modifier_sum_n_invalid_data(data):
 def test_get_modifier_sum_n_invalid_options(options):
     """It should raise a GJSONError if the options are invalid."""
     obj = gjson.GJSON(INPUT_SUM_N)
-    with pytest.raises(gjson.GJSONError, match="Modifier @sum_n raised an exception"):
+    with pytest.raises(gjson.GJSONError, match=r'^Modifier @sum_n raised an exception'):
         obj.get(f'@sum_n{options}')
 
 
@@ -849,6 +850,10 @@ class TestJSONOutput:
         assert gjson.get(self.obj, self.query, as_str=True) == self.value
         assert gjson.get(self.obj, '', as_str=True, quiet=True) == ''
 
+    def test_module_get_str(self):
+        """It should return the string representation of the object."""
+        assert str(self.gjson) == '{"key": "value", "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"}'
+
     def test_gjson_getj(self):
         """It should return the queried object as a JSON string."""
         assert self.gjson.getj(self.query) == self.value
@@ -856,15 +861,15 @@ class TestJSONOutput:
 
     def test_module_get_as_str_raise(self):
         """It should raise a GJSONError with the proper message on failure."""
-        with pytest.raises(gjson.GJSONError, match='Empty query.'):
+        with pytest.raises(gjson.GJSONError, match=r'^Empty query.'):
             gjson.get(self.obj, '', as_str=True)
 
     def test_gjson_get_as_str_raise(self):
         """It should raise a GJSONError with the proper message on failure."""
-        with pytest.raises(gjson.GJSONError, match='Empty query.'):
+        with pytest.raises(gjson.GJSONError, match=r'^Empty query.'):
             self.gjson.getj('')
 
-    @pytest.mark.parametrize('query, expected', (
+    @pytest.mark.parametrize(('query', 'expected'), (
         ('@pretty', '{\n  "key": "value",\n  "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
         ('@pretty:{"indent": 4}',
          '{\n    "key": "value",\n    "hello world": "\u3053\u3093\u306b\u3061\u306f\u4e16\u754c"\n}'),
@@ -898,11 +903,11 @@ class TestJSONOutput:
 
 
 def custom_sum(options, obj, *, last):
-    """Custom modifier function."""
+    """Sum items in list. Custom modifier function to be used in tests."""
     assert last is True
     assert options == {}
     if not isinstance(obj, list):
-        raise RuntimeError('@sum can be used only on lists')
+        raise TypeError('@sum can be used only on lists')
 
     return sum(obj)
 
@@ -935,20 +940,22 @@ class TestCustomModifiers:
         name = fr'a{char}b'
         with pytest.raises(
                 gjson.GJSONError,
-                match=fr'Unable to register modifier `{re.escape(name)}`, contains at least one not allowed'):
+                match=fr'^Unable to register modifier `{re.escape(name)}`, contains at least one not allowed'):
             obj.register_modifier(name, custom_sum)
 
     def test_gjson_register_modifier_override_builtin(self):
         """It should raise a GJSONError if trying to register a modifier with the same name of a built-in one."""
         obj = gjson.GJSON(self.valid_obj)
-        with pytest.raises(gjson.GJSONError,
-                           match=r'Unable to register a modifier with the same name of the built-in modifier: @valid'):
+        match = re.escape('Unable to register a modifier with the same name of the built-in modifier: @valid')
+        with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
             obj.register_modifier('valid', custom_sum)
 
     def test_gjson_register_modifier_not_callable(self):
         """It should raise a GJSONError if trying to register a modifier that is not callable."""
         obj = gjson.GJSON(self.valid_obj)
-        with pytest.raises(gjson.GJSONError, match=r'The given func "not-callable" for the custom modifier @sum does'):
+        match = re.escape('The given func "not-callable" for the custom modifier @sum does not adhere to the '
+                          'gjson.ModifierProtocol.')
+        with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
             obj.register_modifier('sum', 'not-callable')
 
     def test_gjsonobj_custom_modifiers_ok(self):
@@ -958,19 +965,19 @@ class TestCustomModifiers:
 
     def test_gjsonobj_custom_modifiers_raise(self):
         """It should encapsulate the modifier raised exception in a GJSONError."""
-        with pytest.raises(gjson.GJSONError,
-                           match=r'Modifier @sum raised an exception'):
+        with pytest.raises(gjson.GJSONError, match=fr'^{re.escape("Modifier @sum raised an exception")}'):
             gjson.GJSONObj(self.invalid_obj, self.query, custom_modifiers={'sum': custom_sum}).get()
 
     def test_gjsonobj_custom_modifiers_override_builtin(self):
         """It should raise a GJSONError if passing custom modifiers that have the same name of a built-in one."""
         with pytest.raises(gjson.GJSONError,
-                           match=r"Some provided custom_modifiers have the same name of built-in ones: {'valid'}"):
+                           match=r"^Some provided custom_modifiers have the same name of built-in ones: {'valid'}"):
             gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'valid': custom_sum})
 
     def test_gjsoniobj_custom_modifiers_not_callable(self):
         """It should raise a GJSONError if passing custom modifiers that are not callable."""
-        with pytest.raises(gjson.GJSONError, match=r'The given func "not-callable" for the custom modifier @sum does'):
+        match = re.escape('The given func "not-callable" for the custom modifier @sum does not adhere to the')
+        with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
             gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'sum': 'not-callable'})
 
     def test_gjsonobj_builtin_modifiers(self):

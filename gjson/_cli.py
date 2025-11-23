@@ -3,12 +3,12 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
-from typing import Any, IO, Optional
+from typing import IO, Any, Optional
 
-from gjson import get, GJSONError
+from gjson import GJSONError, get
 
 
-def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
+def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: PLR0915
     """Command line entry point to run gjson as a CLI tool.
 
     Arguments:
@@ -18,9 +18,9 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
         The CLI exit code to use.
 
     Raises:
-        OSError: for system-related error, including I/O failures.
+        OSError: for system-related errors, including I/O failures.
         json.JSONDecodeError: when the input data is not a valid JSON.
-        gjson.GJSONError: for any query-related error in gjson.
+        gjson.GJSONError: for any query-related error raised by gjson.
 
     """
     parser = get_parser()
@@ -38,7 +38,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     except (OSError, argparse.ArgumentTypeError) as ex:
         if args.verbose == 1:
             print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
-        elif args.verbose >= 2:
+        elif args.verbose >= 2:  # noqa: PLR2004
             raise
 
         return 1
@@ -46,8 +46,10 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     # Reconfigure __stdin__ and __stdout__ instead of stdin and stdout because the latters are TextIO and could not
     # have the reconfigure() method if re-assigned, while reconfigure() is part of TextIOWrapper.
     # See also: https://github.com/python/typeshed/pull/8171
-    sys.__stdin__.reconfigure(errors='surrogateescape')
-    sys.__stdout__.reconfigure(errors='surrogateescape')
+    if sys.__stdin__ is not None:
+        sys.__stdin__.reconfigure(errors='surrogateescape')
+    if sys.__stdout__ is not None:
+        sys.__stdout__.reconfigure(errors='surrogateescape')
 
     def _execute(line: str, file_obj: Optional[IO[Any]]) -> int:
         try:
@@ -59,11 +61,10 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
                     for input_line in file_obj:
                         if input_line.strip():
                             input_data.append(json.loads(input_line, strict=False))
-            else:
-                if line:
-                    input_data = json.loads(line, strict=False)
-                elif file_obj is not None:
-                    input_data = json.load(file_obj, strict=False)
+            elif line:
+                input_data = json.loads(line, strict=False)
+            elif file_obj is not None:
+                input_data = json.load(file_obj, strict=False)
 
             result = get(input_data, args.query, as_str=True)
             exit_code = 0
@@ -72,7 +73,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
             exit_code = 1
             if args.verbose == 1:
                 print(f'{ex.__class__.__name__}: {ex}', file=sys.stderr)
-            elif args.verbose >= 2:
+            elif args.verbose >= 2:  # noqa: PLR2004
                 raise
 
         if result:
@@ -83,12 +84,11 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: MC0001
     if args.lines:
         exit_code = 0
         for line in args.file:
-            line = line.strip()
-            if not line:
+            data = line.strip()
+            if not data:
                 continue
-            ret = _execute(line, None)
-            if ret > exit_code:
-                exit_code = ret
+            ret = _execute(data, None)
+            exit_code = max(exit_code, ret)
     else:
         exit_code = _execute('', args.file)
 
