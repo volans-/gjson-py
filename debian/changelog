@@ -1,3 +1,12 @@
+python-gjson (1.1.0-1) unstable; urgency=medium
+
+  * v1.1.0 upstream release.
+  * debian/rules: bump Standards-Version to 4.7.2.0.
+  * debian/rules: bump dh-python to >= 6.20250414 (trixie version).
+  * debian/copyright: update copyright year.
+
+ -- Riccardo Coccioli <volans-@users.noreply.github.com>  Sun, 23 Nov 2025 11:34:38 -0000
+
 python-gjson (1.0.0-1) unstable; urgency=medium
 
   * v1.0.0 upstream release.

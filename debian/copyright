@@ -3,7 +3,7 @@ Upstream-Name: gjson-py
 Source: https://github.com/volans-/gjson-py
 
 Files: *
-Copyright: 2022-2023 Riccardo Coccioli <volans-@users.noreply.github.com>
+Copyright: 2022-2025 Riccardo Coccioli <volans-@users.noreply.github.com>
 License: GPL-3.0+
 
 License: GPL-3.0+

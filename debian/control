@@ -2,10 +2,10 @@ Source: python-gjson
 Section: python
 Priority: optional
 Maintainer: Riccardo Coccioli <volans-@users.noreply.github.com>
-Standards-Version: 4.6.2
+Standards-Version: 4.7.2.0
 Build-Depends:
   debhelper-compat (=13),
-  dh-python (>= 4.20201102),
+  dh-python (>= 6.20250414),
   gnupg,
   python3,
   python3-pytest,
