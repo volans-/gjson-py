@@ -13,6 +13,9 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=$(DEB_VERSION_UPSTREAM)
 	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_installman:
-	sphinx-build -b man
+	# Generate egg-info metadata in the current dir so
+	# importlib in doc/source/conf.py finds it
+	python3 setup.py egg_info
+	PYTHONPATH=. sphinx-build -b man doc/source doc/build/man
 	sed -i='' -e 's/^\.B/.B /' doc/build/man/gjson.1
 	dh_installman
