@@ -1,21 +1,20 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson._gjson &mdash; gjson-py 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>gjson._gjson &mdash; gjson-py 1.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -26,14 +25,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> gjson-py
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            gjson-py
           </a>
-              <div class="version">
-                1.0.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -61,7 +61,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../gjson.html">gjson</a></li>
       <li class="breadcrumb-item active">gjson._gjson</li>
@@ -75,17 +75,17 @@
              
   <h1>Source code for gjson._gjson</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;GJSON module.&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">operator</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">zip_longest</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">zip_longest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">gjson._protocols</span> <span class="kn">import</span> <span class="n">ModifierProtocol</span>
-<span class="kn">from</span> <span class="nn">gjson.exceptions</span> <span class="kn">import</span> <span class="n">GJSONError</span><span class="p">,</span> <span class="n">GJSONInvalidSyntaxError</span><span class="p">,</span> <span class="n">GJSONParseError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gjson._protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModifierProtocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gjson.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">GJSONError</span><span class="p">,</span> <span class="n">GJSONInvalidSyntaxError</span><span class="p">,</span> <span class="n">GJSONParseError</span>
 
 <span class="n">ESCAPE_CHARACTER</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span>
 <span class="sd">&quot;&quot;&quot;str: The grammar escape character.&quot;&quot;&quot;</span>
@@ -95,7 +95,7 @@
 <span class="sd">&quot;&quot;&quot;str: One of the available delimiters in the query grammar.&quot;&quot;&quot;</span>
 <span class="n">DELIMITERS</span> <span class="o">=</span> <span class="p">(</span><span class="n">DOT_DELIMITER</span><span class="p">,</span> <span class="n">PIPE_DELIMITER</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;tuple: All the available delimiters in the query grammar.&quot;&quot;&quot;</span>
-<span class="n">MULTIPATHS_DELIMITERS</span> <span class="o">=</span> <span class="n">DELIMITERS</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="n">MULTIPATHS_DELIMITERS</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">DELIMITERS</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;tuple: All the available delimiters in the query grammar.&quot;&quot;&quot;</span>
 <span class="c1"># Single character operators goes last to avoid mis-detection.</span>
 <span class="n">QUERIES_OPERATORS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;==~&#39;</span><span class="p">,</span> <span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;!=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;!%&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span>
@@ -103,14 +103,15 @@
 <span class="n">MODIFIER_NAME_RESERVED_CHARS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;tuple: The list of reserver characters not usable in a modifier&#39;s name.&quot;&quot;&quot;</span>
 <span class="n">PARENTHESES_PAIRS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;(&#39;</span><span class="p">:</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span> <span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">:</span> <span class="s1">&#39;{&#39;</span><span class="p">}</span>
+<span class="n">GJSONObjT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;GJSONObjT&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;GJSONObj&#39;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">NoResult</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A no result type to be passed around and be checked.&quot;&quot;&quot;</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">BaseQueryPart</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseQueryPart</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base dataclass class to represent a query part.&quot;&quot;&quot;</span>
 
     <span class="n">start</span><span class="p">:</span> <span class="nb">int</span>
@@ -120,8 +121,8 @@
     <span class="n">previous</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s1">&#39;BaseQueryPart&#39;</span><span class="p">]</span>
     <span class="n">is_last</span><span class="p">:</span> <span class="nb">bool</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;String representation of the part.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the string representation of the part.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            The part property of the instance.</span>
@@ -130,19 +131,19 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">part</span>
 
 
-<span class="k">class</span> <span class="nc">FieldQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FieldQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Basic field path query part.&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">ArrayLenghtQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayLenghtQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Hash query part, to get the size of an array.&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">ArrayIndexQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayIndexQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Integer query part to get an array index.&quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the integer representation of the query part.</span>
 
 <span class="sd">        Returns:</span>
@@ -153,7 +154,7 @@
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ArrayQueryQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayQueryQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Query part for array queries, with additional fields.&quot;&quot;&quot;</span>
 
     <span class="n">field</span><span class="p">:</span> <span class="nb">str</span>
@@ -163,7 +164,7 @@
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ModifierQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModifierQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Modifier query part.&quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
@@ -171,7 +172,7 @@
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MultipathsItem</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultipathsItem</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Single multipaths query item.&quot;&quot;&quot;</span>
 
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
@@ -179,29 +180,29 @@
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MultipathsObjectQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultipathsObjectQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;JSON object multipaths query part.&quot;&quot;&quot;</span>
 
     <span class="n">parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MultipathsItem</span><span class="p">]</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MultipathsArrayQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MultipathsArrayQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;JSON object multipaths query part.&quot;&quot;&quot;</span>
 
     <span class="n">parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">BaseQueryPart</span><span class="p">]]</span>
 
 
-<span class="k">class</span> <span class="nc">LiteralQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LiteralQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Literal query part.&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="GJSONObj"><a class="viewcode-back" href="../../api.html#gjson.GJSONObj">[docs]</a><span class="k">class</span> <span class="nc">GJSONObj</span><span class="p">:</span>
+<div class="viewcode-block" id="GJSONObj">
+<a class="viewcode-back" href="../../api.html#gjson.GJSONObj">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GJSONObj</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A low-level class to perform the GJSON query on a JSON-like object.&quot;&quot;&quot;</span>
 
-    <span class="c1"># pylint: disable=too-many-branches,too-many-statements,too-many-locals</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ModifierProtocol</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ModifierProtocol</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the instance with the starting object and query.</span>
 
 <span class="sd">        Examples:</span>
@@ -238,8 +239,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="GJSONObj.builtin_modifiers"><a class="viewcode-back" href="../../api.html#gjson.GJSONObj.builtin_modifiers">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">builtin_modifiers</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="GJSONObj.builtin_modifiers">
+<a class="viewcode-back" href="../../api.html#gjson.GJSONObj.builtin_modifiers">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">builtin_modifiers</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">GJSONObjT</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the names of the built-in modifiers.</span>
 
 <span class="sd">        Returns:</span>
@@ -249,7 +252,10 @@
         <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;_apply_modifier_&#39;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">modifier</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span> <span class="k">for</span> <span class="n">modifier</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="k">if</span> <span class="n">modifier</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)}</span></div>
 
-<div class="viewcode-block" id="GJSONObj.get"><a class="viewcode-back" href="../../api.html#gjson.GJSONObj.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+
+<div class="viewcode-block" id="GJSONObj.get">
+<a class="viewcode-back" href="../../api.html#gjson.GJSONObj.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the query and return the resulting object.</span>
 
 <span class="sd">        Examples:</span>
@@ -279,7 +285,10 @@
 
         <span class="k">return</span> <span class="n">obj</span></div>
 
-<div class="viewcode-block" id="GJSONObj.__str__"><a class="viewcode-back" href="../../api.html#gjson.GJSONObj.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+
+<div class="viewcode-block" id="GJSONObj.__str__">
+<a class="viewcode-back" href="../../api.html#gjson.GJSONObj.__str__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the JSON string representation of the object, based on the query parameters.</span>
 
 <span class="sd">        Examples:</span>
@@ -300,13 +309,14 @@
         <span class="n">json_string</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">prefix</span><span class="p">:</span>
-            <span class="n">json_string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">line</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">json_string</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">line</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">json_string</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">json_string</span></div>
 
-    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-               <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseQueryPart</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main parser of the query that will delegate to more specific parsers for each different feature.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1"># noqa: PLR0912, PLR0915</span>
+               <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">BaseQueryPart</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the query. It will delegate to more specific parsers for each different feature.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            start: the start position in the query.</span>
@@ -368,22 +378,24 @@
                 <span class="k">continue</span>
 
             <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;@&#39;</span><span class="p">:</span>
-                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_modifier_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_modifier_query_part</span><span class="p">(</span>
+                    <span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">next_char</span> <span class="ow">in</span> <span class="n">DELIMITERS</span> <span class="ow">or</span> <span class="n">next_char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="n">part</span> <span class="o">=</span> <span class="n">ArrayLenghtQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">char</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="n">next_char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
                                             <span class="n">previous</span><span class="o">=</span><span class="n">previous</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span> <span class="ow">and</span> <span class="n">next_char</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
-                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_query_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_query_query_part</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[0-9]&#39;</span><span class="p">,</span> <span class="n">char</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">current</span><span class="p">:</span>
-                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_index_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_index_query_part</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span>
-                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_object_multipaths_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_object_multipaths_query_part</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
                 <span class="n">require_delimiter</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
-                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_multipaths_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_multipaths_query_part</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
                 <span class="n">require_delimiter</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;!&#39;</span><span class="p">:</span>
-                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_literal_query_part</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_literal_query_part</span><span class="p">(</span>
+                    <span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">in_multipaths</span> <span class="ow">and</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span><span class="p">:</span>
                 <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
                 <span class="k">break</span>
@@ -420,7 +432,7 @@
         <span class="k">return</span> <span class="n">parts</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if an object is a sequence but not a string or bytes object.</span>
 
 <span class="sd">        Arguments:</span>
@@ -432,7 +444,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_find_closing_parentheses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">opening</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_closing_parentheses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">opening</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>  <span class="c1"># noqa: PLR0912</span>
+                                  <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the matching parentheses that closes the opening one looking for unbalance of the given character.</span>
 
 <span class="sd">        Arguments:</span>
@@ -467,11 +480,7 @@
                 <span class="k">continue</span>
 
             <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">in_string</span><span class="p">:</span>
-                    <span class="n">in_string</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">in_string</span> <span class="o">=</span> <span class="kc">True</span>
-
+                <span class="n">in_string</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">in_string</span>
                 <span class="k">continue</span>
 
             <span class="k">if</span> <span class="n">in_string</span><span class="p">:</span>
@@ -479,7 +488,7 @@
 
             <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="n">opening</span><span class="p">:</span>
                 <span class="n">opened</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="n">closing</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="n">closing</span><span class="p">:</span>  <span class="c1"># noqa: SIM102</span>
                 <span class="k">if</span> <span class="n">opened</span><span class="p">:</span>
                     <span class="n">opened</span> <span class="o">-=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">opened</span><span class="p">:</span>
@@ -504,7 +513,7 @@
 
         <span class="k">return</span> <span class="n">start</span> <span class="o">+</span> <span class="n">end</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_modifier_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                                    <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModifierQueryPart</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the modifier end position in the query starting from a given point.</span>
 
@@ -562,7 +571,7 @@
         <span class="k">return</span> <span class="n">ModifierQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span>
                                  <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_modifier_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_modifier_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the modifier options end position in the query starting from a given point.</span>
 
 <span class="sd">        Arguments:</span>
@@ -591,14 +600,14 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">options</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">options_string</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">break</span>
-            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>  <span class="c1"># noqa: S110</span>
                 <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Unable to load modifier options.&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_string</span><span class="p">),</span> <span class="n">options</span>
 
-    <span class="k">def</span> <span class="nf">_parse_array_query_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArrayQueryQueryPart</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_array_query_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArrayQueryQueryPart</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse an array query part starting from the given point.</span>
 
 <span class="sd">        Arguments:</span>
@@ -641,7 +650,8 @@
             <span class="n">offset</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">query_operator</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span> <span class="k">else</span> <span class="mi">0</span>
             <span class="n">query_operator</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="n">nested_start</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="o">+</span> <span class="n">offset</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_query_query_part</span><span class="p">(</span><span class="n">nested_start</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">end</span> <span class="o">+</span> <span class="n">content_end</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_query_query_part</span><span class="p">(</span>
+                <span class="n">start</span><span class="o">=</span><span class="n">nested_start</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">end</span> <span class="o">+</span> <span class="n">content_end</span><span class="p">)</span>
             <span class="n">value</span><span class="o">.</span><span class="n">first_only</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Nested queries first_only is controlled by the most external query</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">query_operator</span> <span class="ow">and</span> <span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ArrayQueryQueryPart</span><span class="p">):</span>
@@ -650,7 +660,7 @@
         <span class="k">return</span> <span class="n">ArrayQueryQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                    <span class="n">field</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">operator</span><span class="o">=</span><span class="n">query_operator</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">first_only</span><span class="o">=</span><span class="n">first_only</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_array_index_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_array_index_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                                       <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ArrayIndexQueryPart</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse an array index query part.</span>
 
@@ -675,8 +685,8 @@
 
         <span class="k">return</span> <span class="n">ArrayIndexQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_object_multipaths_query_part</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultipathsObjectQueryPart</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_object_multipaths_query_part</span><span class="p">(</span>  <span class="c1"># noqa: PLR0912, PLR0915</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultipathsObjectQueryPart</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse a multipaths object query part.</span>
 
 <span class="sd">        Arguments:</span>
@@ -695,7 +705,7 @@
         <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">def</span> <span class="nf">_get_key</span><span class="p">(</span><span class="n">current_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseQueryPart</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_key</span><span class="p">(</span><span class="n">current_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseQueryPart</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Return the current key or the default value if not set. Allow for empty key as valid key.</span>
 
 <span class="sd">            Arguments:</span>
@@ -751,7 +761,7 @@
                         <span class="n">key</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">part</span><span class="p">[</span><span class="n">key_start</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                     <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to parse multipaths key </span><span class="si">{</span><span class="n">part</span><span class="p">[</span><span class="n">key_start</span><span class="p">:</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span>
-                                              <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">key_start</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+                                              <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">key_start</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
                     <span class="n">key_start</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="k">continue</span>
 
@@ -791,8 +801,8 @@
         <span class="k">return</span> <span class="n">MultipathsObjectQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                          <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="n">parts</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_array_multipaths_query_part</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultipathsArrayQueryPart</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_array_multipaths_query_part</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MultipathsArrayQueryPart</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse a multipaths object query part.</span>
 
 <span class="sd">        Arguments:</span>
@@ -840,7 +850,7 @@
         <span class="k">return</span> <span class="n">MultipathsArrayQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parts</span><span class="o">=</span><span class="n">parts</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_literal_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_literal_query_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                                   <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LiteralQueryPart</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse a literal query part.</span>
 
@@ -896,7 +906,8 @@
         <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">LiteralQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_parse_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">:</span> <span class="n">BaseQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">part</span><span class="p">:</span> <span class="n">BaseQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>  <span class="c1"># noqa: PLR0912, PLR0915</span>
+            <span class="n">in_multipaths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the given part of the full query.</span>
 
 <span class="sd">        Arguments:</span>
@@ -954,7 +965,12 @@
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span><span class="p">)</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span><span class="p">:</span>
                     <span class="c1"># Skip non mapping items and items without the given key</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="n">part</span><span class="o">.</span><span class="n">part</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">part</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">part</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+                            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">part</span><span class="o">.</span><span class="n">part</span><span class="p">])</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">part</span><span class="p">)])</span>
                 <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span>
                         <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">previous</span><span class="p">,</span> <span class="n">ArrayLenghtQueryPart</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Integer query part after a pipe delimiter on an sequence like object.&#39;</span><span class="p">,</span>
@@ -990,7 +1006,7 @@
                 <span class="n">pattern_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)</span>
                 <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pattern_parts</span><span class="p">)</span>
 
-                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
                         <span class="n">ret</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                         <span class="k">break</span>
@@ -1084,13 +1100,14 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="n">new_obj</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>  <span class="c1"># noqa: SIM108</span>
                         <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_obj</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
                 <span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span><span class="p">:</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="n">new_obj</span>
-            <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
                     <span class="n">json_error</span> <span class="o">=</span> <span class="s1">&#39;literal afer a dot delimiter.&#39;</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
@@ -1108,7 +1125,7 @@
 
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_evaluate_query_return_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_query_return_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the return value of an inline query #(...) / #(...)# depending on first match or all matches.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1131,7 +1148,7 @@
 
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_parse_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># noqa: PLR0912, PLR0915</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse an inline query #(...) / #(...)#.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1169,7 +1186,7 @@
         <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
             <span class="n">position</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">field</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">operator</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Invalid value `</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s1">` for the query key `</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">`.&#39;</span><span class="p">,</span>
-                                  <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+                                  <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">and</span> <span class="n">query</span><span class="o">.</span><span class="n">first_only</span> <span class="ow">and</span> <span class="n">obj</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Query on mapping like objects require a key before the operator.&#39;</span><span class="p">,</span>
@@ -1184,7 +1201,7 @@
 
                 <span class="k">return</span> <span class="p">[]</span>
 
-            <span class="k">def</span> <span class="nf">truthy_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">truthy_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: FBT001</span>
                 <span class="n">truthy</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span><span class="n">obj_a</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">obj_b</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">truthy</span>
@@ -1207,13 +1224,13 @@
             <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;.*&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
             <span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;^</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">$&#39;</span>
             <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s1">&#39;%&#39;</span><span class="p">:</span>
-                <span class="k">def</span> <span class="nf">match_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">match_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                         <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">obj_b</span><span class="p">,</span> <span class="n">obj_a</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="n">oper</span> <span class="o">=</span> <span class="n">match_op</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">def</span> <span class="nf">not_match_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="k">def</span><span class="w"> </span><span class="nf">not_match_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                         <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">obj_b</span><span class="p">,</span> <span class="n">obj_a</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -1232,11 +1249,11 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modifier</span><span class="p">:</span> <span class="n">ModifierQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modifier</span><span class="p">:</span> <span class="n">ModifierQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply a modifier.</span>
 
 <span class="sd">        Arguments:</span>
-<span class="sd">            part: the modifier query part to parse.</span>
+<span class="sd">            modifier: the modifier query part to parse.</span>
 <span class="sd">            obj: the current object before applying the modifier.</span>
 
 <span class="sd">        Raises:</span>
@@ -1253,16 +1270,16 @@
             <span class="n">modifier_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_custom_modifiers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modifier</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">modifier_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span>
-                                      <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">modifier</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+                                      <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">modifier</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">modifier_func</span><span class="p">(</span><span class="n">modifier</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">modifier</span><span class="o">.</span><span class="n">is_last</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
             <span class="k">raise</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> raised an exception.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Modifier @</span><span class="si">{</span><span class="n">modifier</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> raised an exception.&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @reverse modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1274,15 +1291,15 @@
 <span class="sd">            the reversed object. If the object cannot be reversed is returned untouched.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">())}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">()))}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">obj</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @keys modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1297,13 +1314,13 @@
 <span class="sd">            the current object keys as list.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object does not have a keys() method.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object does not have a keys() method.&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @values modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1318,13 +1335,13 @@
 <span class="sd">            the current object values as list.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object does not have a values() method.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object does not have a values() method.&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_ugly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_ugly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @ugly modifier to condense the output.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1336,12 +1353,12 @@
 <span class="sd">            the current object, unmodified.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;separators&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_pretty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_pretty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @pretty modifier to pretty-print the output.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1353,13 +1370,13 @@
 <span class="sd">            the current object, unmodified.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;indent&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;sort_keys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sortKeys&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;prefix&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_ascii</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_ascii</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @ascii modifier to have all non-ASCII characters escaped when dumping the object.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1371,11 +1388,11 @@
 <span class="sd">            the current object, unmodified.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">[</span><span class="s1">&#39;ensure_ascii&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_sort</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @sort modifier, sorts mapping and sequences.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1390,7 +1407,7 @@
 <span class="sd">            the sorted object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">())}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
@@ -1399,7 +1416,7 @@
         <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;@sort modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
                          <span class="s1">&#39;Expected a mapping or sequence like object.&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @valid modifier, checking that the current object can be converted to JSON.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1414,15 +1431,15 @@
 <span class="sd">            the current object, unmodified.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_dump_params</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object cannot be converted to JSON.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object cannot be converted to JSON.&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
 
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_this</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_this</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @this modifier, that returns the current object.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1434,10 +1451,10 @@
 <span class="sd">            the current object, unmodified.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_fromstr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_fromstr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @fromstr modifier, converting a string to JSON, if valid.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1452,16 +1469,16 @@
 <span class="sd">            the parsed JSON.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Modifier @fromstr got object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1"> as input, expected string or bytes.&#39;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current @fromstr input object cannot be converted to JSON.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current @fromstr input object cannot be converted to JSON.&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_tostr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_tostr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @tostr modifier, converting the current object to a JSON-encoded string, if valid.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1476,13 +1493,13 @@
 <span class="sd">            the JSON-encoded string.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object cannot be converted to a JSON-encoded string for @tostr.&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">ex</span>
+            <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="s1">&#39;The current object cannot be converted to a JSON-encoded string for @tostr.&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ex</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @group modifier, that groups a dictionary of lists in a list of dictionaries.</span>
 
 <span class="sd">        Example input::</span>
@@ -1505,7 +1522,7 @@
 <span class="sd">            a list with the grouped objects or an empty list if the input has no lists as values.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Modifier @group got object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1"> as input, expected dictionary.&#39;</span><span class="p">)</span>
 
@@ -1516,7 +1533,7 @@
         <span class="c1"># Skip keys with value NoResult in each dictionary</span>
         <span class="k">return</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">)}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @join modifier, that joins a list of dictionaries into a single dictionary.</span>
 
 <span class="sd">        Items in the sequence that are not dictionaries are skipped.</span>
@@ -1540,7 +1557,7 @@
 <span class="sd">            the object untouched if the object is not a sequence, a dictionary with joined objects otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">obj</span>
 
@@ -1551,7 +1568,7 @@
 
         <span class="k">return</span> <span class="n">ret</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_top_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_top_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @top_n modifier to find the most common values of a given field.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1567,14 +1584,14 @@
 <span class="sd">            dict: a dictionary of unique items as keys and the count as value.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;@top_n modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
                              <span class="s1">&#39;Expected a sequence like object.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)))</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_sum_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_sum_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @sum_n modifier that groups the values of a given key while summing the values of another key.</span>
 
 <span class="sd">        The key used to sum must have numeric values.</span>
@@ -1594,7 +1611,7 @@
 <span class="sd">            dict: a dictionary of unique items as keys and the sum as value.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">GJSONError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;@sum_n modifier not supported for object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s1">. &#39;</span>
                              <span class="s1">&#39;Expected a sequence like object.&#39;</span><span class="p">)</span>
@@ -1604,7 +1621,7 @@
             <span class="n">results</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]]]</span> <span class="o">+=</span> <span class="n">item</span><span class="p">[</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">]]</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)))</span>
 
-    <span class="k">def</span> <span class="nf">_apply_modifier_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_modifier_flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">last</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the @flatten modifier.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1616,13 +1633,13 @@
 <span class="sd">            the modified object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># for pylint, unused argument</span>
+        <span class="k">del</span> <span class="n">last</span>  <span class="c1"># unused argument</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">obj</span>
 
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flatten_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;deep&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))</span>
 
-    <span class="k">def</span> <span class="nf">_flatten_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">deep</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flatten_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">deep</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Flatten nested sequences in the given object.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1642,6 +1659,7 @@
                     <span class="k">yield from</span> <span class="n">elem</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">elem</span></div>
+
 </pre></div>
 
            </div>
