@@ -1,4 +1,0 @@
-# Although the package ships the 'gjson' application, it's mainly a Python
-# library.
-python3-gjson binary: application-in-library-section
-python3-gjson binary: library-package-name-for-application
