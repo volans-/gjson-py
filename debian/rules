@@ -13,6 +13,6 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=$(DEB_VERSION_UPSTREAM)
 	dh $@ --with python3 --buildsystem=pybuild
 
 override_dh_installman:
-	python3 setup.py build_sphinx -b man
+	sphinx-build -b man
 	sed -i='' -e 's/^\.B/.B /' doc/build/man/gjson.1
 	dh_installman

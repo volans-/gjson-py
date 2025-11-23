@@ -1,8 +1,16 @@
+python-gjson (1.1.0-2) unstable; urgency=medium
+
+  * debian/rules: fix manpage build in debian.
+  * debian/changelog: fix changelog referencing debian/rules instead of
+    debian/control.
+
+ -- Riccardo Coccioli <volans-@users.noreply.github.com>  Sun, 23 Nov 2025 12:01:24 -0000
+
 python-gjson (1.1.0-1) unstable; urgency=medium
 
   * v1.1.0 upstream release.
-  * debian/rules: bump Standards-Version to 4.7.2.0.
-  * debian/rules: bump dh-python to >= 6.20250414 (trixie version).
+  * debian/control: bump Standards-Version to 4.7.2.0.
+  * debian/control: bump dh-python to >= 6.20250414 (trixie version).
   * debian/copyright: update copyright year.
 
  -- Riccardo Coccioli <volans-@users.noreply.github.com>  Sun, 23 Nov 2025 11:34:38 -0000
@@ -10,9 +18,9 @@ python-gjson (1.1.0-1) unstable; urgency=medium
 python-gjson (1.0.0-1) unstable; urgency=medium
 
   * v1.0.0 upstream release.
-  * debian/rules: remove X-Python3-Version, superseded.
-  * debian/rules: add Rules-Requires-Root: no.
-  * debian/rules: bump Standards-Version.
+  * debian/control: remove X-Python3-Version, superseded.
+  * debian/control: add Rules-Requires-Root: no.
+  * debian/control: bump Standards-Version.
   * debian/copyright: update copyright year.
   * debian/rules: refactor to use SETUPTOOLS_SCM_PRETEND_VERSION and not
     install the package or require a $HOME. Remove override_dh_auto_test.
