@@ -544,6 +544,14 @@ class TestList:
         with pytest.raises(gjson.GJSONParseError, match=fr'^{re.escape(error)}'):
             self.list.get(query)
 
+    def test_get_existence_query_on_non_mapping_items(self):
+        """An existence query on a sequence of non-mappings should not leak a TypeError."""
+        assert gjson.get([1, 2, 3], '#(foo)#') == []
+        assert gjson.get([1, 2, 3], '#(foo)#', quiet=True) == []
+        with pytest.raises(gjson.GJSONParseError,
+                           match=r'^Query for first element does not match anything\.'):
+            gjson.get([1, 2, 3], '#(foo)')
+
 
 class TestFlattenModifier:
     """Test gjson @flatten modifier."""

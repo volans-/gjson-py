@@ -1091,7 +1091,8 @@ class GJSONObj:
             return self._evaluate_query_return_value(query, ret)
 
         if not query.operator:
-            return self._evaluate_query_return_value(query, [i for i in obj if query.field in i])
+            return self._evaluate_query_return_value(
+                query, [i for i in obj if isinstance(i, Mapping) and query.field in i])
 
         key = query.field.replace('\\', '')
         try:
