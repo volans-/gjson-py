@@ -1158,7 +1158,7 @@ class GJSONObj:
                     ret = [i for i in obj if key in i and oper(i[key], value)]
             else:  # Query on an array of non-objects, match them directly
                 ret = [i for i in obj if oper(i, value)]
-        except TypeError:
+        except (TypeError, AttributeError):
             ret = []
 
         return self._evaluate_query_return_value(query, ret)

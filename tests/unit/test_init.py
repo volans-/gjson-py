@@ -596,6 +596,11 @@ class TestTruthiness:
         with pytest.raises(gjson.GJSONError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
 
+    def test_get_truthy_query_on_non_mapping_items(self):
+        """A ==~ query on a sequence of scalars should return an empty result without leaking an exception."""
+        assert gjson.get([1, 2, 3], '#(foo==~true)#') == []
+        assert gjson.get([1, 2, 3], '#(foo==~true)#', quiet=True) == []
+
 
 class TestNestedQueries:
     """Testing gjson nested queries."""
