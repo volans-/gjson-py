@@ -25,7 +25,7 @@ MULTIPATHS_DELIMITERS = (*DELIMITERS, ']', '}', ',')
 QUERIES_OPERATORS = ('==~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
 """tuple: The list of supported operators inside queries."""
 MODIFIER_NAME_RESERVED_CHARS = ('"', ',', '.', '|', ':', '@', '{', '}', '[', ']', '(', ')')
-"""tuple: The list of reserver characters not usable in a modifier's name."""
+"""tuple: The list of reserved characters not usable in a modifier's name."""
 PARENTHESES_PAIRS = {'(': ')', ')': '(', '[': ']', ']': '[', '{': '}', '}': '{'}
 GJSONObjT = TypeVar('GJSONObjT', bound='GJSONObj')
 
@@ -59,7 +59,7 @@ class FieldQueryPart(BaseQueryPart):
     """Basic field path query part."""
 
 
-class ArrayLenghtQueryPart(BaseQueryPart):
+class ArrayLengthQueryPart(BaseQueryPart):
     """Hash query part, to get the size of an array."""
 
 
@@ -128,7 +128,7 @@ class GJSONObj:
         """Initialize the instance with the starting object and query.
 
         Examples:
-            Client code should not need to instantiate this low-level class in normal circumastances::
+            Client code should not need to instantiate this low-level class in normal circumstances::
 
                 >>> import gjson
                 >>> data = {'items': [{'name': 'a', 'size': 1}, {'name': 'b', 'size': 2}]}
@@ -294,7 +294,7 @@ class GJSONObj:
                 part = self._parse_modifier_query_part(
                     start=i, delimiter=delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif char == '#' and (next_char in DELIMITERS or next_char is None):
-                part = ArrayLenghtQueryPart(start=i, end=i, part=char, delimiter=delimiter, is_last=next_char is None,
+                part = ArrayLengthQueryPart(start=i, end=i, part=char, delimiter=delimiter, is_last=next_char is None,
                                             previous=previous)
             elif char == '#' and next_char == '(':
                 part = self._parse_array_query_query_part(start=i, delimiter=delimiter, max_end=max_end)
@@ -841,12 +841,12 @@ class GJSONObj:
         if isinstance(obj, NoResult):
             return obj
 
-        if isinstance(part, ArrayLenghtQueryPart):
+        if isinstance(part, ArrayLengthQueryPart):
             in_hash = True
             if part.is_last:
                 if part.delimiter == DOT_DELIMITER and (self._after_hash or self._after_query_all):
                     ret = []
-                elif part.delimiter == PIPE_DELIMITER and isinstance(part.previous, ArrayLenghtQueryPart):
+                elif part.delimiter == PIPE_DELIMITER and isinstance(part.previous, ArrayLengthQueryPart):
                     raise GJSONParseError('The pipe delimiter cannot immediately follow the # element.',
                                           query=self._query, position=part.start)
                 elif self._is_sequence(obj):
@@ -884,7 +884,7 @@ class GJSONObj:
                         elif self._is_sequence(i) and len(i):
                             ret.append(i[int(part.part)])
                 elif (self._after_hash and part.delimiter == PIPE_DELIMITER
-                        and isinstance(part.previous, ArrayLenghtQueryPart)):
+                        and isinstance(part.previous, ArrayLengthQueryPart)):
                     raise GJSONParseError('Integer query part after a pipe delimiter on an sequence like object.',
                                           query=self._query, position=part.start)
                 else:
@@ -1021,7 +1021,7 @@ class GJSONObj:
 
             elif not self._after_hash and not self._after_query_all:
                 if part.delimiter == DOT_DELIMITER and not isinstance(new_obj, NoResult):
-                    json_error = 'literal afer a dot delimiter.'
+                    json_error = 'literal after a dot delimiter.'
                     ret = NoResult()
                 elif part.delimiter == PIPE_DELIMITER:
                     ret = new_obj

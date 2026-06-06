@@ -425,7 +425,7 @@ class TestObject:
         ('!{true,', 'Unbalanced parentheses `{`, 1 still opened.'),
         ('![true,', 'Unbalanced parentheses `[`, 1 still opened.'),
         ('!"value".invalid', 'Invalid or unsupported query part `invalid`.'),
-        ('name.!"value"', 'Unable to load literal JSON: literal afer a dot delimiter.'),
+        ('name.!"value"', 'Unable to load literal JSON: literal after a dot delimiter.'),
     ))
     def test_get_parser_raise(self, query, error):
         """It should raise a GJSONParseError error with the expected message."""
