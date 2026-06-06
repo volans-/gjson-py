@@ -5,16 +5,15 @@ import re
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
-from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS, GJSONObj
+from gjson._gjson import MODIFIER_NAME_RESERVED_CHARS, GJSONObj, JSONType
 from gjson._protocols import ModifierProtocol
 from gjson.exceptions import GJSONError, GJSONParseError
 
 # Explicit export of modules for the import * syntax, custom order to force the documentation order
-__all__ = ['GJSON', 'GJSONError', 'GJSONObj', 'GJSONParseError', 'ModifierProtocol', '__version__', 'get']
+__all__ = ['GJSON', 'GJSONError', 'GJSONObj', 'GJSONParseError', 'JSONType', 'ModifierProtocol', '__version__', 'get']
 
 
-# TODO: use a proper type hint for obj once https://github.com/python/typing/issues/182 will be fixed
-def get(obj: Any, query: str, *, as_str: bool = False, quiet: bool = False) -> Any:
+def get(obj: JSONType, query: str, *, as_str: bool = False, quiet: bool = False) -> Any:
     """Quick accessor to GJSON functionalities exposed for simplicity of use.
 
     Examples:
@@ -47,7 +46,7 @@ def get(obj: Any, query: str, *, as_str: bool = False, quiet: bool = False) -> A
 class GJSON:
     """The GJSON class to operate on JSON-like objects."""
 
-    def __init__(self, obj: Any):
+    def __init__(self, obj: JSONType):
         """Initialize the instance with the given object.
 
         Examples:

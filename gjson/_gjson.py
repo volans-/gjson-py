@@ -6,7 +6,7 @@ from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from itertools import zip_longest
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import Any, Optional, Type, TypeAlias, TypeVar, Union
 
 from gjson._protocols import ModifierProtocol
 from gjson.exceptions import GJSONError, GJSONInvalidSyntaxError, GJSONParseError
@@ -28,6 +28,8 @@ MODIFIER_NAME_RESERVED_CHARS = ('"', ',', '.', '|', ':', '@', '{', '}', '[', ']'
 """tuple: The list of reserved characters not usable in a modifier's name."""
 PARENTHESES_PAIRS = {'(': ')', ')': '(', '[': ']', ']': '[', '{': '}', '}': '{'}
 GJSONObjT = TypeVar('GJSONObjT', bound='GJSONObj')
+JSONType: TypeAlias = Union[Mapping[str, 'JSONType'], Sequence['JSONType'], str, int, float, bool, None]
+"""Recursive type hint for a JSON-serializable object, the kind of object gjson can query."""
 
 
 class NoResult:
@@ -124,7 +126,7 @@ class LiteralQueryPart(BaseQueryPart):
 class GJSONObj:
     """A low-level class to perform the GJSON query on a JSON-like object."""
 
-    def __init__(self, obj: Any, query: str, *, custom_modifiers: Optional[dict[str, ModifierProtocol]] = None):
+    def __init__(self, obj: JSONType, query: str, *, custom_modifiers: Optional[dict[str, ModifierProtocol]] = None):
         """Initialize the instance with the starting object and query.
 
         Examples:
