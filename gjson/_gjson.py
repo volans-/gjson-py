@@ -800,7 +800,7 @@ class GJSONObj:
                 # Includes also Infinite and NaN values:
                 # https://docs.python.org/3/library/json.html#infinite-and-nan-number-values
                 offset = 0
-            elif match := re.match(r'-?(0|[1-9][0-9]*)(.[0-9]+)?((e|E)(\+|-|)[0-9]+)?', query):
+            elif match := re.match(r'-?(0|[1-9][0-9]*)(\.[0-9]+)?((e|E)(\+|-|)[0-9]+)?', query):
                 offset = 0  # JSON number
             else:  # Catch until the first delimiter or end of string
                 delimiters = MULTIPATHS_DELIMITERS if in_multipaths else DELIMITERS
