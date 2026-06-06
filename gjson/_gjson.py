@@ -472,7 +472,6 @@ class GJSONObj:
             end = start + i
             name = self._query[start + 1:start + i + 1]
 
-        name.replace(ESCAPE_CHARACTER, '')
         if not name:
             raise GJSONParseError('Got empty modifier name.', query=self._query, position=start)
 

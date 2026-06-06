@@ -993,6 +993,15 @@ class TestCustomModifiers:
         with pytest.raises(gjson.GJSONError, match=fr'^{match}'):
             gjson.GJSONObj(self.valid_obj, self.query, custom_modifiers={'sum': 'not-callable'})
 
+    def test_gjson_query_modifier_with_escaped_name(self):
+        """It should not resolve a modifier whose name contains an escape character to the unescaped one."""
+        obj = gjson.GJSON(self.valid_obj)
+        assert obj.get('@reverse') == [5, 4, 3, 2, 1]
+        # A stray escape keeps the name distinct: @re\verse must not resolve to the @reverse built-in.
+        match = re.escape(r'Unknown modifier @re\verse.')
+        with pytest.raises(gjson.GJSONParseError, match=fr'^{match}'):
+            obj.get(r'@re\verse')
+
     def test_gjsonobj_builtin_modifiers(self):
         """It should return a set with the names of the built-in modifiers."""
         expected = {'ascii', 'flatten', 'fromstr', 'group', 'join', 'keys', 'pretty', 'reverse', 'sort', 'sum_n',
