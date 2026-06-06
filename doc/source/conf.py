@@ -5,10 +5,13 @@
 
 import datetime
 import sys
+import typing
 from importlib.metadata import version as meta_version
 from pathlib import Path
 
 import sphinx_rtd_theme  # noqa: F401
+
+import gjson
 
 # -- Path setup --------------------------------------------------------------
 
@@ -62,6 +65,10 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+# The typehints_formatter config value below is a function and cannot be pickled by Sphinx's config cache,
+# which would emit a `config.cache` warning that the -W build flag turns into an error.
+suppress_warnings = ['config.cache']
+
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
@@ -112,4 +119,28 @@ autodoc_default_options = {
     'special-members': '__str__,__version__,__call__',
 }
 autoclass_content = 'both'
+
+# The JSONType alias resolved as sphinx-autodoc-typehints sees it: get_type_hints() expands the alias one
+# level (the inner recursive references stay as ForwardRef), so the raw alias object never compares equal to
+# the annotation passed to the formatter. Compare against the resolved form to detect it reliably. This
+# relies on gjson.get keeping an `obj: JSONType` parameter as the source of the resolved form.
+_JSON_TYPE_ANNOTATION = typing.get_type_hints(gjson.get)['obj']
+
+
+# sphinx-autodoc-typehints settings
+def typehints_formatter(annotation: typing.Any, config: typing.Any) -> typing.Optional[str]:  # noqa: ARG001
+    """Render the JSONType alias by name and link to its definition instead of expanding the full Union.
+
+    Arguments:
+        annotation: the type annotation being documented.
+        config: the Sphinx configuration, unused.
+
+    Returns:
+        the reStructuredText to use for the annotation or :py:data:`None` to fall back to the default.
+
+    """
+    if annotation in (gjson.JSONType, _JSON_TYPE_ANNOTATION):
+        return ':py:data:`gjson.JSONType`'
+
+    return None
 
