@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; gjson-py 1.1.0 documentation</title>
+  <title>API &mdash; gjson-py 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=fc837d61"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=6efca38a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">CLI</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gjson.JSONType"><code class="docutils literal notranslate"><span class="pre">JSONType</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gjson.GJSON"><code class="docutils literal notranslate"><span class="pre">GJSON</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#gjson.GJSON.__str__"><code class="docutils literal notranslate"><span class="pre">GJSON.__str__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#gjson.GJSON.get"><code class="docutils literal notranslate"><span class="pre">GJSON.get()</span></code></a></li>
@@ -56,9 +57,9 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#gjson.GJSONError"><code class="docutils literal notranslate"><span class="pre">GJSONError</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gjson.GJSONObj"><code class="docutils literal notranslate"><span class="pre">GJSONObj</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSONObj.__str__"><code class="docutils literal notranslate"><span class="pre">GJSONObj.__str__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#gjson.GJSONObj.builtin_modifiers"><code class="docutils literal notranslate"><span class="pre">GJSONObj.builtin_modifiers()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#gjson.GJSONObj.get"><code class="docutils literal notranslate"><span class="pre">GJSONObj.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gjson.GJSONObj.__str__"><code class="docutils literal notranslate"><span class="pre">GJSONObj.__str__()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#gjson.GJSONParseError"><code class="docutils literal notranslate"><span class="pre">GJSONParseError</span></code></a><ul>
@@ -102,12 +103,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-gjson">
-<span id="api"></span><h1>API<a class="headerlink" href="#module-gjson" title="Link to this heading"></a></h1>
-<p>GJSON module.</p>
+  <section id="api">
+<h1>API<a class="headerlink" href="#api" title="Link to this heading"></a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="gjson.JSONType">
+<span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">JSONType</span></span><a class="headerlink" href="#gjson.JSONType" title="Link to this definition"></a></dt>
+<dd><p>Represent a union type</p>
+<p>E.g. for int | str</p>
+</dd></dl>
+
+<p id="module-gjson">GJSON module.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="gjson.GJSON">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#GJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSON" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson.html#GJSON"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSON" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The GJSON class to operate on JSON-like objects.</p>
 <p>Initialize the instance with the given object.</p>
@@ -121,7 +129,7 @@ object:</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>obj</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>) – the object to query.</p>
+<dd class="field-odd"><p><strong>obj</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#gjson.JSONType" title="gjson.JSONType"><code class="xref py py-data docutils literal notranslate"><span class="pre">gjson.JSONType</span></code></a></span>) – the object to query.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -277,19 +285,19 @@ are registered with the same name the last one will be used.</p></li>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="gjson.GJSONError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONError</span></span><a class="reference internal" href="_modules/gjson/exceptions.html#GJSONError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONError" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONError</span></span><a class="reference internal" href="_modules/gjson/exceptions.html#GJSONError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised by the gjson module on error while performing queries or converting to JSON.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gjson.GJSONObj">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_modifiers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_gjson.html#GJSONObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_modifiers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_gjson.html#GJSONObj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A low-level class to perform the GJSON query on a JSON-like object.</p>
 <p>Initialize the instance with the starting object and query.</p>
 <p class="rubric">Examples</p>
-<p>Client code should not need to instantiate this low-level class in normal circumastances:</p>
+<p>Client code should not need to instantiate this low-level class in normal circumstances:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">gjson</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gjson_obj</span> <span class="o">=</span> <span class="n">gjson</span><span class="o">.</span><span class="n">GJSONObj</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;items.#.size&#39;</span><span class="p">)</span>
@@ -298,9 +306,9 @@ are registered with the same name the last one will be used.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>) – the JSON-like object to query.</p></li>
+<li><p><strong>obj</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#gjson.JSONType" title="gjson.JSONType"><code class="xref py py-data docutils literal notranslate"><span class="pre">gjson.JSONType</span></code></a></span>) – the JSON-like object to query.</p></li>
 <li><p><strong>query</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – the GJSON query to apply to the object.</p></li>
-<li><p><strong>custom_modifiers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="#gjson.ModifierProtocol" title="gjson._protocols.ModifierProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModifierProtocol</span></code></a>]]</span>) – an optional dictionary with the custom modifiers to load. The dictionary keys are the
+<li><p><strong>custom_modifiers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="#gjson.ModifierProtocol" title="gjson._protocols.ModifierProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModifierProtocol</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – an optional dictionary with the custom modifiers to load. The dictionary keys are the
 names of the modifiers and the values are the callables with the modifier code that adhere to the
 <a class="reference internal" href="#gjson.ModifierProtocol" title="gjson.ModifierProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">gjson.ModifierProtocol</span></code></a> protocol.</p></li>
 </ul>
@@ -310,31 +318,8 @@ names of the modifiers and the values are the callables with the modifier code t
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="gjson.GJSONObj.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_gjson.html#GJSONObj.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj.__str__" title="Link to this definition"></a></dt>
-<dd><p>Return the JSON string representation of the object, based on the query parameters.</p>
-<p class="rubric">Examples</p>
-<p>Returns the resulting object as a JSON-encoded string:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">gjson_obj</span><span class="p">)</span>
-<span class="go">&#39;[1, 2]&#39;</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#gjson.GJSONError" title="gjson.GJSONError"><strong>gjson.GJSONError</strong></a> – on error.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the JSON encoded string.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="gjson.GJSONObj.builtin_modifiers">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">builtin_modifiers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_gjson.html#GJSONObj.builtin_modifiers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj.builtin_modifiers" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">builtin_modifiers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_gjson.html#GJSONObj.builtin_modifiers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj.builtin_modifiers" title="Link to this definition"></a></dt>
 <dd><p>Return the names of the built-in modifiers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -369,11 +354,34 @@ names of the modifiers and the values are the callables with the modifier code t
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="gjson.GJSONObj.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_gjson.html#GJSONObj.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONObj.__str__" title="Link to this definition"></a></dt>
+<dd><p>Return the JSON string representation of the object, based on the query parameters.</p>
+<p class="rubric">Examples</p>
+<p>Returns the resulting object as a JSON-encoded string:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">gjson_obj</span><span class="p">)</span>
+<span class="go">&#39;[1, 2]&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gjson.GJSONError" title="gjson.GJSONError"><strong>gjson.GJSONError</strong></a> – on error.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the JSON encoded string.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="gjson.GJSONParseError">
-<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONParseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/exceptions.html#GJSONParseError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONParseError" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">GJSONParseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/exceptions.html#GJSONParseError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.GJSONParseError" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#gjson.GJSONError" title="gjson.exceptions.GJSONError"><code class="xref py py-class docutils literal notranslate"><span class="pre">GJSONError</span></code></a></p>
 <p>Raised when there is an error parsing the query string, with nicer representation of the error.</p>
 <p>Initialize the exception with the additional data of the query part.</p>
@@ -404,7 +412,7 @@ names of the modifiers and the values are the callables with the modifier code t
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gjson.ModifierProtocol">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">ModifierProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_protocols.html#ModifierProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.ModifierProtocol" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">ModifierProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gjson/_protocols.html#ModifierProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gjson.ModifierProtocol" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
 <p>Callback protocol for the custom modifiers.</p>
 <dl class="py method">
@@ -452,7 +460,7 @@ an empty dictionary as options. The modifier can supports any number of options,
 
 <dl class="py data">
 <dt class="sig sig-object py" id="gjson.__version__">
-<span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">__version__</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.1.1.dev0+g3cdd37ceb.d20251123'</span></em><a class="headerlink" href="#gjson.__version__" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">gjson.</span></span><span class="sig-name descname"><span class="pre">__version__</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'1.2.0'</span></span><a class="headerlink" href="#gjson.__version__" title="Link to this definition"></a></dt>
 <dd><p>the version of the current gjson module.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -476,7 +484,7 @@ an empty dictionary as options. The modifier can supports any number of options,
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>) – the object to query. It must be accessible in JSON-like fashion so it must be an object that can be
+<li><p><strong>obj</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#gjson.JSONType" title="gjson.JSONType"><code class="xref py py-data docutils literal notranslate"><span class="pre">gjson.JSONType</span></code></a></span>) – the object to query. It must be accessible in JSON-like fashion so it must be an object that can be
 converted to JSON.</p></li>
 <li><p><strong>query</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – the query string to evaluate to extract the data from the object.</p></li>
 <li><p><strong>as_str</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – if set to <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code></a> returns a JSON-encoded string, a Python object otherwise.</p></li>
@@ -506,7 +514,7 @@ converted to JSON.</p></li>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Riccardo Coccioli.</p>
+    <p>&#169; Copyright 2022-2026, Riccardo Coccioli.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

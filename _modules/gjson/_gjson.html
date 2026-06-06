@@ -5,16 +5,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gjson._gjson &mdash; gjson-py 1.1.0 documentation</title>
+  <title>gjson._gjson &mdash; gjson-py 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -82,7 +82,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">zip_longest</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeAlias</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">gjson._protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModifierProtocol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gjson.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">GJSONError</span><span class="p">,</span> <span class="n">GJSONInvalidSyntaxError</span><span class="p">,</span> <span class="n">GJSONParseError</span>
@@ -98,12 +98,14 @@
 <span class="n">MULTIPATHS_DELIMITERS</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">DELIMITERS</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;tuple: All the available delimiters in the query grammar.&quot;&quot;&quot;</span>
 <span class="c1"># Single character operators goes last to avoid mis-detection.</span>
-<span class="n">QUERIES_OPERATORS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;==~&#39;</span><span class="p">,</span> <span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;!=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;!%&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span>
+<span class="n">QUERIES_OPERATORS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;==~&#39;</span><span class="p">,</span> <span class="s1">&#39;!=~&#39;</span><span class="p">,</span> <span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;!=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span> <span class="s1">&#39;!%&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;tuple: The list of supported operators inside queries.&quot;&quot;&quot;</span>
 <span class="n">MODIFIER_NAME_RESERVED_CHARS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;{&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;tuple: The list of reserver characters not usable in a modifier&#39;s name.&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;tuple: The list of reserved characters not usable in a modifier&#39;s name.&quot;&quot;&quot;</span>
 <span class="n">PARENTHESES_PAIRS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;(&#39;</span><span class="p">:</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span> <span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span> <span class="s1">&#39;[&#39;</span><span class="p">,</span> <span class="s1">&#39;{&#39;</span><span class="p">:</span> <span class="s1">&#39;}&#39;</span><span class="p">,</span> <span class="s1">&#39;}&#39;</span><span class="p">:</span> <span class="s1">&#39;{&#39;</span><span class="p">}</span>
 <span class="n">GJSONObjT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;GJSONObjT&#39;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s1">&#39;GJSONObj&#39;</span><span class="p">)</span>
+<span class="n">JSONType</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;JSONType&#39;</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="s1">&#39;JSONType&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;Recursive type hint for a JSON-serializable object, the kind of object gjson can query.&quot;&quot;&quot;</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">NoResult</span><span class="p">:</span>
@@ -135,7 +137,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Basic field path query part.&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">ArrayLenghtQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayLengthQueryPart</span><span class="p">(</span><span class="n">BaseQueryPart</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Hash query part, to get the size of an array.&quot;&quot;&quot;</span>
 
 
@@ -202,11 +204,11 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">GJSONObj</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A low-level class to perform the GJSON query on a JSON-like object.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ModifierProtocol</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">JSONType</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">custom_modifiers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ModifierProtocol</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the instance with the starting object and query.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            Client code should not need to instantiate this low-level class in normal circumastances::</span>
+<span class="sd">            Client code should not need to instantiate this low-level class in normal circumstances::</span>
 
 <span class="sd">                &gt;&gt;&gt; import gjson</span>
 <span class="sd">                &gt;&gt;&gt; data = {&#39;items&#39;: [{&#39;name&#39;: &#39;a&#39;, &#39;size&#39;: 1}, {&#39;name&#39;: &#39;b&#39;, &#39;size&#39;: 2}]}</span>
@@ -377,11 +379,11 @@
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
 
-            <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;@&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;@&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">current</span><span class="p">:</span>
                 <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_modifier_query_part</span><span class="p">(</span>
                     <span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="n">in_multipaths</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">next_char</span> <span class="ow">in</span> <span class="n">DELIMITERS</span> <span class="ow">or</span> <span class="n">next_char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">part</span> <span class="o">=</span> <span class="n">ArrayLenghtQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">char</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="n">next_char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">part</span> <span class="o">=</span> <span class="n">ArrayLengthQueryPart</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">char</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">is_last</span><span class="o">=</span><span class="n">next_char</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
                                             <span class="n">previous</span><span class="o">=</span><span class="n">previous</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span> <span class="ow">and</span> <span class="n">next_char</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
                 <span class="n">part</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_array_query_query_part</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">max_end</span><span class="o">=</span><span class="n">max_end</span><span class="p">)</span>
@@ -559,7 +561,6 @@
             <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">i</span>
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">start</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">ESCAPE_CHARACTER</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Got empty modifier name.&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
 
@@ -888,7 +889,7 @@
                 <span class="c1"># Includes also Infinite and NaN values:</span>
                 <span class="c1"># https://docs.python.org/3/library/json.html#infinite-and-nan-number-values</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">elif</span> <span class="n">match</span> <span class="o">:=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;-?(0|[1-9][0-9]*)(.[0-9]+)?((e|E)(\+|-|)[0-9]+)?&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">match</span> <span class="o">:=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;-?(0|[1-9][0-9]*)(\.[0-9]+)?((e|E)(\+|-|)[0-9]+)?&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
                 <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># JSON number</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># Catch until the first delimiter or end of string</span>
                 <span class="n">delimiters</span> <span class="o">=</span> <span class="n">MULTIPATHS_DELIMITERS</span> <span class="k">if</span> <span class="n">in_multipaths</span> <span class="k">else</span> <span class="n">DELIMITERS</span>
@@ -929,12 +930,12 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">obj</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">ArrayLenghtQueryPart</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="p">,</span> <span class="n">ArrayLengthQueryPart</span><span class="p">):</span>
             <span class="n">in_hash</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">is_last</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span><span class="p">):</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">previous</span><span class="p">,</span> <span class="n">ArrayLenghtQueryPart</span><span class="p">):</span>
+                <span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">previous</span><span class="p">,</span> <span class="n">ArrayLengthQueryPart</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;The pipe delimiter cannot immediately follow the # element.&#39;</span><span class="p">,</span>
                                           <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">part</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
@@ -972,7 +973,7 @@
                         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_sequence</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
                             <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">part</span><span class="p">)])</span>
                 <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">and</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span>
-                        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">previous</span><span class="p">,</span> <span class="n">ArrayLenghtQueryPart</span><span class="p">)):</span>
+                        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">previous</span><span class="p">,</span> <span class="n">ArrayLengthQueryPart</span><span class="p">)):</span>
                     <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="s1">&#39;Integer query part after a pipe delimiter on an sequence like object.&#39;</span><span class="p">,</span>
                                           <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">part</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -1047,8 +1048,11 @@
                     <span class="n">obj_item</span> <span class="o">=</span> <span class="p">{}</span>
                     <span class="k">for</span> <span class="n">obj_part</span> <span class="ow">in</span> <span class="n">part</span><span class="o">.</span><span class="n">parts</span><span class="p">:</span>
                         <span class="n">obj_ret</span> <span class="o">=</span> <span class="n">i</span>
-                        <span class="k">for</span> <span class="n">obj_value</span> <span class="ow">in</span> <span class="n">obj_part</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
-                            <span class="n">obj_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">obj_value</span><span class="p">,</span> <span class="n">obj_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">obj_value</span> <span class="ow">in</span> <span class="n">obj_part</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                                <span class="n">obj_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">obj_value</span><span class="p">,</span> <span class="n">obj_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
+                            <span class="n">obj_ret</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
 
                         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_ret</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
                             <span class="n">obj_item</span><span class="p">[</span><span class="n">obj_part</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj_ret</span>
@@ -1058,8 +1062,11 @@
                 <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">obj_part</span> <span class="ow">in</span> <span class="n">part</span><span class="o">.</span><span class="n">parts</span><span class="p">:</span>
                     <span class="n">obj_ret</span> <span class="o">=</span> <span class="n">obj</span>
-                    <span class="k">for</span> <span class="n">obj_value</span> <span class="ow">in</span> <span class="n">obj_part</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
-                        <span class="n">obj_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">obj_value</span><span class="p">,</span> <span class="n">obj_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">obj_value</span> <span class="ow">in</span> <span class="n">obj_part</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                            <span class="n">obj_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">obj_value</span><span class="p">,</span> <span class="n">obj_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
+                        <span class="n">obj_ret</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
 
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_ret</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
                         <span class="n">ret</span><span class="p">[</span><span class="n">obj_part</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj_ret</span>
@@ -1072,8 +1079,11 @@
                     <span class="n">array_item</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="k">for</span> <span class="n">array_part</span> <span class="ow">in</span> <span class="n">part</span><span class="o">.</span><span class="n">parts</span><span class="p">:</span>
                         <span class="n">array_ret</span> <span class="o">=</span> <span class="n">i</span>
-                        <span class="k">for</span> <span class="n">array_value</span> <span class="ow">in</span> <span class="n">array_part</span><span class="p">:</span>
-                            <span class="n">array_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">array_value</span><span class="p">,</span> <span class="n">array_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">array_value</span> <span class="ow">in</span> <span class="n">array_part</span><span class="p">:</span>
+                                <span class="n">array_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">array_value</span><span class="p">,</span> <span class="n">array_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
+                            <span class="n">array_ret</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
 
                         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array_ret</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
                             <span class="n">array_item</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array_ret</span><span class="p">)</span>
@@ -1083,8 +1093,11 @@
                 <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">array_part</span> <span class="ow">in</span> <span class="n">part</span><span class="o">.</span><span class="n">parts</span><span class="p">:</span>
                     <span class="n">array_ret</span> <span class="o">=</span> <span class="n">obj</span>
-                    <span class="k">for</span> <span class="n">array_value</span> <span class="ow">in</span> <span class="n">array_part</span><span class="p">:</span>
-                        <span class="n">array_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">array_value</span><span class="p">,</span> <span class="n">array_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">array_value</span> <span class="ow">in</span> <span class="n">array_part</span><span class="p">:</span>
+                            <span class="n">array_ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_part</span><span class="p">(</span><span class="n">array_value</span><span class="p">,</span> <span class="n">array_ret</span><span class="p">,</span> <span class="n">in_multipaths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">GJSONError</span><span class="p">:</span>
+                        <span class="n">array_ret</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
 
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array_ret</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
                         <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array_ret</span><span class="p">)</span>
@@ -1109,7 +1122,7 @@
 
             <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_hash</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_after_query_all</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">DOT_DELIMITER</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_obj</span><span class="p">,</span> <span class="n">NoResult</span><span class="p">):</span>
-                    <span class="n">json_error</span> <span class="o">=</span> <span class="s1">&#39;literal afer a dot delimiter.&#39;</span>
+                    <span class="n">json_error</span> <span class="o">=</span> <span class="s1">&#39;literal after a dot delimiter.&#39;</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="n">NoResult</span><span class="p">()</span>
                 <span class="k">elif</span> <span class="n">part</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">==</span> <span class="n">PIPE_DELIMITER</span><span class="p">:</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="n">new_obj</span>
@@ -1148,7 +1161,7 @@
 
         <span class="k">return</span> <span class="n">obj</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># noqa: PLR0912, PLR0915</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>  <span class="c1"># noqa: PLR0912</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse an inline query #(...) / #(...)#.</span>
 
 <span class="sd">        Arguments:</span>
@@ -1178,9 +1191,14 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span>
+                <span class="n">query</span><span class="p">,</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span> <span class="ow">in</span> <span class="n">i</span><span class="p">])</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;==~&#39;</span><span class="p">,</span> <span class="s1">&#39;!=~&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_truthiness_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
@@ -1193,22 +1211,7 @@
                                   <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
 
         <span class="n">oper</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s1">&#39;==~&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">first_only</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Queries ==~ operator requires a boolean value, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1"> instead: &#39;</span>
-                                          <span class="sa">f</span><span class="s1">&#39;`</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">`.&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">field</span><span class="p">))</span>
-
-                <span class="k">return</span> <span class="p">[]</span>
-
-            <span class="k">def</span><span class="w"> </span><span class="nf">truthy_op</span><span class="p">(</span><span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">obj_b</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: FBT001</span>
-                <span class="n">truthy</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span><span class="n">obj_a</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">obj_b</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">truthy</span>
-                <span class="k">return</span> <span class="ow">not</span> <span class="n">truthy</span>
-
-            <span class="n">oper</span> <span class="o">=</span> <span class="n">truthy_op</span>
-        <span class="k">elif</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;==&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">):</span>
             <span class="n">oper</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span>
         <span class="k">elif</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s1">&#39;!=&#39;</span><span class="p">:</span>
             <span class="n">oper</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span>
@@ -1237,15 +1240,69 @@
                 <span class="n">oper</span> <span class="o">=</span> <span class="n">not_match_op</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s1">&#39;==~&#39;</span><span class="p">:</span>  <span class="c1"># Consider missing keys as falsy according to GJSON docs.</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">value</span><span class="p">)]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c1"># Query on an array of non-objects, match them directly</span>
-                <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">)]</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="c1"># With a key, match the value at the key; otherwise match the array elements directly.</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)]</span> <span class="k">if</span> <span class="n">key</span>
+                   <span class="k">else</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">oper</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">)])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_truthiness_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">ArrayQueryQueryPart</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse a truthiness query using the ``==~`` or ``!=~`` operator.</span>
+
+<span class="sd">        The supported raw value tokens are ``true``, ``false``, ``null`` and ``*``:</span>
+
+<span class="sd">        * ``~true``/``~false`` match elements whose value is truthy/falsy (Python truthiness,</span>
+<span class="sd">          see the README Queries footnote for the difference with the Go implementation).</span>
+<span class="sd">        * ``~null`` matches elements whose value is JSON ``null``/:py:const:`None` or whose key is missing.</span>
+<span class="sd">        * ``~*`` (existy) matches elements where the key exists (or any element for keyless queries).</span>
+
+<span class="sd">        The ``!=~`` operator is the boolean complement of ``==~`` taken over all the elements.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            query: the query part.</span>
+<span class="sd">            obj: the current object.</span>
+<span class="sd">            key: the already unescaped query key.</span>
+<span class="sd">            value_token: the raw value token following the operator.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            gjson.GJSONParseError: on invalid value token.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the result of the query.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">value_of</span><span class="p">(</span><span class="n">element</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return the value at the query key, treating a missing key as None per the GJSON docs.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">element</span>
+            <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_existy</span><span class="p">(</span><span class="n">element</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return whether the key exists (or any element for keyless queries).&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">element</span>
+
+        <span class="n">predicates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;true&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">element</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span><span class="n">value_of</span><span class="p">(</span><span class="n">element</span><span class="p">)),</span>
+            <span class="s1">&#39;false&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">element</span><span class="p">:</span> <span class="ow">not</span> <span class="n">operator</span><span class="o">.</span><span class="n">truth</span><span class="p">(</span><span class="n">value_of</span><span class="p">(</span><span class="n">element</span><span class="p">)),</span>
+            <span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">element</span><span class="p">:</span> <span class="n">value_of</span><span class="p">(</span><span class="n">element</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="n">is_existy</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">predicate</span> <span class="o">=</span> <span class="n">predicates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value_token</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">predicate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">first_only</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">GJSONParseError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Queries </span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">operator</span><span class="si">}</span><span class="s1"> operator requires one of the true, false, null or * value tokens, &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;got `</span><span class="si">{</span><span class="n">value_token</span><span class="si">}</span><span class="s1">` instead.&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_query</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">query</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">field</span><span class="p">))</span>
+
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># The !=~ operator is the boolean complement of ==~ taken over all the elements.</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s1">&#39;==~&#39;</span>
+               <span class="k">else</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">obj</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">predicate</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_query_return_value</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
 
@@ -1669,7 +1726,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Riccardo Coccioli.</p>
+    <p>&#169; Copyright 2022-2026, Riccardo Coccioli.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

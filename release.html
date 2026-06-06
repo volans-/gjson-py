@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release Notes &mdash; gjson-py 1.1.0 documentation</title>
+  <title>Release Notes &mdash; gjson-py 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=fc837d61"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=6efca38a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -48,65 +48,71 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release Notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#v1-1-0-2025-11-23">v1.1.0 (2025-11-23)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v1-2-0-2026-06-06">v1.2.0 (2026-06-06)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#minor-improvements">Minor improvements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#miscellanea">Miscellanea</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#v1-0-0-2023-01-24">v1.0.0 (2023-01-24)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#v1-1-0-2025-11-23">v1.1.0 (2025-11-23)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Minor improvements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id2">Bug fixes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id3">Miscellanea</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#v1-0-0-2023-01-24">v1.0.0 (2023-01-24)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Minor improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Miscellanea</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-4-0-2022-11-12">v0.4.0 (2022-11-12)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#new-features">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">Bug fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id5">Miscellanea</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Miscellanea</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-3-0-2022-11-10">v0.3.0 (2022-11-10)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id6">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id7">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id10">Bug fixes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-2-1-2022-10-25">v0.2.1 (2022-10-25)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id8">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">Bug fixes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-2-0-2022-10-24">v0.2.0 (2022-10-24)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id9">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id10">Minor improvements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id11">Miscellanea</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#v0-1-0-2022-10-03">v0.1.0 (2022-10-03)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id12">Minor improvements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id13">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id12">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Minor improvements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id14">Miscellanea</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-0-2022-10-03">v0.1.0 (2022-10-03)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id15">Minor improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id16">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">Miscellanea</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-5-2022-08-05">v0.0.5 (2022-08-05)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id15">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id16">Minor improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id18">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id19">Minor improvements</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-4-2022-06-11">v0.0.4 (2022-06-11)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id17">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id18">Minor improvements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id19">Miscellanea</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#v0-0-3-2022-06-11">v0.0.3 (2022-06-11)</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id20">New features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id21">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id21">Minor improvements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id22">Miscellanea</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-3-2022-06-11">v0.0.3 (2022-06-11)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id23">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id24">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id25">Miscellanea</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-2-2022-05-31">v0.0.2 (2022-05-31)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id23">Bug fixes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id24">Miscellanea</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id26">Bug fixes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id27">Miscellanea</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-0-1-2022-05-22">v0.0.1 (2022-05-22)</a></li>
@@ -140,22 +146,62 @@
              
   <section id="release-notes">
 <h1>Release Notes<a class="headerlink" href="#release-notes" title="Link to this heading"></a></h1>
-<section id="v1-1-0-2025-11-23">
-<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v1.1.0">v1.1.0</a> (2025-11-23)<a class="headerlink" href="#v1-1-0-2025-11-23" title="Link to this heading"></a></h2>
+<section id="v1-2-0-2026-06-06">
+<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v1.2.0">v1.2.0</a> (2026-06-06)<a class="headerlink" href="#v1-2-0-2026-06-06" title="Link to this heading"></a></h2>
 <section id="minor-improvements">
 <h3>Minor improvements<a class="headerlink" href="#minor-improvements" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Add official support for Python 3.12, 3.13 and 3.13, remove support for Python 3.9.</p></li>
+<li><p>code: type public APIs with a JSON type alias, replacing the <code class="docutils literal notranslate"><span class="pre">Any</span></code> hint on the public input object with a
+recursive <code class="docutils literal notranslate"><span class="pre">JSONType</span></code> alias, using the read-only covariant Mapping/Sequence variant.</p></li>
+<li><p>Query parsing: complete the <code class="docutils literal notranslate"><span class="pre">~</span></code> truthiness query operator. Previously only <code class="docutils literal notranslate"><span class="pre">==~true</span></code> / <code class="docutils literal notranslate"><span class="pre">==~false</span></code> were
+accepted. Add the missing operator forms to match the Go GJSON package:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">!=~</span></code> as the boolean complement of ==~ over all elements;</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">null</span></code> value token (<code class="docutils literal notranslate"><span class="pre">~null</span></code>: value is JSON <code class="docutils literal notranslate"><span class="pre">null</span></code>/<code class="docutils literal notranslate"><span class="pre">None</span></code> or the key is missing);</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">*</span></code> value token (<code class="docutils literal notranslate"><span class="pre">~*</span></code>: existy, the key exists / any element for keyless queries).</p></li>
+</ul>
+</li>
 </ul>
 </section>
 <section id="bug-fixes">
 <h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Query parsing: fix array index in corner case queries like <code class="docutils literal notranslate"><span class="pre">friends.#.nets.0</span></code>.</p></li>
+<li><p>Query parsing: fix the existence check for queries on array of scalars, raising a <code class="docutils literal notranslate"><span class="pre">GJSONError</span></code> instead of the
+unexpected <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>, honoring <code class="docutils literal notranslate"><span class="pre">quiet=True</span></code>.</p></li>
+<li><p>Query parsing: fix <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> raised in <code class="docutils literal notranslate"><span class="pre">==~</span></code> query on scalars, that was not properly catched.</p></li>
+<li><p>Query parsing: do not resolve modifier names that have escaped characters as if they were not havign the escape.</p></li>
+<li><p>Query parsing: fix typo in the JSON-number literal fraction regular expression.</p></li>
+<li><p>CLI: raise a defensive exception in case there is an unexpected initialization input in the CLI.</p></li>
+<li><p>code: fix the <code class="docutils literal notranslate"><span class="pre">ArrayLenghtQueryPart</span></code> class typo to <code class="docutils literal notranslate"><span class="pre">ArrayLengthQueryPart</span></code> and other small typos.</p></li>
+<li><p>Query parsing: only treat <code class="docutils literal notranslate"><span class="pre">&#64;</span></code> as a modifier name start when at part start.</p></li>
+<li><p>Query parsing: multipaths already suppressed parse-time failures of their sub-paths but not evaluation-time ones,
+fix the error and treat the failure as <code class="docutils literal notranslate"><span class="pre">NoResult</span></code> for that item.</p></li>
 </ul>
 </section>
 <section id="miscellanea">
 <h3>Miscellanea<a class="headerlink" href="#miscellanea" title="Link to this heading"></a></h3>
+<p>doc: mention that the Go GJSON legacy query syntax is not supported.
+doc: rename to the documentation pages to gjson-py, to avoid confusion with the Go GJSON package.
+doc: render <code class="docutils literal notranslate"><span class="pre">JSONType</span></code> alias by name, not expanded, for a more readable documentation.
+doc: document the supported <code class="docutils literal notranslate"><span class="pre">~</span></code> operator new features.</p>
+</section>
+</section>
+<section id="v1-1-0-2025-11-23">
+<h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v1.1.0">v1.1.0</a> (2025-11-23)<a class="headerlink" href="#v1-1-0-2025-11-23" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Minor improvements<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Add official support for Python 3.12, 3.13 and 3.13, remove support for Python 3.9.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Bug fixes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Query parsing: fix array index in corner case queries like <code class="docutils literal notranslate"><span class="pre">friends.#.nets.0</span></code>.</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Miscellanea<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>code: various improvements:</p>
 <ul>
@@ -197,8 +243,8 @@
 <p>With this release <code class="docutils literal notranslate"><span class="pre">gjson-py</span></code> has reached pretty much feature parity with <a class="reference external" href="https://github.com/tidwall/gjson/">GJSON</a>, with only some inherent minor
 caveats, differences and limitations due to the different programming languages and technologies used. With this
 release <code class="docutils literal notranslate"><span class="pre">gjson-py</span></code> can also be considered stable and production ready.</p>
-<section id="id1">
-<h3>Minor improvements<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id4">
+<h3>Minor improvements<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Modifiers: add support for missing upstream GJSON modifiers: <code class="docutils literal notranslate"><span class="pre">&#64;tostr</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;fromstr</span></code>, <code class="docutils literal notranslate"><span class="pre">&#64;group</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;join</span></code>.</p></li>
 <li><p>gjson: make <code class="docutils literal notranslate"><span class="pre">__version__</span></code> more reliable:</p>
@@ -211,8 +257,8 @@ variable as documented in <code class="docutils literal notranslate"><span class
 </li>
 </ul>
 </section>
-<section id="id2">
-<h3>Bug fixes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id5">
+<h3>Bug fixes<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>I/O: allow control characters in all JSON inputs, loading the data with <code class="docutils literal notranslate"><span class="pre">strict=False</span></code> both for the JSON input
 and when parsing eventual JSON bits present in the query.</p></li>
@@ -225,8 +271,8 @@ and when parsing eventual JSON bits present in the query.</p></li>
 </li>
 </ul>
 </section>
-<section id="id3">
-<h3>Miscellanea<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<section id="id6">
+<h3>Miscellanea<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>setup.py: add <code class="docutils literal notranslate"><span class="pre">python_requires</span></code> to prevent the package to be installed in an unsupported version of Python.</p></li>
 <li><p>setup.py: update classifiers.</p></li>
@@ -250,8 +296,8 @@ accepted although they are in GJSON.</p></li>
 <li><p>Queries: add support for nested queries. There is no limit on the number of levels queries can be nested.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>Bug fixes<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<section id="id7">
+<h3>Bug fixes<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Queries: fix bug on first element query without operator:</p>
 <ul>
@@ -262,8 +308,8 @@ erroneously returned instead of raising an exception.</p></li>
 </li>
 </ul>
 </section>
-<section id="id5">
-<h3>Miscellanea<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<section id="id8">
+<h3>Miscellanea<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>documentation: add missing method docstring.</p></li>
 <li><p>documentation: add note to modifiers specifying that the <code class="docutils literal notranslate"><span class="pre">&#64;keys</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;values</span></code> modifiers are valid only if applied
@@ -274,14 +320,14 @@ to a JSON object (mapping).</p></li>
 </section>
 <section id="v0-3-0-2022-11-10">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.3.0">v0.3.0</a> (2022-11-10)<a class="headerlink" href="#v0-3-0-2022-11-10" title="Link to this heading"></a></h2>
-<section id="id6">
-<h3>New features<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<section id="id9">
+<h3>New features<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Query parsing: add <a class="reference external" href="https://github.com/tidwall/gjson/blob/master/SYNTAX.md#multipath">GJSON multipaths</a> support.</p></li>
 </ul>
 </section>
-<section id="id7">
-<h3>Bug fixes<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<section id="id10">
+<h3>Bug fixes<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Query parsing: fix integer mapping keys</p>
 <ul>
@@ -295,8 +341,8 @@ specifications).</p></li>
 </section>
 <section id="v0-2-1-2022-10-25">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.2.1">v0.2.1</a> (2022-10-25)<a class="headerlink" href="#v0-2-1-2022-10-25" title="Link to this heading"></a></h2>
-<section id="id8">
-<h3>Bug fixes<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<section id="id11">
+<h3>Bug fixes<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Query parsing: fix modifier options:</p>
 <ul>
@@ -309,8 +355,8 @@ first path in the query.</p></li>
 </section>
 <section id="v0-2-0-2022-10-24">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.2.0">v0.2.0</a> (2022-10-24)<a class="headerlink" href="#v0-2-0-2022-10-24" title="Link to this heading"></a></h2>
-<section id="id9">
-<h3>New features<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<section id="id12">
+<h3>New features<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
 <ul>
 <li><p>Query parsing: fully rewrite of the query parser:</p>
 <ul>
@@ -337,8 +383,8 @@ Query: name.last.invalid
 </li>
 </ul>
 </section>
-<section id="id10">
-<h3>Minor improvements<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Minor improvements<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Refactor code splitting it into multiple files:</p>
 <ul>
@@ -355,8 +401,8 @@ raising a GJSONError exception.</p></li>
 </li>
 </ul>
 </section>
-<section id="id11">
-<h3>Miscellanea<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>Miscellanea<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>README: clarify naming for nested queries, based on feedback from <a class="reference external" href="https://github.com/volans-/gjson-py/issues/2">issue #2</a>. Also fix a typo.</p></li>
 </ul>
@@ -364,8 +410,8 @@ raising a GJSONError exception.</p></li>
 </section>
 <section id="v0-1-0-2022-10-03">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.1.0">v0.1.0</a> (2022-10-03)<a class="headerlink" href="#v0-1-0-2022-10-03" title="Link to this heading"></a></h2>
-<section id="id12">
-<h3>Minor improvements<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<section id="id15">
+<h3>Minor improvements<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Modifiers: add <code class="docutils literal notranslate"><span class="pre">&#64;top_n</span></code> modifier (not present in GJSON):</p></li>
 </ul>
@@ -393,8 +439,8 @@ values as values.</p></li>
 </ul>
 </div></blockquote>
 </section>
-<section id="id13">
-<h3>Bug fixes<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<section id="id16">
+<h3>Bug fixes<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Output: fix unicode handling:</p>
 <ul>
@@ -410,8 +456,8 @@ failures when parsing the input and reducing the loss of data.</p></li>
 </li>
 </ul>
 </section>
-<section id="id14">
-<h3>Miscellanea<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Miscellanea<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>documentation: add mention to Debian packaging and the availability of Debian packages for the project.</p></li>
 <li><p>Type hints: use native types when possible. Instead of importing from <code class="docutils literal notranslate"><span class="pre">typing</span></code> use directly the native types when
@@ -425,8 +471,8 @@ ones.</p></li>
 </section>
 <section id="v0-0-5-2022-08-05">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.5">v0.0.5</a> (2022-08-05)<a class="headerlink" href="#v0-0-5-2022-08-05" title="Link to this heading"></a></h2>
-<section id="id15">
-<h3>New features<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>New features<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Queries: add support for the tilde operator:</p>
 <ul>
@@ -437,8 +483,8 @@ in the Go package.</p></li>
 </li>
 </ul>
 </section>
-<section id="id16">
-<h3>Minor improvements<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<section id="id19">
+<h3>Minor improvements<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>documentation: add man page for the gjson binary.</p></li>
 </ul>
@@ -446,23 +492,23 @@ in the Go package.</p></li>
 </section>
 <section id="v0-0-4-2022-06-11">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.4">v0.0.4</a> (2022-06-11)<a class="headerlink" href="#v0-0-4-2022-06-11" title="Link to this heading"></a></h2>
-<section id="id17">
-<h3>New features<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id20">
+<h3>New features<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>CLI: improve the JSON Lines support allowing to use the <code class="docutils literal notranslate"><span class="pre">-l/--lines</span></code> CLI argument and the special query prefix
 <code class="docutils literal notranslate"><span class="pre">..</span></code> syntax together to encapsulate each parsed line in an array to enable filtering using the Queries
 capabilities.</p></li>
 </ul>
 </section>
-<section id="id18">
-<h3>Minor improvements<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="id21">
+<h3>Minor improvements<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>CLI: the input file CLI argument is now optional, defaulting to read from stdin. The equivalent of passing <code class="docutils literal notranslate"><span class="pre">-</span></code>.</p></li>
 <li><p>Modifiers: add support for the upstream Go GJSON modifier <code class="docutils literal notranslate"><span class="pre">&#64;this</span></code>, that just returns the current object.</p></li>
 </ul>
 </section>
-<section id="id19">
-<h3>Miscellanea<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<section id="id22">
+<h3>Miscellanea<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Documentation: add a section to with examples on how to use the CLI.</p></li>
 <li><p>CLI: add a link at the bottom of the help message of the CLI to the online documentation.</p></li>
@@ -471,8 +517,8 @@ capabilities.</p></li>
 </section>
 <section id="v0-0-3-2022-06-11">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.3">v0.0.3</a> (2022-06-11)<a class="headerlink" href="#v0-0-3-2022-06-11" title="Link to this heading"></a></h2>
-<section id="id20">
-<h3>New features<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id23">
+<h3>New features<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Add CLI support for JSON Lines:</p>
 <ul>
@@ -500,8 +546,8 @@ the execution is interrupted at the first error printing the full traceback.</p>
 </li>
 </ul>
 </section>
-<section id="id21">
-<h3>Bug fixes<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<section id="id24">
+<h3>Bug fixes<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Query parsing: when using the queries GJSON syntax <code class="docutils literal notranslate"><span class="pre">#(...)</span></code> and <code class="docutils literal notranslate"><span class="pre">#(...)#</span></code> fix the return value in case of a key
 matching that doesn’t match any element.</p></li>
@@ -533,8 +579,8 @@ incompatible objects is catched and raise as a GJSONError.</p></li>
 </li>
 </ul>
 </section>
-<section id="id22">
-<h3>Miscellanea<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<section id="id25">
+<h3>Miscellanea<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>tests: when matching exception messages always escape the string or use raw strings to avoid false matchings.</p></li>
 <li><p>pylint: remove unnecessary comments</p></li>
@@ -543,15 +589,15 @@ incompatible objects is catched and raise as a GJSONError.</p></li>
 </section>
 <section id="v0-0-2-2022-05-31">
 <h2><a class="reference external" href="https://github.com/volans-/gjson-py/releases/tag/v0.0.2">v0.0.2</a> (2022-05-31)<a class="headerlink" href="#v0-0-2-2022-05-31" title="Link to this heading"></a></h2>
-<section id="id23">
-<h3>Bug fixes<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<section id="id26">
+<h3>Bug fixes<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&#64;sort</span></code> modifier: fix the actual sorting.</p></li>
 <li><p>tests: ensure that mapping-like objects are compared also in the order of their keys.</p></li>
 </ul>
 </section>
-<section id="id24">
-<h3>Miscellanea<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<section id="id27">
+<h3>Miscellanea<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>GitHub actions: add workflow to run tox.</p></li>
 <li><p>GitHub actions: fix branch name for pushes</p></li>
@@ -580,7 +626,7 @@ incompatible objects is catched and raise as a GJSONError.</p></li>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Riccardo Coccioli.</p>
+    <p>&#169; Copyright 2022-2026, Riccardo Coccioli.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
