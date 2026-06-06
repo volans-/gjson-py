@@ -1,6 +1,43 @@
 Release Notes
 =============
 
+`v1.2.0`_ (2026-06-06)
+^^^^^^^^^^^^^^^^^^^^^^
+
+Minor improvements
+""""""""""""""""""
+
+* code: type public APIs with a JSON type alias, replacing the ``Any`` hint on the public input object with a
+  recursive ``JSONType`` alias, using the read-only covariant Mapping/Sequence variant.
+* Query parsing: complete the ``~`` truthiness query operator. Previously only ``==~true`` / ``==~false`` were
+  accepted. Add the missing operator forms to match the Go GJSON package:
+
+  * ``!=~`` as the boolean complement of ==~ over all elements;
+  * the ``null`` value token (``~null``: value is JSON ``null``/``None`` or the key is missing);
+  * the ``*`` value token (``~*``: existy, the key exists / any element for keyless queries).
+
+Bug fixes
+"""""""""
+
+* Query parsing: fix the existence check for queries on array of scalars, raising a ``GJSONError`` instead of the
+  unexpected ``TypeError``, honoring ``quiet=True``.
+* Query parsing: fix ``AttributeError`` raised in ``==~`` query on scalars, that was not properly catched.
+* Query parsing: do not resolve modifier names that have escaped characters as if they were not havign the escape.
+* Query parsing: fix typo in the JSON-number literal fraction regular expression.
+* CLI: raise a defensive exception in case there is an unexpected initialization input in the CLI.
+* code: fix the ``ArrayLenghtQueryPart`` class typo to ``ArrayLengthQueryPart`` and other small typos.
+* Query parsing: only treat ``@`` as a modifier name start when at part start.
+* Query parsing: multipaths already suppressed parse-time failures of their sub-paths but not evaluation-time ones,
+  fix the error and treat the failure as ``NoResult`` for that item.
+
+Miscellanea
+"""""""""""
+
+doc: mention that the Go GJSON legacy query syntax is not supported.
+doc: rename to the documentation pages to gjson-py, to avoid confusion with the Go GJSON package.
+doc: render ``JSONType`` alias by name, not expanded, for a more readable documentation.
+doc: document the supported ``~`` operator new features.
+
 `v1.1.0`_ (2025-11-23)
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -380,3 +417,4 @@ Miscellanea
 .. _`v0.4.0`: https://github.com/volans-/gjson-py/releases/tag/v0.4.0
 .. _`v1.0.0`: https://github.com/volans-/gjson-py/releases/tag/v1.0.0
 .. _`v1.1.0`: https://github.com/volans-/gjson-py/releases/tag/v1.1.0
+.. _`v1.2.0`: https://github.com/volans-/gjson-py/releases/tag/v1.2.0
