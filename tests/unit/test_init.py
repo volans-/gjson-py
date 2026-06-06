@@ -588,9 +588,22 @@ class TestTruthiness:
     @pytest.mark.parametrize(('query', 'expected'), (
         ('vals.#(b==~true).a', 1),
         ('vals.#(b==~true)#.a', [1, 2, 4, 6, 7, 8]),
+        ('vals.#(b!=~true).a', 3),
+        ('vals.#(b!=~true)#.a', [3, 5, 9, 10, 11]),
         ('vals.#(b==~false).a', 3),
         ('vals.#(b==~false)#.a', [3, 5, 9, 10, 11]),
+        ('vals.#(b!=~false).a', 1),
+        ('vals.#(b!=~false)#.a', [1, 2, 4, 6, 7, 8]),
+        ('vals.#(b==~null).a', 10),
+        ('vals.#(b==~null)#.a', [10, 11]),
+        ('vals.#(b!=~null).a', 1),
+        ('vals.#(b!=~null)#.a', [1, 2, 3, 4, 5, 6, 7, 8, 9]),
+        ('vals.#(b==~*).a', 1),
+        ('vals.#(b==~*)#.a', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+        ('vals.#(b!=~*).a', 11),
+        ('vals.#(b!=~*)#.a', [11]),
         ('vals.#(b==~"invalid")#', []),
+        ('vals.#(b!=~"invalid")#', []),
     ))
     def test_get_ok(self, query, expected):
         """It should query the JSON object and return the expected result."""
@@ -598,7 +611,9 @@ class TestTruthiness:
 
     @pytest.mark.parametrize(('query', 'error'), (
         ('vals.#(b==~"invalid")',
-         "Queries ==~ operator requires a boolean value, got <class 'str'> instead: `invalid`"),
+         'Queries ==~ operator requires one of the true, false, null or * value tokens, got `"invalid"` instead.'),
+        ('vals.#(b!=~"invalid")',
+         'Queries !=~ operator requires one of the true, false, null or * value tokens, got `"invalid"` instead.'),
     ))
     def test_get_raise(self, query, error):
         """It should raise a GJSONError error with the expected message."""
@@ -606,9 +621,22 @@ class TestTruthiness:
             self.object.get(query)
 
     def test_get_truthy_query_on_non_mapping_items(self):
-        """A ==~ query on a sequence of scalars should return an empty result without leaking an exception."""
+        """A ~ query keyed on a sequence of scalars should not leak an exception."""
+        # A missing key on a scalar is treated as None: falsy, not truthy, null-ish, non-existy.
         assert gjson.get([1, 2, 3], '#(foo==~true)#') == []
         assert gjson.get([1, 2, 3], '#(foo==~true)#', quiet=True) == []
+        assert gjson.get([1, 2, 3], '#(foo!=~true)#') == [1, 2, 3]
+        assert gjson.get([1, 2, 3], '#(foo==~false)#') == [1, 2, 3]
+        assert gjson.get([1, 2, 3], '#(foo==~null)#') == [1, 2, 3]
+        assert gjson.get([1, 2, 3], '#(foo==~*)#') == []
+        assert gjson.get([1, 2, 3], '#(foo!=~*)#') == [1, 2, 3]
+
+    def test_get_keyless_truthy_query_on_scalars(self):
+        """A keyless ~ query should match the scalar elements directly."""
+        assert gjson.get([1, 0, 2, '', 'x'], '#(==~true)#') == [1, 2, 'x']
+        assert gjson.get([1, 0, 2, '', 'x'], '#(!=~true)#') == [0, '']
+        assert gjson.get([1, None, 2], '#(==~null)#') == [None]
+        assert gjson.get([1, None, 2], '#(==~*)#') == [1, None, 2]
 
 
 class TestNestedQueries:

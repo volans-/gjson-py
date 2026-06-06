@@ -22,7 +22,7 @@ DELIMITERS = (DOT_DELIMITER, PIPE_DELIMITER)
 MULTIPATHS_DELIMITERS = (*DELIMITERS, ']', '}', ',')
 """tuple: All the available delimiters in the query grammar."""
 # Single character operators goes last to avoid mis-detection.
-QUERIES_OPERATORS = ('==~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
+QUERIES_OPERATORS = ('==~', '!=~', '==', '!=', '<=', '>=', '!%', '=', '<', '>', '%')
 """tuple: The list of supported operators inside queries."""
 MODIFIER_NAME_RESERVED_CHARS = ('"', ',', '.', '|', ':', '@', '{', '}', '[', ']', '(', ')')
 """tuple: The list of reserved characters not usable in a modifier's name."""
@@ -1062,7 +1062,7 @@ class GJSONObj:
 
         return obj
 
-    def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:  # noqa: PLR0912, PLR0915
+    def _parse_query(self, query: ArrayQueryQueryPart, obj: Any) -> Any:  # noqa: PLR0912
         """Parse an inline query #(...) / #(...)#.
 
         Arguments:
@@ -1096,6 +1096,10 @@ class GJSONObj:
                 query, [i for i in obj if isinstance(i, Mapping) and query.field in i])
 
         key = query.field.replace('\\', '')
+
+        if query.operator in ('==~', '!=~'):
+            return self._parse_truthiness_query(query, obj, key, query.value)
+
         try:
             value = json.loads(query.value, strict=False)
         except json.JSONDecodeError as ex:
@@ -1108,22 +1112,7 @@ class GJSONObj:
                                   query=self._query, position=query.start)
 
         oper: Callable[[Any, Any], bool]
-        if query.operator == '==~':
-            if value not in (True, False):
-                if query.first_only:
-                    raise GJSONParseError(f'Queries ==~ operator requires a boolean value, got {type(value)} instead: '
-                                          f'`{value}`.', query=self._query, position=query.start + len(query.field))
-
-                return []
-
-            def truthy_op(obj_a: Any, obj_b: bool) -> bool:  # noqa: FBT001
-                truthy = operator.truth(obj_a)
-                if obj_b:
-                    return truthy
-                return not truthy
-
-            oper = truthy_op
-        elif query.operator in ('==', '='):
+        if query.operator in ('==', '='):
             oper = operator.eq
         elif query.operator == '!=':
             oper = operator.ne
@@ -1152,15 +1141,69 @@ class GJSONObj:
                 oper = not_match_op
 
         try:
-            if key:
-                if query.operator == '==~':  # Consider missing keys as falsy according to GJSON docs.
-                    ret = [i for i in obj if oper(i.get(key), value)]
-                else:
-                    ret = [i for i in obj if key in i and oper(i[key], value)]
-            else:  # Query on an array of non-objects, match them directly
-                ret = [i for i in obj if oper(i, value)]
+            # With a key, match the value at the key; otherwise match the array elements directly.
+            ret = ([i for i in obj if key in i and oper(i[key], value)] if key
+                   else [i for i in obj if oper(i, value)])
         except (TypeError, AttributeError):
             ret = []
+
+        return self._evaluate_query_return_value(query, ret)
+
+    def _parse_truthiness_query(self, query: ArrayQueryQueryPart, obj: Any, key: str, value_token: str) -> Any:
+        """Parse a truthiness query using the ``==~`` or ``!=~`` operator.
+
+        The supported raw value tokens are ``true``, ``false``, ``null`` and ``*``:
+
+        * ``~true``/``~false`` match elements whose value is truthy/falsy (Python truthiness,
+          see the README Queries footnote for the difference with the Go implementation).
+        * ``~null`` matches elements whose value is JSON ``null``/:py:const:`None` or whose key is missing.
+        * ``~*`` (existy) matches elements where the key exists (or any element for keyless queries).
+
+        The ``!=~`` operator is the boolean complement of ``==~`` taken over all the elements.
+
+        Arguments:
+            query: the query part.
+            obj: the current object.
+            key: the already unescaped query key.
+            value_token: the raw value token following the operator.
+
+        Raises:
+            gjson.GJSONParseError: on invalid value token.
+
+        Returns:
+            the result of the query.
+
+        """
+        def value_of(element: Any) -> Any:
+            """Return the value at the query key, treating a missing key as None per the GJSON docs."""
+            if not key:
+                return element
+            return element.get(key) if isinstance(element, Mapping) else None
+
+        def is_existy(element: Any) -> bool:
+            """Return whether the key exists (or any element for keyless queries)."""
+            if not key:
+                return True
+            return isinstance(element, Mapping) and key in element
+
+        predicates: dict[str, Callable[[Any], bool]] = {
+            'true': lambda element: operator.truth(value_of(element)),
+            'false': lambda element: not operator.truth(value_of(element)),
+            'null': lambda element: value_of(element) is None,
+            '*': is_existy,
+        }
+        predicate = predicates.get(value_token)
+        if predicate is None:
+            if query.first_only:
+                raise GJSONParseError(
+                    f'Queries {query.operator} operator requires one of the true, false, null or * value tokens, '
+                    f'got `{value_token}` instead.', query=self._query, position=query.start + len(query.field))
+
+            return []
+
+        # The !=~ operator is the boolean complement of ==~ taken over all the elements.
+        ret = ([i for i in obj if predicate(i)] if query.operator == '==~'
+               else [i for i in obj if not predicate(i)])
 
         return self._evaluate_query_return_value(query, ret)
 
