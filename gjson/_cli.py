@@ -19,6 +19,7 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: PLR0915
 
     Raises:
         OSError: for system-related errors, including I/O failures.
+        RuntimeError: on internal error, should never happen.
         json.JSONDecodeError: when the input data is not a valid JSON.
         gjson.GJSONError: for any query-related error raised by gjson.
 
@@ -53,18 +54,19 @@ def cli(argv: Optional[Sequence[str]] = None) -> int:  # noqa: PLR0915
 
     def _execute(line: str, file_obj: Optional[IO[Any]]) -> int:
         try:
-            if encapsulate:
-                if line:
-                    input_data = [json.loads(line, strict=False)]
-                elif file_obj is not None:
+            if line:
+                parsed = json.loads(line, strict=False)
+                input_data = [parsed] if encapsulate else parsed
+            elif file_obj is not None:
+                if encapsulate:
                     input_data = []
                     for input_line in file_obj:
                         if input_line.strip():
                             input_data.append(json.loads(input_line, strict=False))
-            elif line:
-                input_data = json.loads(line, strict=False)
-            elif file_obj is not None:
-                input_data = json.load(file_obj, strict=False)
+                else:
+                    input_data = json.load(file_obj, strict=False)
+            else:  # pragma: no cover - defensive: cli() always passes a non-empty line or a file object
+                raise RuntimeError('No input data to process: expected a non-empty line or a file object.')
 
             result = get(input_data, args.query, as_str=True)
             exit_code = 0
