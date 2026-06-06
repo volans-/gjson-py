@@ -961,8 +961,11 @@ class GJSONObj:
                     obj_item = {}
                     for obj_part in part.parts:
                         obj_ret = i
-                        for obj_value in obj_part.values:
-                            obj_ret = self._parse_part(obj_value, obj_ret, in_multipaths=True)
+                        try:
+                            for obj_value in obj_part.values:
+                                obj_ret = self._parse_part(obj_value, obj_ret, in_multipaths=True)
+                        except GJSONError:
+                            obj_ret = NoResult()
 
                         if not isinstance(obj_ret, NoResult):
                             obj_item[obj_part.key] = obj_ret
@@ -972,8 +975,11 @@ class GJSONObj:
                 ret = {}
                 for obj_part in part.parts:
                     obj_ret = obj
-                    for obj_value in obj_part.values:
-                        obj_ret = self._parse_part(obj_value, obj_ret, in_multipaths=True)
+                    try:
+                        for obj_value in obj_part.values:
+                            obj_ret = self._parse_part(obj_value, obj_ret, in_multipaths=True)
+                    except GJSONError:
+                        obj_ret = NoResult()
 
                     if not isinstance(obj_ret, NoResult):
                         ret[obj_part.key] = obj_ret
@@ -986,8 +992,11 @@ class GJSONObj:
                     array_item = []
                     for array_part in part.parts:
                         array_ret = i
-                        for array_value in array_part:
-                            array_ret = self._parse_part(array_value, array_ret, in_multipaths=True)
+                        try:
+                            for array_value in array_part:
+                                array_ret = self._parse_part(array_value, array_ret, in_multipaths=True)
+                        except GJSONError:
+                            array_ret = NoResult()
 
                         if not isinstance(array_ret, NoResult):
                             array_item.append(array_ret)
@@ -997,8 +1006,11 @@ class GJSONObj:
                 ret = []
                 for array_part in part.parts:
                     array_ret = obj
-                    for array_value in array_part:
-                        array_ret = self._parse_part(array_value, array_ret, in_multipaths=True)
+                    try:
+                        for array_value in array_part:
+                            array_ret = self._parse_part(array_value, array_ret, in_multipaths=True)
+                    except GJSONError:
+                        array_ret = NoResult()
 
                     if not isinstance(array_ret, NoResult):
                         ret.append(array_ret)

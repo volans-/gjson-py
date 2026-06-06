@@ -281,6 +281,11 @@ class TestObject:
         ('{"children":children|@upper,"name":name.first,"age":age}',
          {'children': ['SARA', 'ALEX', 'JACK'], 'name': 'Tom', 'age': 37}),
         ('friends.#.{age,"first":first.invalid}', [{'age': 44}, {'age': 68}, {'age': 47}]),
+        # Object multipath after a `#` whose inner multipath indexes string elements out of
+        # range, raising an evaluation error that is caught and drops the element.
+        ('friends.#.{"x":nets.#.{"y":9}}',
+         [{'x': [{}, {}, {}]}, {'x': [{}, {}]}, {'x': [{}, {}]}]),
+        ('{"a":children.0,"b":children.10}', {'a': 'Sara'}),
         # Multipaths arrays
         ('[]', []),
         ('[.]', []),
@@ -297,6 +302,9 @@ class TestObject:
         ('friends.0.[age,nets.#(="ig"),invalid]', [44, 'ig']),
         ('friends.0.[age,nets.#(="ig")#]', [44, ['ig']]),
         ('friends.#.[age,first]', [[44, 'Dale'], [68, 'Roger'], [47, 'Jane']]),
+        # Array multipath after a `#` whose inner multipath indexes string elements out of
+        # range, raising an evaluation error that is caught and drops the element.
+        ('friends.#.[nets.#.[9]]', [[[[], [], []]], [[[], []]], [[[], []]]]),
         ('friends.#(age>44)#.[age,first]', [[68, 'Roger'], [47, 'Jane']]),
         ('friends.#(age>44)#.[age,invalid,invalid.invalid,first]', [[68, 'Roger'], [47, 'Jane']]),
         (r'[age,name.first,fav\.movie]', [37, 'Tom', 'Deer Hunter']),
@@ -304,6 +312,9 @@ class TestObject:
         ('friends.[0.first,1.last,2.age]', ['Dale', 'Craig', 47]),
         ('[friends.[0.[nets.[0]]]]', [[[['ig']]]]),
         ('[friends.[0.[nets.[0,1]]]]', [[[['ig', 'fb']]]]),
+        ('children.[10]', []),
+        ('children.[0,10]', ['Sara']),
+        (r'fav\.movie.[1]', []),
         # Multipaths mixed
         ('[{}]', [{}]),
         ('{[]}', {'_': []}),
@@ -363,6 +374,7 @@ class TestObject:
         ('name|.first', 'Invalid query with two consecutive path delimiters.'),
         ('age.0', "Integer query part on unsupported object type <class 'int'>"),
         ('friends.99', 'Index `99` out of range for sequence object with 3 items in query.'),
+        ('children.10', 'Index `10` out of range for sequence object with 3 items in query.'),
         ('name.nonexistent', 'Mapping object does not have key `nonexistent`.'),
         ('name.1', 'Mapping object does not have key `1`.'),
         ('children.invalid', 'Invalid or unsupported query part `invalid`.'),
