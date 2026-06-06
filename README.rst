@@ -180,7 +180,7 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+------------------------------------------------------+
 | `Arrays`_              | YES                    |                                                      |
 +------------------------+------------------------+------------------------------------------------------+
-| `Queries`_             | YES                    | Using Python's operators [#]_ [#]_                   |
+| `Queries`_             | YES                    | Using Python's operators [#]_ [#]_ [#]_              |
 +------------------------+------------------------+------------------------------------------------------+
 | `Dot vs Pipe`_         | YES                    |                                                      |
 +------------------------+------------------------+------------------------------------------------------+
@@ -200,6 +200,8 @@ This is the list of GJSON features and how they are supported by gjson-py:
 .. [#] The queries matching is based on Python's operator and as such the results might be different than the ones from
    the Go GJSON package. In particular for the ``~`` operator that checks the truthy-ness of objects.
 .. [#] When using nested queries, only the outermost one controls whether to return only the first item or all items.
+.. [#] The legacy bracket query syntax ``#[...]`` (an older alias of ``#(...)`` still accepted by the Go GJSON
+   package) is not supported: only the ``#(...)`` syntax can be used.
 .. [#] Custom modifiers names cannot contain reserved characters used by the GJSON grammar.
 .. [#] For example ``{"years":age}`` is valid while ``{years:age}`` is not, although that's valid in GJSON.
 .. [#] Those special cases are handled according to `Python's JSON documentation`_.
