@@ -292,7 +292,7 @@ class GJSONObj:
                 i += 1
                 continue
 
-            if char == '@':
+            if char == '@' and not current:
                 part = self._parse_modifier_query_part(
                     start=i, delimiter=delimiter, max_end=max_end, in_multipaths=in_multipaths)
             elif char == '#' and (next_char in DELIMITERS or next_char is None):

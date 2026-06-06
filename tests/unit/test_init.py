@@ -398,6 +398,9 @@ class TestObject:
         ('friends.@pretty:["invalid"]', 'Expected JSON object `{...}` as modifier options.'),
         ('friends.@invalid', 'Unknown modifier @invalid.'),
         ('friends.@in"valid', 'Invalid modifier name @in"valid, the following characters are not allowed'),
+        # A modifier not preceded by a path delimiter is a literal field name, not a modifier
+        ('children@reverse', 'Mapping object does not have key `children@reverse`.'),
+        ('children@this', 'Mapping object does not have key `children@this`.'),
         # JSON Lines
         ('..name', 'Invalid query starting with a path delimiter.'),
         # Multipaths
@@ -431,6 +434,10 @@ class TestObject:
         """It should raise a GJSONParseError error with the expected message."""
         with pytest.raises(gjson.GJSONParseError, match=fr'^{re.escape(error)}'):
             self.object.get(query)
+
+    def test_get_literal_at_in_key(self):
+        """A '@' not at the start of a path part is a literal field char, so '@'-containing keys resolve."""
+        assert gjson.get({'e@mail': 'x@y.z'}, 'e@mail') == 'x@y.z'
 
     @pytest.mark.parametrize(('query', 'error'), (
         # Basic
