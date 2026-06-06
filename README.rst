@@ -198,7 +198,9 @@ This is the list of GJSON features and how they are supported by gjson-py:
 +------------------------+------------------------+------------------------------------------------------+
 
 .. [#] The queries matching is based on Python's operator and as such the results might be different than the ones from
-   the Go GJSON package. In particular for the ``~`` operator that checks the truthy-ness of objects.
+   the Go GJSON package. The ``~`` operator is supported in both its ``==~`` and ``!=~`` forms with the ``true``,
+   ``false``, ``null`` and ``*`` value tokens; ``~null`` and ``~*`` match the Go GJSON package exactly, while
+   ``~true``/``~false`` use Python's truthy-ness rules and may hence differ.
 .. [#] When using nested queries, only the outermost one controls whether to return only the first item or all items.
 .. [#] The legacy bracket query syntax ``#[...]`` (an older alias of ``#(...)`` still accepted by the Go GJSON
    package) is not supported: only the ``#(...)`` syntax can be used.
