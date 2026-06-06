@@ -3,6 +3,7 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import datetime
 import sys
 from importlib.metadata import version as meta_version
 from pathlib import Path
@@ -23,9 +24,9 @@ sys.path.insert(0, Path(__file__).resolve().parent.parent)
 
 # -- Project information -----------------------------------------------------
 
-project = 'gjson'
+project = 'gjson-py'
 title = f'{project} Documentation'
-copyright = '2022, Riccardo Coccioli'
+copyright = f'2022-{datetime.datetime.now(tz=datetime.timezone.utc).year}, Riccardo Coccioli'
 author = 'Riccardo Coccioli'
 
 # The version info for the project you're documenting, acts as replacement for
